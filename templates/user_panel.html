@@ -4,137 +4,220 @@
   <title>TradeEra User Panel</title>
   <style>
     body {
-      background: #22293f;
       margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #22293f;
       color: #eaf1fa;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
     .sidebar {
-      width: 220px;
-      background: #132338;
-      color: #ffb24d;
-      height: 100vh;
-      position: fixed;
-      left: 0; top: 0;
-      padding-top: 30px;
-      font-size: 1.09em;
-      box-shadow: 0 0 40px #1118;
+      width:220px;
+      background:#132338;
+      color:#ffb24d;
+      height:100vh;
+      position:fixed;
+      left:0;top:0;
+      padding-top:30px;
+      font-size:1.05em;
+      box-shadow:0 0 38px #111b;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
     }
-    .sidebar h2 {
-      text-align: center;
-      font-size: 1.6em;
-      color: #ffb24d;
-      font-weight: 600;
-      margin-bottom: 16px;
-      letter-spacing: 1px;
-    }
-    .sidebar ul { list-style:none; padding:0; margin:0;}
-    .sidebar ul li { padding:14px 28px; cursor:pointer;}
-    .sidebar ul li:hover { background:#1b304b; color:#fff; }
-    .active { background:#21365a !important; color:#fff;}
-    .main {
-      margin-left: 235px;
-      padding: 36px 36px 24px 36px;
-      background: linear-gradient(120deg,#132338 70%,#22375a 100%);
-      min-height: 100vh;
-    }
-    .stats-row {
-      display: flex;
-      gap:16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background:#37476a;
-      border-radius:11px;
-      flex:1;
-      padding:18px;
-      box-shadow: 0 8px 28px #0003;
-      color:#fff;
+    .sb-logo {
+      font-size:2em;
       text-align:center;
+      letter-spacing:1.5px;
+      color:#ffb24d;
+      font-weight:bold;
+      margin-bottom:18px;
     }
-    .stat-card h3 { margin:0 0 9px 0; font-weight:600; font-size:1.16em;}
-    .stat-card .value { font-size:1.3em; font-weight:bold;}
-    .details-row { display:flex; gap:28px; }
-    .info-block {
-      flex:1;
-      background:#192645;
-      border-radius:14px;
-      padding:24px 22px 20px 22px;
-      box-shadow: 0 8px 28px #0002;
-      margin-bottom:24px;
+    .sb-menu {
+      list-style:none;padding:0;margin:0;
     }
-    .info-block h3 {
+    .sb-menu li {
+      padding:14px 32px;
+      cursor:pointer;
+      color:#eaf1fa;
+      transition:background 0.13s;
+    }
+    .sb-menu li.active,.sb-menu li:hover {
+      background:#21365a;color:#fff;
+      border-left:3px solid #ffb24d;
+    }
+    .sb-footer {
+      padding:10px 20px;
+      border-top:1px solid #2b416a;
+      color:#bcbae2;
+    }
+    .panel-main {
+      margin-left:234px;
+      min-height:100vh;
+      padding:35px 38px 26px 38px;
+      background: linear-gradient(120deg,#132338 70%,#22375a 100%);
+    }
+    .dashboard-top {
+      display:flex;align-items:center;justify-content:space-between;margin-bottom:25px;
+    }
+    .dashboard-title {
+      font-size:1.65em;font-weight:bold;color:#ffb24d;letter-spacing:1.4px;
+    }
+    .user-welcome {
+      font-size:1em;text-align:right;color:#ffb97b;
+    }
+    .stats-widgets {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .stat-widget {
+      background:#37476a;
+      flex: 1;
+      padding: 18px 20px 16px 20px;
+      border-radius: 12px;
+      text-align:center;
+      box-shadow:0 0 20px #0003;
+    }
+    .stat-title {
+      font-weight: 700;
+      font-size: 1.13em;
+      margin-bottom: 7px;
+      color:#ffe1bb;
+    }
+    .stat-value {
+      font-size: 1.28em;
+      font-weight: bold;
       color: #ffb24d;
-      font-size: 1.18em;
-      font-weight: 600;
-      margin-bottom: 10px;
-      letter-spacing:0.5px;
     }
-    .info-row { margin-bottom:11px;}
-    .info-row_b { margin-bottom:6px;}
-    .info-row label { color:#eaf1fa; font-weight:500; width: 140px; display:inline-block;}
-    .info-row_b label { color:#b7c6ee; font-weight:500; width:212px; display:inline-block;}
-    .info-row span,.info-row_b span { color:#ffb24d; font-weight:600;}
+    .info-block-row {
+      display:flex;gap:34px;
+      margin-bottom:18px;
+    }
+    .info-block {
+      background:#192645;
+      flex:1;
+      border-radius:13px;
+      padding:22px 24px 20px 24px;
+      margin-bottom:10px;
+      box-shadow: 0 8px 22px #0002;
+    }
+    .info-block h3,label {
+      margin:0;font-size:1.18em;color:#ffb24d;font-weight:600;
+      margin-bottom:10px;letter-spacing:0.1px;
+    }
+    .info-label {
+      color:#eaf1fa;font-weight:500;width:120px;display:inline-block;margin-right: 8px;
+    }
+    .info-val {
+      color:#ffb24d;font-weight:bold;
+    }
+    .ref-block {
+      margin-top:12px;display:flex;align-items:center;gap:8px;
+    }
+    .ref-input {
+      border:none;
+      background:#232b4d;
+      color:#ffb24d;
+      padding:7px 13px;
+      font-family:'Segoe UI', Arial, sans-serif;
+      border-radius:6px;
+      width:190px;
+      font-size:1.03em;
+    }
+    .copy-btn {
+      padding:7px 14px;font-size:1em;background:#ffb24d;color:#132338;
+      border:none;border-radius:5px;cursor:pointer;
+      font-weight:bold;
+      transition:background 0.18s;
+    }
+    .copy-btn:hover {background:#ffd999;}
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <h2>TRADEERA</h2>
-    <ul>
-      <li class="active">Dashboard</li>
-      <li>Profile</li>
-      <li>Wallets</li>
-      <li>Reports</li>
-      <li>Referral Link</li>
-      <li>Announcements</li>
-      <li>Signout</li>
-    </ul>
-  </div>
-  <div class="main">
-    <h1>Welcome, <span id="username"></span></h1>
-    <div class="stats-row">
-      <div class="stat-card"><h3>Last Days Profit</h3><div class="value" id="last_profit">$0.00</div></div>
-      <div class="stat-card"><h3>Total Profit 15 Days</h3><div class="value" id="total_profit">$0.00</div></div>
-      <div class="stat-card"><h3>Total Investment</h3><div class="value" id="investment">$0.00</div></div>
-      <div class="stat-card"><h3>Live Capital</h3><div class="value" id="live_capital">$0.00</div></div>
+    <div>
+      <div class="sb-logo">TRADEERA</div>
+      <ul class="sb-menu">
+        <li class="active">Dashboard</li>
+        <li>New Registration</li>
+        <li>Profile</li>
+        <li>Wallets</li>
+        <li>Reports</li>
+        <li>Referral Link</li>
+        <li>Signout</li>
+      </ul>
     </div>
-    <div class="details-row">
+    <div class="sb-footer">
+      Status:&nbsp; <span style="color:#1ccb8a;">Active</span>
+    </div>
+  </div>
+  <div class="panel-main">
+    <div class="dashboard-top">
+      <div class="dashboard-title">User Dashboard</div>
+      <div class="user-welcome">Welcome <span id="dash-username"></span></div>
+    </div>
+    <div class="stats-widgets">
+      <div class="stat-widget"><div class="stat-title">Last Days Profit</div><div class="stat-value" id="last_profit">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Total Profit 15 Days</div><div class="stat-value" id="total_profit">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Total Investment</div><div class="stat-value" id="investment">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Live Capital</div><div class="stat-value" id="live_capital">$0.00</div></div>
+    </div>
+    <div class="stats-widgets">
+      <div class="stat-widget"><div class="stat-title">Activation Wallet</div><div class="stat-value">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Credit Wallet</div><div class="stat-value">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Income Wallet</div><div class="stat-value">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Profit Wallet</div><div class="stat-value">$0.00</div></div>
+      <div class="stat-widget"><div class="stat-title">Total Income</div><div class="stat-value">$0.00</div></div>
+    </div>
+    <div class="info-block-row">
       <div class="info-block">
         <h3>Personal Info</h3>
-        <div class="info-row"><label>User ID:</label> <span id="user_id"></span></div>
-        <div class="info-row"><label>Full Name:</label> <span id="full_name"></span></div>
-        <div class="info-row"><label>Mobile:</label> <span id="mobile"></span></div>
-        <div class="info-row"><label>Email:</label> <span id="email"></span></div>
-        <div class="info-row"><label>Country:</label> <span id="country"></span></div>
-        <div class="info-row"><label>State:</label> <span id="state"></span></div>
-        <div class="info-row"><label>Registration Date:</label> <span id="reg_date"></span></div>
+        <div><span class="info-label">User Id:</span> <span class="info-val" id="user_id"></span></div>
+        <div><span class="info-label">Username:</span> <span class="info-val" id="username"></span></div>
+        <div><span class="info-label">Full Name:</span> <span class="info-val" id="full_name"></span></div>
+        <div><span class="info-label">Mobile:</span> <span class="info-val" id="mobile"></span></div>
+        <div><span class="info-label">Email:</span> <span class="info-val" id="email"></span></div>
+        <div><span class="info-label">Designation:</span> <span class="info-val">Free User</span></div>
+        <div><span class="info-label">Registration Date:</span> <span class="info-val" id="reg_date"></span></div>
+        <div class="ref-block">
+          <input class="ref-input" id="referralLink" readonly>
+          <button class="copy-btn" onclick="copyReferral()">Copy</button>
+        </div>
       </div>
       <div class="info-block">
         <h3>Business Info</h3>
-        <div class="info-row_b"><label>Active Bots:</label> <span>0</span></div>
-        <div class="info-row_b"><label>Inactive Bots:</label> <span>0</span></div>
-        <div class="info-row_b"><label>Profit Wallet:</label> <span>$0.00</span></div>
-        <div class="info-row_b"><label>Credit Wallet:</label> <span>$0.00</span></div>
-        <div class="info-row_b"><label>Income Wallet:</label> <span>$0.00</span></div>
-        <div class="info-row_b"><label>Total Income:</label> <span>$0.00</span></div>
+        <div><span class="info-label">Active Bots:</span> <span class="info-val">0</span></div>
+        <div><span class="info-label">Inactive Bots:</span> <span class="info-val">0</span></div>
+        <div><span class="info-label">Profit Wallet:</span> <span class="info-val">$0.00</span></div>
+        <div><span class="info-label">Credit Wallet:</span> <span class="info-val">$0.00</span></div>
+        <div><span class="info-label">Income Wallet:</span> <span class="info-val">$0.00</span></div>
+        <div><span class="info-label">Total Income:</span> <span class="info-val">$0.00</span></div>
       </div>
     </div>
   </div>
   <script>
-    // Use prompt for now, or load from login session
+    // Prompt for user ID (for demo)
     let userId = prompt("Enter your User ID to view panel:");
     if(userId){
       fetch('/user/' + userId + '/panel').then(r=>r.json()).then(data=>{
         if(!data.user_id){ alert("User not found"); return;}
-        document.getElementById('username').textContent = data.username || "";
+        document.getElementById('dash-username').textContent = data.username || "";
         document.getElementById('user_id').textContent = data.user_id || "";
-        document.getElementById('full_name').textContent = ((data.first_name||"") + " " + (data.last_name||"")).trim();
-        document.getElementById('mobile').textContent = (data.country_code || "") + " " + (data.mobile || "");
+        document.getElementById('username').textContent = data.username || "";
+        document.getElementById('full_name').textContent = (data.first_name ? data.first_name : "") + (data.last_name ? " "+data.last_name : "");
+        document.getElementById('mobile').textContent = (data.country_code || "") + (data.mobile || "");
         document.getElementById('email').textContent = data.email || "";
-        document.getElementById('country').textContent = data.country || "";
-        document.getElementById('state').textContent = data.state || "";
         document.getElementById('reg_date').textContent = new Date().toLocaleString(); // For demo
+        // Fill referral link
+        let refLink = window.location.origin + '/signup-page?referral=' + data.user_id;
+        document.getElementById('referralLink').value = refLink;
       });
+    }
+    function copyReferral() {
+      let refInput = document.getElementById('referralLink');
+      refInput.select();
+      refInput.setSelectionRange(0, 99999); // For mobile devices
+      document.execCommand('copy');
+      alert('Referral link copied!');
     }
   </script>
 </body>
