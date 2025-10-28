@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra User Dashboard</title>
+  <title>TradeEra Dashboard Sidebar</title>
   <style>
     body {
-      background: #102429;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #19262d;
       margin: 0;
-      color: #eaf1fa;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+      color: #f5e8c9;
     }
     .sidebar {
       width: 265px;
@@ -16,7 +16,7 @@
       height: 100vh;
       position: fixed;
       left: 0; top: 0;
-      font-size: 1.11em;
+      font-size: 1.09em;
       font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
       box-shadow: 0 0 28px #031013;
       z-index: 1;
@@ -27,7 +27,7 @@
       letter-spacing: 1.4px;
       padding: 32px 0 18px 28px;
       color: #ffb955;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
       font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
     .sb-menu {
@@ -60,7 +60,8 @@
     .sb-menu > li.has-dropdown {
       position:relative;
     }
-    .sb-menu > li.has-dropdown:hover > .dropdown, .sb-menu > li.has-dropdown:focus-within > .dropdown {
+    .sb-menu > li.has-dropdown:hover > .dropdown, 
+    .sb-menu > li.has-dropdown:focus-within > .dropdown {
       display: block;
     }
     .dropdown {
@@ -73,12 +74,12 @@
       left:0; right:0;
       top:100%;
       z-index:2;
-      min-width: 185px;
+      min-width: 205px;
       box-shadow: 0 6px 16px #0007;
     }
     .dropdown li {
       padding: 11px 20px;
-      font-size: 0.97em;
+      font-size: 0.98em;
       color: #d7d7d7;
       font-weight:400;
       cursor:pointer;
@@ -94,3 +95,110 @@
       color:#ffb955;
     }
     .sb-footer {
+      position: absolute;
+      bottom: 21px;
+      left: 28px;
+      font-size: 1em;
+      color: #b5e7c4;
+      font-family: inherit;
+      letter-spacing:0.5px;
+    }
+    main {
+      margin-left:265px; padding:44px; color:#fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sb-logo">TRADEERA</div>
+    <nav>
+      <ul class="sb-menu">
+        <li class="active">Dashboard</li>
+        <li>New Registration</li>
+        <li class="has-dropdown">Profile
+          <ul class="dropdown">
+            <li>Manage Profile</li>
+            <li>Change Password</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Trading Center
+          <ul class="dropdown">
+            <li>Trading</li>
+            <li>Trading History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Community
+          <ul class="dropdown">
+            <li>Direct Referrals</li>
+            <li>Total Team</li>
+            <li>Team Summary</li>
+            <li>Unilevel Tree</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Activation Wallet
+          <ul class="dropdown">
+            <li>Balance</li>
+            <li>Deposit</li>
+            <li>Fund History</li>
+            <li>P2P Transfer</li>
+            <li>History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Income Wallet
+          <ul class="dropdown">
+            <li>Balance</li>
+            <li>Withdrawal</li>
+            <li>Withdrawal History</li>
+            <li>Internal Fund Transfer</li>
+            <li>History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Profit Wallet
+          <ul class="dropdown">
+            <li>Profit Wallet Balance</li>
+            <li>History</li>
+            <li>Internal Fund Transfer</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Credit Wallet
+          <ul class="dropdown">
+            <li>Credit Wallet Balance</li>
+            <li>History</li>
+            <li>P2P Transfer</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Income Report
+          <ul class="dropdown">
+            <li>Level Income</li>
+            <li>Matching Income</li>
+            <li>Trading Income</li>
+            <li>Trading Level Income</li>
+            <li>Reward Income</li>
+            <li>Leadership Income</li>
+          </ul>
+        </li>
+        <li>Wallet Setting</li>
+        <li>Rank &amp; Reward</li>
+        <li>Leadership Criteria</li>
+        <li>Official Announcements</li>
+        <li>Referral Link</li>
+        <li class="has-dropdown">Ticket Management
+          <ul class="dropdown">
+            <li>Open A Ticket</li>
+            <li>View Ticket Response</li>
+          </ul>
+        </li>
+        <li>Signout</li>
+      </ul>
+    </nav>
+    <div class="sb-footer">Status: <span style="color:#8dfad1;">Active</span></div>
+  </aside>
+
+  <!-- Main page content starts after sidebar -->
+  <main>
+    <h2>Welcome to User Dashboard</h2>
+    <!-- Replace with your main dashboard/content -->
+  </main>
+</body>
+</html>
