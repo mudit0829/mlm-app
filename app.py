@@ -1,11 +1,25 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import uuid
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates')
 CORS(app)
 
 users = {}
+
+# Add the first admin user directly on server start
+admin_user = {
+    "user_id": "admin-1",
+    "username": "admin",
+    "password": "admin123",   # Change as needed
+    "sponsor_id": None,
+    "directs": [],
+    "power_leg": None,
+    "other_leg": [],
+    "is_admin": True
+}
+users[admin_user["user_id"]] = admin_user
 
 def create_user(username, password, sponsor_id=None, is_admin=False):
     user_id = str(uuid.uuid4())
@@ -21,6 +35,22 @@ def create_user(username, password, sponsor_id=None, is_admin=False):
     }
     users[user_id] = user
     return user
+
+@app.route('/')
+def home():
+    return render_template('login.html')
+
+@app.route('/signup-page')
+def signup_page():
+    return render_template('signup.html')
+
+@app.route('/user-panel')
+def user_panel_page():
+    return render_template('user_panel.html')
+
+@app.route('/admin-panel')
+def admin_panel_page():
+    return render_template('admin_panel.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -70,8 +100,6 @@ def admin_panel(admin_id):
         return jsonify({"message": "Admin not found"}), 404
     return jsonify(list(users.values()))
 
-import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-
