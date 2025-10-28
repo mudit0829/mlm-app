@@ -132,7 +132,7 @@
       </select>
 
       <label>Create Login Information</label>
-      <input name="username" placeholder="Enter Username" required>
+      <input name="username" id="usernameInput" placeholder="Enter Username" required>
       <div class="input-row">
         <input name="password" type="password" placeholder="Enter Password" required>
         <input name="confirm_password" type="password" placeholder="Confirm Password" required>
@@ -187,7 +187,6 @@
       }
     };
 
-    // Copy referral code
     document.getElementById('copyReferral').onclick = function() {
       let refCode = document.getElementById('referralCode').value;
       if (refCode) {
@@ -198,7 +197,6 @@
       }
     };
 
-    // Auto-fill country dial code
     document.getElementById('countrySelect').addEventListener('change', function(e) {
       let code = e.target.options[e.target.selectedIndex].getAttribute('data-code');
       document.getElementById('countryCode').value = code || '';
@@ -214,6 +212,7 @@
       Array.from(form.elements).forEach(el => {
         if(el.name && el.type!=="button") fields[el.name] = el.value;
       });
+      fields["reg_date"] = new Date().toISOString();
       let res = await fetch('/signup', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
@@ -221,12 +220,25 @@
       });
       let data = await res.json();
       if (data.user_id) {
-        alert('Registration successful! Your User ID is: ' + data.user_id);
+        alert('Registration successful! Your User ID is: ' + fields.username);
         window.location.href = '/';
       } else {
         alert(data.message);
       }
     };
+
+    // Real-time username availability
+    document.getElementById('usernameInput').addEventListener('blur', async function() {
+      let username = this.value.trim();
+      if (username) {
+        let res = await fetch('/users/by-username/' + encodeURIComponent(username));
+        if (res.ok) {
+          alert("Username is taken. Please choose another.");
+          this.value = '';
+          this.focus();
+        }
+      }
+    });
   </script>
 </body>
 </html>
