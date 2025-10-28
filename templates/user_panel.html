@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra Dashboard - Professional</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <title>TradeEra Dashboard</title>
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
     body {
@@ -30,317 +29,140 @@
       margin-bottom: 10px;
       font-family: inherit;
     }
+    /* ... sidebar menu unchanged ... */
     .sb-menu {
       list-style: none;
       margin: 0;
       padding: 0 0 12px 0;
     }
-    .sb-menu > li {
-      padding: 15px 30px;
-      cursor: pointer;
-      transition: background 0.17s;
-      color: #ededed;
-      font-weight: 500;
-      font-size: 1.08em;
-      position: relative;
-    }
-    .sb-menu > li.active,
-    .sb-menu > li:hover {
-      background: #183342;
-      color: #ffb955;
-    }
-    .sb-menu > li.has-dropdown::after {
-      content: "▼";
-      float: right;
-      font-size: 0.7em;
-      color: #ffb955;
-      margin-right: 2px;
-      margin-top: 8px;
-    }
-    .sb-menu > li.has-dropdown {
-      position:relative;
-    }
-    .sb-menu > li.has-dropdown:hover > .dropdown, 
-    .sb-menu > li.has-dropdown:focus-within > .dropdown {
-      display: block;
-    }
-    .dropdown {
-      display: none;
-      background: #223441;
-      margin: 0;
-      padding: 0 0 0 8px;
-      border-radius: 0 0 9px 9px;
-      position:absolute;
-      left:0; right:0;
-      top:100%;
-      z-index:6;
-      min-width: 205px;
-      box-shadow: 0 6px 16px #0007;
-    }
-    .dropdown li {
-      padding: 11px 20px;
-      font-size: 0.98em;
-      color: #d7d7d7;
-      font-weight:400;
-      cursor:pointer;
-      border-bottom: 1px solid #233;
-      background:#223441;
-      transition: background 0.19s;
-    }
-    .dropdown li:last-child {
-      border-bottom:none;
-    }
-    .dropdown li:hover {
-      background: #2b4362;
-      color:#ffb955;
-    }
-    .sb-footer {
-      position: absolute;
-      bottom: 21px;
-      left: 28px;
-      font-size: 1em;
-      color: #b5e7c4;
-      font-family: inherit;
-      letter-spacing:0.5px;
-    }
-    .dash-content {
-      margin-left: 285px;
-      padding: 0;
-      background: #f7f8fa;
-      min-width:700px;
-    }
-    .top-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 18px 24px 8px 24px;
-      background: #f7f8fa;
-      border-bottom: 1px solid #eeeeee;
-      margin-bottom: 10px;
-    }
+    .sb-menu > li { padding: 15px 30px; cursor: pointer; transition: background 0.17s; color: #ededed; font-size: 1.08em; position: relative; }
+    .sb-menu > li.active, .sb-menu > li:hover { background: #183342; color: #ffb955; }
+    .sb-menu > li.has-dropdown::after { content: "▼"; float: right; font-size: 0.7em; color: #ffb955; margin-right: 2px; margin-top: 8px; }
+    .sb-menu > li.has-dropdown { position:relative; }
+    .sb-menu > li.has-dropdown:hover > .dropdown, .sb-menu > li.has-dropdown:focus-within > .dropdown { display: block; }
+    .dropdown { display: none; background: #223441; margin: 0; padding: 0 0 0 8px; border-radius: 0 0 9px 9px; position:absolute; left:0; right:0; top:100%; z-index:6; min-width: 205px; box-shadow: 0 6px 16px #0007; }
+    .dropdown li { padding: 11px 20px; font-size: 0.98em; color: #d7d7d7; font-weight:400; cursor:pointer; border-bottom: 1px solid #233; background:#223441; transition: background 0.19s; }
+    .dropdown li:last-child { border-bottom:none; }
+    .dropdown li:hover { background: #2b4362; color:#ffb955; }
+    .sb-footer { position: absolute; bottom: 21px; left: 28px; font-size: 1em; color: #b5e7c4; font-family: inherit; letter-spacing:0.5px; }
+    .dash-content { margin-left: 285px; padding: 0; background: #f7f8fa; min-width:700px; }
+    .top-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 18px 24px 8px 24px; background: #f7f8fa; border-bottom: 1px solid #eeeeee; margin-bottom: 10px; }
     .top-space { width: 1px; height: 22px; }
-    .right-head-link {
-      font-size: 1.11em;
-      color: #7f51c5;
-      font-weight: 600;
-      text-decoration: none;
-      padding: 7px 15px;
-      border-radius: 8px;
-      background: #e8eaf6;
-    }
+    .right-head-link { font-size: 1.11em; color: #7f51c5; font-weight: 600; text-decoration: none; padding: 7px 15px; border-radius: 8px; background: #e8eaf6; }
     .dashboard-row {
-      display: flex; gap: 32px; margin-bottom:42px;
+      display: flex; gap: 22px; margin-bottom:30px;
+      font-size: .82em;
     }
     .trading-card {
       flex:1;
       background: #dffbef;
       border-radius: 16px;
-      box-shadow: 0 8px 20px #e3e2ff39;
-      padding: 18px 22px 22px 22px;
-      min-width: 355px;
+      box-shadow: 0 4px 15px #e3e2ff2a;
+      padding: 15px 16px 17px 16px;
+      min-width: 265px;
       display:flex;flex-direction:column;align-items:center;
     }
-    .trading-title {
-      font-size: 1.33em;
-      font-weight: 600;
-      color: #26847a;
-      letter-spacing: 0.5px;
-      margin-bottom:6px;
-      margin-top:3px;
-      text-align: center;
-    }
-    .trading-today {
-      font-size: 1em;
-      color: #4e4e69;
-      margin-bottom: 6px;
-      font-weight: 700;
-      text-align:center;
-    }
-    .trading-pair {
-      font-size: 1.32em;
-      font-weight: bold;
-      color: #232b42;
-      letter-spacing: 1px;
-      margin-bottom: 13px;
-    }
-    .chart-widget {
-      width: 98%; min-height:135px; border-radius: 11px;
-      box-shadow: 0 4px 16px #0001; background: #fff;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .trading-meta-row {
-      display: flex;
-      gap:36px;
-      font-size: 1.11em;
-      color: #2c3659;
-      font-weight: 600;
-      margin-top:6px;
-      margin-bottom:6px;
-      justify-content: center;
-    }
+    .trading-title { font-size: 1.16em; font-weight: 700; color: #26847a; margin-bottom:4px; margin-top:3px; text-align: center;}
+    .trading-today { font-size: 0.98em; color: #4e4e69; margin-bottom:3px;}
+    .trading-pair { font-size: 1.23em; font-weight: bold; color: #232b42; letter-spacing: .6px; margin-bottom: 7px;}
+    .chart-widget { width:97%; min-height:205px; border-radius: 10px; box-shadow: 0 2px 10px #eee3; background: #fff; margin-bottom: 9px; display: flex; align-items: center; justify-content: center;}
+    .trading-meta-row { display: flex; gap:22px; font-size:1em; color: #2c3659; font-weight: 600; margin-top:4px; margin-bottom:4px; justify-content: center;}
     .ref-block {
-      margin: 0 0 30px 0;
+      margin: 0 0 22px 0;
       background: #fff;
-      border-radius:14px;
-      box-shadow: 0 3px 13px #8684ab11;
+      border-radius:12px;
+      box-shadow: 0 2px 8px #8684ab11;
       display:flex;align-items:center;justify-content:space-between;
-      padding:16px 20px;
+      padding:10px 16px;
       margin-left: 10px;
       margin-right: 10px;
+      font-size: 0.93em;
     }
-    .ref-link {
-      font-size: 1.08em; font-weight:600; color:#3a355d;
-    }
-    .ref-url {
-      font-size:1em;color:#666; font-weight:400;margin-left:9px;
-      word-break:break-all;
-    }
-    .ref-btn {
-      background: #e3e2ff;
-      color: #322b68;
-      border: none;
-      border-radius: 7px;
-      font-weight: bold;
-      font-size: 1em;
-      cursor: pointer;
-      padding: 7px 20px;
-    }
+    .ref-link { font-size: 1em; font-weight:700; color:#3a355d;}
+    .ref-url { font-size:1em; color:#666; font-weight:400; margin-left:9px; word-break:break-all;}
+    .ref-btn { background: #e3e2ff; color: #322b68; border: none; border-radius: 7px; font-weight: 600; font-size: 1em; cursor: pointer; padding: 5px 19px;}
     .ref-btn:hover {background:#edeaff;}
-    .wallet-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:18px;
-      margin-bottom: 18px;
-      margin-left: 8px;
-      margin-right: 8px;
+    .wallet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin-bottom: 10px; margin-left: 8px; margin-right: 8px; font-size:0.89em;}
+    .wallet-card { background: #fff; border-radius:13px; box-shadow: 0 2px 8px #8684ab08; padding: 11px 10px 8px 14px; min-height:52px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start;}
+    .wallet-card-title { font-size: 1em; color: #2c3659; font-weight:700; margin-bottom:2px; white-space:nowrap;}
+    .wallet-card-amt { font-size: 1.31em; font-weight: 600; color: #333348; letter-spacing: 1px; margin-bottom:1px;}
+    .summary-row { display:flex; gap:12px; margin-top:10px; margin-left: 8px; margin-right: 8px;}
+    .summary-card { flex: 1; background: #c8efd5; border-radius: 12px; padding: 7px 0 7px 12px; font-size: .96em; font-weight:600; color: #246864; box-shadow: 0 2px 10px #133c4b05; margin-bottom:7px;}
+    .summary-card.withdraw { background: #efd2e1; color: #a0097b;}
+    .profile-section-row {
+      display: flex; gap:24px; margin-top:18px; margin-left:8px; margin-right:8px; font-size:.93em;
     }
-    .wallet-card {
+    .profile-card, .business-card, .income-card {
       background: #fff;
-      border-radius:15px;
-      box-shadow: 0 2px 14px #8684ab10;
-      padding: 16px 13px 13px 18px;
-      min-height:70px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:flex-start;
-    }
-    .wallet-card-title {
-      font-size: 1.09em;
-      color: #2c3659;
-      font-weight:700;
-      margin-bottom:4px;
-      white-space:nowrap;
-    }
-    .wallet-card-amt {
-      font-size: 1.8em;
-      font-weight: 600;
-      color: #333348;
-      letter-spacing: 1px;
-      margin-bottom:1px;
-    }
-    .summary-row {
-      display:flex;gap:14px;margin-top:15px;margin-left: 8px;margin-right: 8px;
-    }
-    .summary-card {
+      border-radius:17px;
+      box-shadow: 0 2px 8px #e5e4ff11;
+      padding: 15px 18px 9px 18px;
       flex: 1;
-      background: #c8efd5;
-      border-radius: 13px;
-      padding: 12px 0 12px 24px;
-      font-size: 1.09em;
-      font-weight:600;
-      color: #246864;
-      box-shadow: 0 2px 10px #133c4b08;
-      margin-bottom:8px;
+      min-width:210px;
+      min-height: 160px;
+      margin-bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
-    .summary-card.withdraw {
-      background: #efd2e1;
-      color: #a0097b;
+    .profile-card img {
+      width:48px;height:48px;border-radius:50%;object-fit:cover;float:left;margin-right:10px;border:2px solid #e7e6ff;
     }
-    @media (max-width:1200px){
-      .wallet-grid {grid-template-columns:repeat(2,1fr);}
-      .dashboard-row{flex-direction:column;}
-    }
-    @media (max-width:800px){
-      .dash-content{margin-left:0;}
-      .wallet-grid{grid-template-columns:1fr;}
-      .ref-block{flex-direction:column;align-items:flex-start;}
-      .summary-row{flex-direction:column;}
-    }
+    .profile-title {font-size:1.17em;margin-bottom:4px;font-weight:700;color:#4c576b;}
+    .profile-subtitle { font-size:.97em; color:#7c7c8e; margin-bottom:12px;}
+    .profile-info-row { font-size:.93em; margin-bottom:3px;}
+    .profile-info-label { min-width:105px; display:inline-block; color:#aaa;}
+    .profile-info-val { color:#556; font-weight:500;}
+    .profile-btn { margin-top:15px; padding:5px 14px; border:none; background:#2963e6; color:#fff; font-weight:600; border-radius:6px; font-size:.96em; cursor:pointer;}
+    .business-title, .income-title { font-size:1.09em; font-weight:700; color:#4c576b; margin-bottom:7px;}
+    .business-row, .income-row { display:flex; justify-content:space-between; }
+    .business-label, .income-label { color:#999; font-size: .94em;}
+    .business-val, .income-val { color:#4d5474; font-weight:600; font-size: .97em;}
+    @media (max-width:1300px){ .wallet-grid, .profile-section-row{grid-template-columns: repeat(2,1fr);} .dashboard-row{flex-direction:column;} }
+    @media (max-width:800px){ .dash-content{margin-left:0;} .wallet-grid{grid-template-columns:1fr;} .ref-block{flex-direction:column;align-items:flex-start;} .summary-row, .profile-section-row{flex-direction:column;} }
   </style>
 </head>
 <body>
-  <!-- Sidebar Navigation (remains unchanged) -->
+  <!-- Sidebar Navigation -->
   <aside class="sidebar">
     <div class="sb-logo">TRADEERA</div>
     <nav>
       <ul class="sb-menu">
         <li class="active">Dashboard</li>
+        <!-- ...rest menu unchanged... -->
         <li>New Registration</li>
         <li class="has-dropdown">Profile
-          <ul class="dropdown">
-            <li>Manage Profile</li>
-            <li>Change Password</li>
-          </ul>
+          <ul class="dropdown"><li>Manage Profile</li><li>Change Password</li></ul>
         </li>
         <li class="has-dropdown">Trading Center
-          <ul class="dropdown">
-            <li>Trading</li>
-            <li>Trading History</li>
-          </ul>
+          <ul class="dropdown"><li>Trading</li><li>Trading History</li></ul>
         </li>
         <li class="has-dropdown">Community
           <ul class="dropdown">
-            <li>Direct Referrals</li>
-            <li>Total Team</li>
-            <li>Team Summary</li>
-            <li>Unilevel Tree</li>
+            <li>Direct Referrals</li><li>Total Team</li><li>Team Summary</li><li>Unilevel Tree</li>
           </ul>
         </li>
         <li class="has-dropdown">Activation Wallet
           <ul class="dropdown">
-            <li>Balance</li>
-            <li>Deposit</li>
-            <li>Fund History</li>
-            <li>P2P Transfer</li>
-            <li>History</li>
+            <li>Balance</li><li>Deposit</li><li>Fund History</li><li>P2P Transfer</li><li>History</li>
           </ul>
         </li>
         <li class="has-dropdown">Income Wallet
           <ul class="dropdown">
-            <li>Balance</li>
-            <li>Withdrawal</li>
-            <li>Withdrawal History</li>
-            <li>Internal Fund Transfer</li>
-            <li>History</li>
+            <li>Balance</li><li>Withdrawal</li><li>Withdrawal History</li><li>Internal Fund Transfer</li><li>History</li>
           </ul>
         </li>
         <li class="has-dropdown">Profit Wallet
           <ul class="dropdown">
-            <li>Profit Wallet Balance</li>
-            <li>History</li>
-            <li>Internal Fund Transfer</li>
+            <li>Profit Wallet Balance</li><li>History</li><li>Internal Fund Transfer</li>
           </ul>
         </li>
         <li class="has-dropdown">Credit Wallet
-          <ul class="dropdown">
-            <li>Credit Wallet Balance</li>
-            <li>History</li>
-            <li>P2P Transfer</li>
-          </ul>
+          <ul class="dropdown"><li>Credit Wallet Balance</li><li>History</li><li>P2P Transfer</li></ul>
         </li>
         <li class="has-dropdown">Income Report
           <ul class="dropdown">
-            <li>Level Income</li>
-            <li>Matching Income</li>
-            <li>Trading Income</li>
-            <li>Trading Level Income</li>
-            <li>Reward Income</li>
-            <li>Leadership Income</li>
+            <li>Level Income</li><li>Matching Income</li><li>Trading Income</li><li>Trading Level Income</li><li>Reward Income</li><li>Leadership Income</li>
           </ul>
         </li>
         <li>Wallet Setting</li>
@@ -349,30 +171,23 @@
         <li>Official Announcements</li>
         <li>Referral Link</li>
         <li class="has-dropdown">Ticket Management
-          <ul class="dropdown">
-            <li>Open A Ticket</li>
-            <li>View Ticket Response</li>
-          </ul>
+          <ul class="dropdown"><li>Open A Ticket</li><li>View Ticket Response</li></ul>
         </li>
         <li>Signout</li>
       </ul>
     </nav>
     <div class="sb-footer">Status: <span style="color:#8dfad1;">Active</span></div>
   </aside>
-
   <div class="dash-content">
-    <div class="top-header">
-      <div class="top-space"></div>
-      <a href="#" class="right-head-link">Welcome</a>
-    </div>
+    <div class="top-header"><div class="top-space"></div><a href="#" class="right-head-link">Welcome</a></div>
+    <!-- Trading bot row -->
     <div class="dashboard-row">
       <div class="trading-card">
         <div class="trading-title">Crypto Trading Bot</div>
         <div class="trading-today">Today &emsp; <span>$0.00</span></div>
         <div class="trading-pair">Crypto: BTC/USDT</div>
         <div class="chart-widget">
-          <!-- Live TradingView Widget JS (replace src if needed for PRO widget) -->
-          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_2b4ec&symbol=BINANCE:BTCUSDT&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=light" width="99%" height="135" frameborder="0" allowtransparency="true"></iframe>
+          <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=Light&hidesidetoolbar=1" width="99%" height="210" frameborder="0" allowtransparency="true"></iframe>
         </div>
         <div class="trading-meta-row">
           <div>Investment $0.00</div>
@@ -386,7 +201,7 @@
         <div class="trading-today">Today &emsp; <span>$0.00</span></div>
         <div class="trading-pair">Forex: EUR/USD</div>
         <div class="chart-widget">
-          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_2b4ec&symbol=FX_IDC:EURUSD&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=light" width="99%" height="135" frameborder="0" allowtransparency="true"></iframe>
+          <iframe src="https://s.tradingview.com/widgetembed/?symbol=FX_IDC:EURUSD&interval=D&theme=Light&hidesidetoolbar=1" width="99%" height="210" frameborder="0" allowtransparency="true"></iframe>
         </div>
         <div class="trading-meta-row">
           <div>Investment $0.00</div>
@@ -396,11 +211,13 @@
         </div>
       </div>
     </div>
+    <!-- Referral link -->
     <div class="ref-block">
       <span class="ref-link">Referral Link</span>
       <span class="ref-url" id="referralUrl">https://tradeera.com/signup?referral=YOURCODE</span>
       <button class="ref-btn" onclick="copyReferral()">Copy</button>
     </div>
+    <!-- Wallets -->
     <div class="wallet-grid">
       <div class="wallet-card"><div class="wallet-card-title">Income Wallet</div><div class="wallet-card-amt">$0</div></div>
       <div class="wallet-card"><div class="wallet-card-title">Angel Wallet</div><div class="wallet-card-amt">$0</div></div>
@@ -411,9 +228,51 @@
       <div class="wallet-card"><div class="wallet-card-title">Capital Wallet</div><div class="wallet-card-amt">$0</div></div>
       <div class="wallet-card"><div class="wallet-card-title">Cross Wallet</div><div class="wallet-card-amt">$0</div></div>
     </div>
+    <!-- Income/Withdraw summary -->
     <div class="summary-row">
       <div class="summary-card">Total Income<br>$0</div>
       <div class="summary-card withdraw">Total Withdraw<br>$0</div>
+    </div>
+    <!-- Profile, Business, Income Details -->
+    <div class="profile-section-row">
+      <div class="profile-card">
+        <img src="https://randomuser.me/api/portraits/men/31.jpg" alt="Profile" />
+        <div class="profile-title">Mudit Tiwari</div>
+        <div class="profile-subtitle">XM161622579</div>
+        <div class="profile-info-row"><span class="profile-info-label">Referral ID:</span> <span class="profile-info-val">X089063</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Bot License:</span> <span class="profile-info-val">Inactive</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Trading ARB Amount:</span> <span class="profile-info-val">0.0000</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Angel ARB Amount:</span> <span class="profile-info-val">0.0000</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Cross ARB Amount:</span> <span class="profile-info-val">0</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Rank:</span> <span class="profile-info-val">NA</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Date of Joining:</span> <span class="profile-info-val">7/14/2025 6:22:59 PM</span></div>
+        <div class="profile-info-row"><span class="profile-info-label">Date of Activation:</span> <span class="profile-info-val"></span></div>
+        <button class="profile-btn">Click to View Closing Report</button>
+      </div>
+      <div class="business-card">
+        <div class="business-title">Business Details</div>
+        <div class="business-row"><span class="business-label">Direct Bot</span> <span class="business-val">0</span></div>
+        <div class="business-row"><span class="business-label">Total Bot</span><span class="business-val">0</span></div>
+        <div class="business-row"><span class="business-label">Team Business (Trading/Angel)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Total Team (Left/Right)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Strong/Weaker Leg Bot</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Total Bot (Left/Right)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Bot Carryforward (Left/Right)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Current Trading Business (Left/Right)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Total Trading Business (Left/Right)</span><span class="business-val">0/0</span></div>
+        <div class="business-row"><span class="business-label">Total Angel Business (Left/Right)</span><span class="business-val">0/0</span></div>
+      </div>
+      <div class="income-card">
+        <div class="income-title">Income Details</div>
+        <div class="income-row"><span class="income-label">Referral Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Generation Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Trading Profit Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Leadership Pool Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Reward Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">IB Income</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Rapid Rise Bonus</span><span class="income-val">0</span></div>
+        <div class="income-row"><span class="income-label">Matching Income</span><span class="income-val">0</span></div>
+      </div>
     </div>
   </div>
   <script>
