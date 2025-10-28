@@ -1,38 +1,141 @@
 <!DOCTYPE html>
 <html>
-<head><title>User Panel</title></head>
-<body>
-  <h2>User Panel</h2>
-  <div id="userInfo"></div>
-
-  <script>
-    async function loadUserPanel() {
-      // Prompt user for their user ID (for demo purposes)
-      let userId = prompt("Enter your User ID:");
-
-      if (!userId) {
-        alert("User ID is required");
-        return;
-      }
-
-      let res = await fetch('https://mlm-app-3d3y.onrender.com/user/' + userId + '/panel');
-      let data = await res.json();
-
-      if (data.user_id) {
-        document.getElementById('userInfo').innerHTML = `
-          <p><b>User ID:</b> ${data.user_id}</p>
-          <p><b>Username:</b> ${data.username}</p>
-          <p><b>Sponsor ID:</b> ${data.sponsor_id}</p>
-          <p><b>Power Leg:</b> ${data.power_leg}</p>
-          <p><b>Other Legs:</b> ${data.other_leg.join(', ')}</p>
-          <p><b>Direct Referrals:</b> ${data.directs.join(', ')}</p>
-        `;
-      } else {
-        alert(data.message || "Error loading user panel");
-      }
+<head>
+  <title>TradeEra User Panel</title>
+  <style>
+    body {
+      background: #22293f;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #eaf1fa;
     }
-
-    loadUserPanel();
+    .sidebar {
+      width: 220px;
+      background: #132338;
+      color: #ffb24d;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      padding-top: 30px;
+      font-size: 1.09em;
+      box-shadow: 0 0 40px #1118;
+    }
+    .sidebar h2 {
+      text-align: center;
+      font-size: 1.6em;
+      color: #ffb24d;
+      font-weight: 600;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+    .sidebar ul { list-style:none; padding:0; margin:0;}
+    .sidebar ul li { padding:14px 28px; cursor:pointer;}
+    .sidebar ul li:hover { background:#1b304b; color:#fff; }
+    .active { background:#21365a !important; color:#fff;}
+    .main {
+      margin-left: 235px;
+      padding: 36px 36px 24px 36px;
+      background: linear-gradient(120deg,#132338 70%,#22375a 100%);
+      min-height: 100vh;
+    }
+    .stats-row {
+      display: flex;
+      gap:16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background:#37476a;
+      border-radius:11px;
+      flex:1;
+      padding:18px;
+      box-shadow: 0 8px 28px #0003;
+      color:#fff;
+      text-align:center;
+    }
+    .stat-card h3 { margin:0 0 9px 0; font-weight:600; font-size:1.16em;}
+    .stat-card .value { font-size:1.3em; font-weight:bold;}
+    .details-row { display:flex; gap:28px; }
+    .info-block {
+      flex:1;
+      background:#192645;
+      border-radius:14px;
+      padding:24px 22px 20px 22px;
+      box-shadow: 0 8px 28px #0002;
+      margin-bottom:24px;
+    }
+    .info-block h3 {
+      color: #ffb24d;
+      font-size: 1.18em;
+      font-weight: 600;
+      margin-bottom: 10px;
+      letter-spacing:0.5px;
+    }
+    .info-row { margin-bottom:11px;}
+    .info-row_b { margin-bottom:6px;}
+    .info-row label { color:#eaf1fa; font-weight:500; width: 140px; display:inline-block;}
+    .info-row_b label { color:#b7c6ee; font-weight:500; width:212px; display:inline-block;}
+    .info-row span,.info-row_b span { color:#ffb24d; font-weight:600;}
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>TRADEERA</h2>
+    <ul>
+      <li class="active">Dashboard</li>
+      <li>Profile</li>
+      <li>Wallets</li>
+      <li>Reports</li>
+      <li>Referral Link</li>
+      <li>Announcements</li>
+      <li>Signout</li>
+    </ul>
+  </div>
+  <div class="main">
+    <h1>Welcome, <span id="username"></span></h1>
+    <div class="stats-row">
+      <div class="stat-card"><h3>Last Days Profit</h3><div class="value" id="last_profit">$0.00</div></div>
+      <div class="stat-card"><h3>Total Profit 15 Days</h3><div class="value" id="total_profit">$0.00</div></div>
+      <div class="stat-card"><h3>Total Investment</h3><div class="value" id="investment">$0.00</div></div>
+      <div class="stat-card"><h3>Live Capital</h3><div class="value" id="live_capital">$0.00</div></div>
+    </div>
+    <div class="details-row">
+      <div class="info-block">
+        <h3>Personal Info</h3>
+        <div class="info-row"><label>User ID:</label> <span id="user_id"></span></div>
+        <div class="info-row"><label>Full Name:</label> <span id="full_name"></span></div>
+        <div class="info-row"><label>Mobile:</label> <span id="mobile"></span></div>
+        <div class="info-row"><label>Email:</label> <span id="email"></span></div>
+        <div class="info-row"><label>Country:</label> <span id="country"></span></div>
+        <div class="info-row"><label>State:</label> <span id="state"></span></div>
+        <div class="info-row"><label>Registration Date:</label> <span id="reg_date"></span></div>
+      </div>
+      <div class="info-block">
+        <h3>Business Info</h3>
+        <div class="info-row_b"><label>Active Bots:</label> <span>0</span></div>
+        <div class="info-row_b"><label>Inactive Bots:</label> <span>0</span></div>
+        <div class="info-row_b"><label>Profit Wallet:</label> <span>$0.00</span></div>
+        <div class="info-row_b"><label>Credit Wallet:</label> <span>$0.00</span></div>
+        <div class="info-row_b"><label>Income Wallet:</label> <span>$0.00</span></div>
+        <div class="info-row_b"><label>Total Income:</label> <span>$0.00</span></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Use prompt for now, or load from login session
+    let userId = prompt("Enter your User ID to view panel:");
+    if(userId){
+      fetch('/user/' + userId + '/panel').then(r=>r.json()).then(data=>{
+        if(!data.user_id){ alert("User not found"); return;}
+        document.getElementById('username').textContent = data.username || "";
+        document.getElementById('user_id').textContent = data.user_id || "";
+        document.getElementById('full_name').textContent = ((data.first_name||"") + " " + (data.last_name||"")).trim();
+        document.getElementById('mobile').textContent = (data.country_code || "") + " " + (data.mobile || "");
+        document.getElementById('email').textContent = data.email || "";
+        document.getElementById('country').textContent = data.country || "";
+        document.getElementById('state').textContent = data.state || "";
+        document.getElementById('reg_date').textContent = new Date().toLocaleString(); // For demo
+      });
+    }
   </script>
 </body>
 </html>
