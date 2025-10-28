@@ -24,9 +24,9 @@
     .header h1 {
       font-size: 2.1em;
       font-weight: bold;
-      letter-spacing: 1.2px;
       color: #ffb24d;
       margin-bottom: 0;
+      letter-spacing: 1.2px;
     }
     .header .subtitle {
       font-size: 1.13em;
@@ -102,7 +102,7 @@
     <form id="signupForm">
       <label>Referral Code Information</label>
       <div class="info-text">Enter your referral code to register</div>
-      <input name="referral_code" required>
+      <input name="referral_code" id="referralCode" required readonly>
 
       <label>Select Position</label>
       <select name="position" required>
@@ -150,6 +150,19 @@
     </form>
   </div>
   <script>
+    // Autofill referral code from URL parameter, make field readonly
+    function getQueryParam(param) {
+      let params = new URLSearchParams(window.location.search);
+      return params.get(param);
+    }
+    window.onload = function() {
+      let referral = getQueryParam('referral');
+      if (referral) {
+        document.getElementById('referralCode').value = referral;
+        document.getElementById('referralCode').readOnly = true;
+      }
+    };
+
     // Auto-fill country dial code
     document.getElementById('countrySelect').addEventListener('change', function(e) {
       let code = e.target.options[e.target.selectedIndex].getAttribute('data-code');
