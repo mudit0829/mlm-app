@@ -12,18 +12,16 @@
   <script>
     document.getElementById('loginForm').onsubmit = async (e) => {
       e.preventDefault();
-      let res = await fetch('https://mlm-app-3d3y.onrender.com/login', {
+      let username = e.target.username.value.trim();
+      let password = e.target.password.value;
+      let res = await fetch('/login', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({
-          username: e.target.username.value,
-          password: e.target.password.value
-        })
+        body: JSON.stringify({ username, password })
       });
       let data = await res.json();
-      if (data.user_id) {
-        alert('Login success! User ID: ' + data.user_id);
-        // Redirect or load user panel next...
+      if (data.user_id && data.username) {
+        window.location.href = '/user-panel?userid=' + encodeURIComponent(data.username);
       } else {
         alert(data.message);
       }
