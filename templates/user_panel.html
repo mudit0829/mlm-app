@@ -195,27 +195,35 @@
     </div>
   </div>
   <script>
-    // Prompt for user ID (for demo)
-    let userId = prompt("Enter your User ID to view panel:");
-    if(userId){
-      fetch('/user/' + userId + '/panel').then(r=>r.json()).then(data=>{
-        if(!data.user_id){ alert("User not found"); return;}
+    function getQueryParam(param) {
+      let params = new URLSearchParams(window.location.search);
+      return params.get(param) || '';
+    }
+    window.onload = function() {
+      let username = getQueryParam('userid');
+      if(!username){
+        alert("No User ID supplied in URL!"); 
+        return;
+      }
+      fetch('/users/by-username/' + encodeURIComponent(username))
+      .then(r=>r.json())
+      .then(data=>{
+        if(!data.user_id){ alert("User not found!"); return; }
         document.getElementById('dash-username').textContent = data.username || "";
-        document.getElementById('user_id').textContent = data.user_id || "";
+        document.getElementById('user_id').textContent = data.username || "";
         document.getElementById('username').textContent = data.username || "";
-        document.getElementById('full_name').textContent = (data.first_name ? data.first_name : "") + (data.last_name ? " "+data.last_name : "");
-        document.getElementById('mobile').textContent = (data.country_code || "") + (data.mobile || "");
+        document.getElementById('full_name').textContent = (data.first_name?data.first_name:"") + (data.last_name?" "+data.last_name:"");
+        document.getElementById('mobile').textContent = (data.country_code||"") + (data.mobile||"");
         document.getElementById('email').textContent = data.email || "";
-        document.getElementById('reg_date').textContent = new Date().toLocaleString(); // For demo
-        // Fill referral link
-        let refLink = window.location.origin + '/signup-page?referral=' + data.user_id;
+        document.getElementById('reg_date').textContent = data.reg_date || new Date().toLocaleString();
+        let refLink = window.location.origin + '/signup-page?referral=' + data.username;
         document.getElementById('referralLink').value = refLink;
       });
     }
     function copyReferral() {
       let refInput = document.getElementById('referralLink');
       refInput.select();
-      refInput.setSelectionRange(0, 99999); // For mobile devices
+      refInput.setSelectionRange(0, 99999);
       document.execCommand('copy');
       alert('Referral link copied!');
     }
