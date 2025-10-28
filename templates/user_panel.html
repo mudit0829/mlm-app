@@ -1,36 +1,148 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra Dashboard - Modern Wallet Style</title>
+  <title>TradeEra Dashboard - Professional</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0; background: #f5f7fa;
+      margin: 0; background: #f7f8fa;
       font-family: 'Nunito', Arial, sans-serif;
       color: #232b42;
     }
-    .dashboard-main {
-      margin-left: 280px;
-      padding: 44px 38px 26px 38px;
-      background: #f8f9fb;
-      min-height: 100vh;
+    .sidebar {
+      width: 265px;
+      background: #12262e;
+      color: #ffb955;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+      font-size: 1.09em;
+      box-shadow: 0 0 28px #031013;
+      z-index: 4;
+    }
+    .sb-logo {
+      font-size: 2.1em;
+      font-weight: bold;
+      letter-spacing: 1.4px;
+      padding: 32px 0 18px 28px;
+      color: #ffb955;
+      margin-bottom: 10px;
+      font-family: inherit;
+    }
+    .sb-menu {
+      list-style: none;
+      margin: 0;
+      padding: 0 0 12px 0;
+    }
+    .sb-menu > li {
+      padding: 15px 30px;
+      cursor: pointer;
+      transition: background 0.17s;
+      color: #ededed;
+      font-weight: 500;
+      font-size: 1.08em;
+      position: relative;
+    }
+    .sb-menu > li.active,
+    .sb-menu > li:hover {
+      background: #183342;
+      color: #ffb955;
+    }
+    .sb-menu > li.has-dropdown::after {
+      content: "▼";
+      float: right;
+      font-size: 0.7em;
+      color: #ffb955;
+      margin-right: 2px;
+      margin-top: 8px;
+    }
+    .sb-menu > li.has-dropdown {
+      position:relative;
+    }
+    .sb-menu > li.has-dropdown:hover > .dropdown, 
+    .sb-menu > li.has-dropdown:focus-within > .dropdown {
+      display: block;
+    }
+    .dropdown {
+      display: none;
+      background: #223441;
+      margin: 0;
+      padding: 0 0 0 8px;
+      border-radius: 0 0 9px 9px;
+      position:absolute;
+      left:0; right:0;
+      top:100%;
+      z-index:6;
+      min-width: 205px;
+      box-shadow: 0 6px 16px #0007;
+    }
+    .dropdown li {
+      padding: 11px 20px;
+      font-size: 0.98em;
+      color: #d7d7d7;
+      font-weight:400;
+      cursor:pointer;
+      border-bottom: 1px solid #233;
+      background:#223441;
+      transition: background 0.19s;
+    }
+    .dropdown li:last-child {
+      border-bottom:none;
+    }
+    .dropdown li:hover {
+      background: #2b4362;
+      color:#ffb955;
+    }
+    .sb-footer {
+      position: absolute;
+      bottom: 21px;
+      left: 28px;
+      font-size: 1em;
+      color: #b5e7c4;
+      font-family: inherit;
+      letter-spacing:0.5px;
+    }
+    .dash-content {
+      margin-left: 285px;
+      padding: 0;
+      background: #f7f8fa;
+      min-width:700px;
+    }
+    .top-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px 8px 24px;
+      background: #f7f8fa;
+      border-bottom: 1px solid #eeeeee;
+      margin-bottom: 10px;
+    }
+    .top-space { width: 1px; height: 22px; }
+    .right-head-link {
+      font-size: 1.11em;
+      color: #7f51c5;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 7px 15px;
+      border-radius: 8px;
+      background: #e8eaf6;
     }
     .dashboard-row {
-      display: flex; gap: 36px; margin-bottom:32px;
+      display: flex; gap: 32px; margin-bottom:42px;
     }
     .trading-card {
       flex:1;
-      background: #e3fbf3;
-      border-radius: 18px;
-      box-shadow: 0 8px 20px #0002;
-      padding: 18px 22px 35px 22px;
+      background: #dffbef;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px #e3e2ff39;
+      padding: 18px 22px 22px 22px;
       min-width: 355px;
       display:flex;flex-direction:column;align-items:center;
     }
     .trading-title {
-      font-size: 1.43em;
+      font-size: 1.33em;
       font-weight: 600;
       color: #26847a;
       letter-spacing: 0.5px;
@@ -46,127 +158,221 @@
       text-align:center;
     }
     .trading-pair {
-      font-size: 1.44em;
+      font-size: 1.32em;
       font-weight: bold;
       color: #232b42;
       letter-spacing: 1px;
-      margin-bottom: 12px;
+      margin-bottom: 13px;
     }
     .chart-widget {
-      width: 99%; min-height:140px; border-radius: 11px;
-      box-shadow: 0 4px 16px #0002; background: #fff;
-      margin-bottom: 18px;
+      width: 98%; min-height:135px; border-radius: 11px;
+      box-shadow: 0 4px 16px #0001; background: #fff;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .trading-meta-row {
       display: flex;
-      gap:60px;
-      font-size: 1.23em;
+      gap:36px;
+      font-size: 1.11em;
       color: #2c3659;
       font-weight: 600;
-      margin-top:8px;
-      margin-bottom:8px;
+      margin-top:6px;
+      margin-bottom:6px;
       justify-content: center;
     }
+    .ref-block {
+      margin: 0 0 30px 0;
+      background: #fff;
+      border-radius:14px;
+      box-shadow: 0 3px 13px #8684ab11;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:16px 20px;
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    .ref-link {
+      font-size: 1.08em; font-weight:600; color:#3a355d;
+    }
+    .ref-url {
+      font-size:1em;color:#666; font-weight:400;margin-left:9px;
+      word-break:break-all;
+    }
+    .ref-btn {
+      background: #e3e2ff;
+      color: #322b68;
+      border: none;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 1em;
+      cursor: pointer;
+      padding: 7px 20px;
+    }
+    .ref-btn:hover {background:#edeaff;}
     .wallet-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap:28px;
-      margin-bottom: 24px;
-      margin-top:36px;
+      gap:18px;
+      margin-bottom: 18px;
+      margin-left: 8px;
+      margin-right: 8px;
     }
     .wallet-card {
       background: #fff;
-      border-radius:17px;
-      box-shadow: 0 2px 17px #8684ab15;
-      padding: 19px 17px 16px 22px;
-      min-height:88px;
+      border-radius:15px;
+      box-shadow: 0 2px 14px #8684ab10;
+      padding: 16px 13px 13px 18px;
+      min-height:70px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       align-items:flex-start;
     }
     .wallet-card-title {
-      font-size: 1.19em;
+      font-size: 1.09em;
       color: #2c3659;
       font-weight:700;
-      margin-bottom:8px;
+      margin-bottom:4px;
       white-space:nowrap;
     }
     .wallet-card-amt {
-      font-size: 2em;
+      font-size: 1.8em;
       font-weight: 600;
       color: #333348;
       letter-spacing: 1px;
-      margin-bottom:2px;
+      margin-bottom:1px;
     }
     .summary-row {
-      display:flex;gap:15px;margin-top:13px;
+      display:flex;gap:14px;margin-top:15px;margin-left: 8px;margin-right: 8px;
     }
     .summary-card {
       flex: 1;
-      background: #d6f3e0;
-      border-radius: 16px;
-      padding: 15px 0 15px 24px;
-      font-size: 1.27em;
-      font-weight:bold;
+      background: #c8efd5;
+      border-radius: 13px;
+      padding: 12px 0 12px 24px;
+      font-size: 1.09em;
+      font-weight:600;
       color: #246864;
-      box-shadow: 0 2px 10px #133c4b12;
+      box-shadow: 0 2px 10px #133c4b08;
+      margin-bottom:8px;
     }
     .summary-card.withdraw {
-      background: #f5d6e6;
+      background: #efd2e1;
       color: #a0097b;
     }
-    .ref-block {
-      margin: 24px 0 32px 0;
-      width:95%;
-      background: #fff;
-      border-radius:14px;
-      box-shadow: 0 3px 13px #8684ab11;
-      display:flex;align-items:center;justify-content:space-between;
-      padding:17px 20px;
-    }
-    .ref-link {
-      font-size: 1.12em; font-weight:600; color:#3a355d;
-    }
-    .ref-url {
-      font-size:1em;color:#666; font-weight:400;margin-left:7px;
-      word-break:break-all;
-    }
-    .ref-btn {
-      background: #d1d0fd;
-      color: #322b68;
-      border: none;
-      border-radius: 7px;
-      font-weight: bold;
-      font-size: 1.04em;
-      cursor: pointer;
-      padding: 7px 22px;
-    }
-    .ref-btn:hover {background:#edeaff;}
-    /* Responsive */
     @media (max-width:1200px){
       .wallet-grid {grid-template-columns:repeat(2,1fr);}
       .dashboard-row{flex-direction:column;}
     }
-    @media (max-width:700px){
-      .dashboard-main{margin-left:0;padding:24px;}
+    @media (max-width:800px){
+      .dash-content{margin-left:0;}
       .wallet-grid{grid-template-columns:1fr;}
+      .ref-block{flex-direction:column;align-items:flex-start;}
+      .summary-row{flex-direction:column;}
     }
   </style>
 </head>
 <body>
-  <main class="dashboard-main">
+  <!-- Sidebar Navigation (remains unchanged) -->
+  <aside class="sidebar">
+    <div class="sb-logo">TRADEERA</div>
+    <nav>
+      <ul class="sb-menu">
+        <li class="active">Dashboard</li>
+        <li>New Registration</li>
+        <li class="has-dropdown">Profile
+          <ul class="dropdown">
+            <li>Manage Profile</li>
+            <li>Change Password</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Trading Center
+          <ul class="dropdown">
+            <li>Trading</li>
+            <li>Trading History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Community
+          <ul class="dropdown">
+            <li>Direct Referrals</li>
+            <li>Total Team</li>
+            <li>Team Summary</li>
+            <li>Unilevel Tree</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Activation Wallet
+          <ul class="dropdown">
+            <li>Balance</li>
+            <li>Deposit</li>
+            <li>Fund History</li>
+            <li>P2P Transfer</li>
+            <li>History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Income Wallet
+          <ul class="dropdown">
+            <li>Balance</li>
+            <li>Withdrawal</li>
+            <li>Withdrawal History</li>
+            <li>Internal Fund Transfer</li>
+            <li>History</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Profit Wallet
+          <ul class="dropdown">
+            <li>Profit Wallet Balance</li>
+            <li>History</li>
+            <li>Internal Fund Transfer</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Credit Wallet
+          <ul class="dropdown">
+            <li>Credit Wallet Balance</li>
+            <li>History</li>
+            <li>P2P Transfer</li>
+          </ul>
+        </li>
+        <li class="has-dropdown">Income Report
+          <ul class="dropdown">
+            <li>Level Income</li>
+            <li>Matching Income</li>
+            <li>Trading Income</li>
+            <li>Trading Level Income</li>
+            <li>Reward Income</li>
+            <li>Leadership Income</li>
+          </ul>
+        </li>
+        <li>Wallet Setting</li>
+        <li>Rank &amp; Reward</li>
+        <li>Leadership Criteria</li>
+        <li>Official Announcements</li>
+        <li>Referral Link</li>
+        <li class="has-dropdown">Ticket Management
+          <ul class="dropdown">
+            <li>Open A Ticket</li>
+            <li>View Ticket Response</li>
+          </ul>
+        </li>
+        <li>Signout</li>
+      </ul>
+    </nav>
+    <div class="sb-footer">Status: <span style="color:#8dfad1;">Active</span></div>
+  </aside>
+
+  <div class="dash-content">
+    <div class="top-header">
+      <div class="top-space"></div>
+      <a href="#" class="right-head-link">Welcome</a>
+    </div>
     <div class="dashboard-row">
       <div class="trading-card">
         <div class="trading-title">Crypto Trading Bot</div>
         <div class="trading-today">Today &emsp; <span>$0.00</span></div>
         <div class="trading-pair">Crypto: BTC/USDT</div>
         <div class="chart-widget">
-          <!-- TradingView widget or chart here. Placeholder below: -->
-          <img src="https://s3.tradingview.com/chart_snapshot/BTCUSDT.png" alt="Crypto Chart" style="width:95%; height:120px;object-fit:cover;" />
+          <!-- Live TradingView Widget JS (replace src if needed for PRO widget) -->
+          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_2b4ec&symbol=BINANCE:BTCUSDT&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=light" width="99%" height="135" frameborder="0" allowtransparency="true"></iframe>
         </div>
         <div class="trading-meta-row">
           <div>Investment $0.00</div>
@@ -180,7 +386,7 @@
         <div class="trading-today">Today &emsp; <span>$0.00</span></div>
         <div class="trading-pair">Forex: EUR/USD</div>
         <div class="chart-widget">
-          <img src="https://s3.tradingview.com/chart_snapshot/EURUSD.png" alt="Forex Chart" style="width:95%; height:120px;object-fit:cover;" />
+          <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_2b4ec&symbol=FX_IDC:EURUSD&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=light" width="99%" height="135" frameborder="0" allowtransparency="true"></iframe>
         </div>
         <div class="trading-meta-row">
           <div>Investment $0.00</div>
@@ -190,53 +396,26 @@
         </div>
       </div>
     </div>
-
     <div class="ref-block">
-      <div>
-        <span class="ref-link">Referral Link</span>
-        <span class="ref-url" id="referralUrl">https://tradeera.com/signup?referral=YOURCODE</span>
-      </div>
+      <span class="ref-link">Referral Link</span>
+      <span class="ref-url" id="referralUrl">https://tradeera.com/signup?referral=YOURCODE</span>
       <button class="ref-btn" onclick="copyReferral()">Copy</button>
     </div>
     <div class="wallet-grid">
-      <div class="wallet-card">
-        <div class="wallet-card-title">Income Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Angel Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Fuel Income Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Fuel Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Topup Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Package Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Capital Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
-      <div class="wallet-card">
-        <div class="wallet-card-title">Cross Wallet</div>
-        <div class="wallet-card-amt">$0</div>
-      </div>
+      <div class="wallet-card"><div class="wallet-card-title">Income Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Angel Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Fuel Income Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Fuel Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Topup Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Package Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Capital Wallet</div><div class="wallet-card-amt">$0</div></div>
+      <div class="wallet-card"><div class="wallet-card-title">Cross Wallet</div><div class="wallet-card-amt">$0</div></div>
     </div>
     <div class="summary-row">
       <div class="summary-card">Total Income<br>$0</div>
       <div class="summary-card withdraw">Total Withdraw<br>$0</div>
     </div>
-  </main>
+  </div>
   <script>
     function copyReferral(){
       const url = document.getElementById('referralUrl').textContent;
