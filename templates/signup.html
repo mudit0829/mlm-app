@@ -91,6 +91,24 @@
       margin-bottom: 9px;
       color: #8aa0c6;
     }
+    .referral-row {
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    #copyReferral {
+      padding:8px 16px;
+      font-size:0.95em;
+      background:#ffb24d;
+      color:#132338;
+      border:none;
+      border-radius:5px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    #copyReferral:hover {
+      background:#ffd999;
+    }
   </style>
 </head>
 <body>
@@ -102,7 +120,10 @@
     <form id="signupForm">
       <label>Referral Code Information</label>
       <div class="info-text">Enter your referral code to register</div>
-      <input name="referral_code" id="referralCode" required readonly>
+      <div class="referral-row">
+        <input name="referral_code" id="referralCode" required>
+        <button type="button" id="copyReferral">Copy</button>
+      </div>
 
       <label>Select Position</label>
       <select name="position" required>
@@ -150,16 +171,30 @@
     </form>
   </div>
   <script>
-    // Autofill referral code from URL parameter, make field readonly
+    // Autofill referral code from URL parameter (readonly if present)
     function getQueryParam(param) {
       let params = new URLSearchParams(window.location.search);
       return params.get(param);
     }
     window.onload = function() {
       let referral = getQueryParam('referral');
+      let refInput = document.getElementById('referralCode');
       if (referral) {
-        document.getElementById('referralCode').value = referral;
-        document.getElementById('referralCode').readOnly = true;
+        refInput.value = referral;
+        refInput.readOnly = true;
+      } else {
+        refInput.readOnly = false;
+      }
+    };
+
+    // Copy referral code
+    document.getElementById('copyReferral').onclick = function() {
+      let refCode = document.getElementById('referralCode').value;
+      if (refCode) {
+        navigator.clipboard.writeText(refCode);
+        alert("Referral code copied!");
+      } else {
+        alert("Nothing to copy!");
       }
     };
 
@@ -176,8 +211,8 @@
         alert("Passwords do not match."); return;
       }
       let fields = {};
-      Array.from(form.elements).forEach(el => { 
-        if(el.name && el.type!=="button") fields[el.name] = el.value; 
+      Array.from(form.elements).forEach(el => {
+        if(el.name && el.type!=="button") fields[el.name] = el.value;
       });
       let res = await fetch('/signup', {
         method: 'POST',
