@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head><title>Signup</title></head>
+<body>
+  <h2>Signup</h2>
+  <form id="signupForm">
+    Username: <input name="username"><br>
+    Password: <input name="password" type="password"><br>
+    Sponsor ID (optional): <input name="sponsor_id"><br>
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <script>
+    document.getElementById('signupForm').onsubmit = async (e) => {
+      e.preventDefault();
+      let res = await fetch('https://mlm-app-3d3y.onrender.com/signup', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          username: e.target.username.value,
+          password: e.target.password.value,
+          sponsor_id: e.target.sponsor_id.value || null
+        })
+      });
+      let data = await res.json();
+      if (data.user_id) {
+        alert('Signup successful! Please login.');
+        window.location.href = 'login.html'; // You can open login page next
+      } else {
+        alert(data.message);
+      }
+    };
+  </script>
+</body>
+</html>

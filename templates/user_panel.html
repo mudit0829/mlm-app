@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>User Panel</title></head>
+<body>
+  <h2>User Panel</h2>
+  <div id="userInfo"></div>
+
+  <script>
+    async function loadUserPanel() {
+      // Prompt user for their user ID (for demo purposes)
+      let userId = prompt("Enter your User ID:");
+
+      if (!userId) {
+        alert("User ID is required");
+        return;
+      }
+
+      let res = await fetch('https://mlm-app-3d3y.onrender.com/user/' + userId + '/panel');
+      let data = await res.json();
+
+      if (data.user_id) {
+        document.getElementById('userInfo').innerHTML = `
+          <p><b>User ID:</b> ${data.user_id}</p>
+          <p><b>Username:</b> ${data.username}</p>
+          <p><b>Sponsor ID:</b> ${data.sponsor_id}</p>
+          <p><b>Power Leg:</b> ${data.power_leg}</p>
+          <p><b>Other Legs:</b> ${data.other_leg.join(', ')}</p>
+          <p><b>Direct Referrals:</b> ${data.directs.join(', ')}</p>
+        `;
+      } else {
+        alert(data.message || "Error loading user panel");
+      }
+    }
+
+    loadUserPanel();
+  </script>
+</body>
+</html>
