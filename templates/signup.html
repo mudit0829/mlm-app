@@ -4,121 +4,168 @@
   <title>TradeEra - Registration</title>
   <style>
     body {
-      background: #122623;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #22293f;
       margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
-    #mainBox {
-      width: 400px;
-      margin: 60px auto;
-      background: #163a36;
+    .container {
+      width: 420px;
+      margin: 56px auto;
+      background: #132338;
       border-radius: 14px;
-      box-shadow: 0 0 24px #0006;
-      padding: 32px 32px 24px 32px;
-      color: #fff;
-      position: relative;
+      box-shadow: 0 0 32px #0007;
+      padding: 32px 38px 30px 38px;
+      color: #eaf1fa;
     }
-    h1 {
+    .header {
       text-align: center;
       margin-bottom: 18px;
-      font-size: 2em;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-weight: 600;
-      letter-spacing: 1px;
     }
-    label { font-weight:600; display:block; margin-top:16px; }
+    .header h1 {
+      font-size: 2.1em;
+      font-weight: bold;
+      letter-spacing: 1.2px;
+      color: #ffb24d;
+      margin-bottom: 0;
+    }
+    .header .subtitle {
+      font-size: 1.13em;
+      font-weight: 400;
+      color: #ececec;
+      margin-bottom: 10px;
+      margin-top: 4px;
+    }
+    label {
+      font-weight: 600;
+      margin-top: 18px;
+      margin-bottom: 4px;
+      display: block;
+    }
+    .input-row {
+      display: flex;
+      gap: 16px;
+    }
+    .input-row input, .input-row select {
+      flex:1;
+    }
     input, select {
       font-size: 1em;
-      margin-top: 7px;
-      margin-bottom: 16px;
-      padding: 10px;
+      margin-bottom: 14px;
+      padding: 9px;
       width: 100%;
       border-radius: 6px;
-      border: 1px solid #20544b;
-      background: #132725;
-      color: #fff;
+      border: 1px solid #435c8d;
+      background: #192645;
+      color: #f8f8f8;
+      transition: border 0.2s;
     }
-    input[type="date"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-    }
-    button {
-      width: 120px;
-      padding: 12px;
-      background: #ff9c2b;
-      color: #fff;
-      border:none;
-      border-radius: 7px;
-      margin-top: 16px;
-      font-size: 1em;
-      font-weight: bold;
-      cursor: pointer;
+    input:focus, select:focus {
+      outline: none;
+      border: 1.5px solid #ffb24d;
     }
     .actions {
-      display: flex; justify-content: space-between;
+      display: flex;
+      gap: 16px;
+      margin-top: 22px;
+      justify-content: flex-end;
+    }
+    .actions button {
+      padding: 12px 32px;
+      font-size: 1em;
+      font-weight: bold;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .actions .register-btn {
+      background: #ffb24d;
+      color: #22293f;
+    }
+    .actions .cancel-btn {
+      background: #37476a;
+      color: #eaf1fa;
+    }
+    .info-text {
+      font-size: 0.95em;
+      margin-bottom: 9px;
+      color: #8aa0c6;
     }
   </style>
 </head>
 <body>
-  <div id="mainBox">
-    <h1>TradeEra</h1>
+  <div class="container">
+    <div class="header">
+      <h1>TRADEERA</h1>
+      <div class="subtitle">New Registration</div>
+    </div>
     <form id="signupForm">
-      <label>Referral Code (User ID):</label>
+      <label>Referral Code Information</label>
+      <div class="info-text">Enter your referral code to register</div>
       <input name="referral_code" required>
 
-      <label>Select Position:</label>
+      <label>Select Position</label>
       <select name="position" required>
-        <option value="LEFT">LEFT (Max 6)</option>
-        <option value="RIGHT">RIGHT (Max 6)</option>
+        <option value="LEFT">LEFT</option>
+        <option value="RIGHT">RIGHT</option>
       </select>
 
-      <label>Enter Username:</label>
-      <input name="username" required>
+      <label>Create Login Information</label>
+      <input name="username" placeholder="Enter Username" required>
+      <div class="input-row">
+        <input name="password" type="password" placeholder="Enter Password" required>
+        <input name="confirm_password" type="password" placeholder="Confirm Password" required>
+      </div>
 
-      <label>Enter Password:</label>
-      <input name="password" type="password" required>
-      <label>Confirm Password:</label>
-      <input name="confirm_password" type="password" required>
-
-      <label>First Name:</label>
-      <input name="first_name" required>
-      <label>Last Name:</label>
-      <input name="last_name" required>
-
-      <label>Email:</label>
-      <input name="email" type="email" required>
-
-      <label>Date of Birth (DOB):</label>
-      <input name="dob" type="date" required>
-
-      <label>Country:</label>
-      <select name="country" required>
-        <option value="">--Select Country--</option>
-        <option value="India">India</option>
-        <option value="USA">USA</option>
-        <option value="UK">UK</option>
-        <option value="Australia">Australia</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <label>Mobile Number:</label>
-      <input name="mobile" required>
-      <label>State:</label>
-      <input name="state" required>
+      <label>Personal Information</label>
+      <div class="input-row">
+        <input name="first_name" placeholder="First name" required>
+        <input name="last_name" placeholder="Last name" required>
+      </div>
+      <div class="input-row">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="dob" type="date" placeholder="DOB" required>
+      </div>
+      <div class="input-row">
+        <select name="country" id="countrySelect" required>
+          <option value="">--Select Country--</option>
+          <option value="India" data-code="+91">India (+91)</option>
+          <option value="USA" data-code="+1">USA (+1)</option>
+          <option value="UK" data-code="+44">UK (+44)</option>
+          <option value="Australia" data-code="+61">Australia (+61)</option>
+          <option value="Canada" data-code="+1">Canada (+1)</option>
+          <option value="Lithuania" data-code="+370">Lithuania (+370)</option>
+          <option value="Germany" data-code="+49">Germany (+49)</option>
+          <option value="France" data-code="+33">France (+33)</option>
+          <option value="Other" data-code="">Other</option>
+        </select>
+        <input name="country_code" id="countryCode" placeholder="Code" readonly required>
+        <input name="mobile" placeholder="Mobile" required>
+      </div>
+      <input name="state" placeholder="State" required>
       <div class="actions">
-        <button type="submit">Register</button>
-        <button type="button" onclick="window.location.href='/'">Cancel</button>
+        <button class="register-btn" type="submit">Register</button>
+        <button class="cancel-btn" type="button" onclick="window.location.href='/'">Cancel</button>
       </div>
     </form>
   </div>
   <script>
-    document.getElementById('signupForm').onsubmit = async (e) => {
+    // Auto-fill country dial code
+    document.getElementById('countrySelect').addEventListener('change', function(e) {
+      let code = e.target.options[e.target.selectedIndex].getAttribute('data-code');
+      document.getElementById('countryCode').value = code || '';
+    });
+
+    document.getElementById('signupForm').onsubmit = async function(e) {
       e.preventDefault();
       let form = e.target;
       if(form.password.value !== form.confirm_password.value){
         alert("Passwords do not match."); return;
       }
       let fields = {};
-      Array.from(form.elements).forEach(el => { if(el.name && el.type!=="button") fields[el.name] = el.value; });
+      Array.from(form.elements).forEach(el => { 
+        if(el.name && el.type!=="button") fields[el.name] = el.value; 
+      });
       let res = await fetch('/signup', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
