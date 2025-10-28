@@ -3,25 +3,72 @@
 <head>
   <title>TradeEra - Registration</title>
   <style>
-    body { background: #112120; color: #fff; font-family: Arial, sans-serif; }
-    #formBox { background: #193a37; margin: 40px auto; width: 440px; padding: 32px 28px; border-radius: 10px; box-shadow: 0 0 24px #0004; }
-    h2 { text-align:center; font-weight:bold; margin-bottom: 18px; }
-    label { display:block; margin: 14px 0 4px; }
-    input, select { width:100%; padding:10px; margin:6px 0 12px; border: 1px solid #ddd; background:#113327; color:#fafafa;}
-    button { padding:12px 30px; background:#ff8c21; color:#fff; border:none; font-size:1em; border-radius:6px; cursor:pointer;}
+    body {
+      background: #122623;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+    }
+    #mainBox {
+      width: 400px;
+      margin: 60px auto;
+      background: #163a36;
+      border-radius: 14px;
+      box-shadow: 0 0 24px #0006;
+      padding: 32px 32px 24px 32px;
+      color: #fff;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 2em;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    label { font-weight:600; display:block; margin-top:16px; }
+    input, select {
+      font-size: 1em;
+      margin-top: 7px;
+      margin-bottom: 16px;
+      padding: 10px;
+      width: 100%;
+      border-radius: 6px;
+      border: 1px solid #20544b;
+      background: #132725;
+      color: #fff;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+    button {
+      width: 120px;
+      padding: 12px;
+      background: #ff9c2b;
+      color: #fff;
+      border:none;
+      border-radius: 7px;
+      margin-top: 16px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .actions {
+      display: flex; justify-content: space-between;
+    }
   </style>
 </head>
 <body>
-  <div id="formBox">
-    <h2>TradeEra Registration</h2>
+  <div id="mainBox">
+    <h1>TradeEra</h1>
     <form id="signupForm">
       <label>Referral Code (User ID):</label>
       <input name="referral_code" required>
 
       <label>Select Position:</label>
       <select name="position" required>
-        <option value="LEFT">LEFT</option>
-        <option value="RIGHT">RIGHT</option>
+        <option value="LEFT">LEFT (Max 6)</option>
+        <option value="RIGHT">RIGHT (Max 6)</option>
       </select>
 
       <label>Enter Username:</label>
@@ -29,10 +76,11 @@
 
       <label>Enter Password:</label>
       <input name="password" type="password" required>
+      <label>Confirm Password:</label>
+      <input name="confirm_password" type="password" required>
 
       <label>First Name:</label>
       <input name="first_name" required>
-
       <label>Last Name:</label>
       <input name="last_name" required>
 
@@ -43,31 +91,43 @@
       <input name="dob" type="date" required>
 
       <label>Country:</label>
-      <input name="country" required>
+      <select name="country" required>
+        <option value="">--Select Country--</option>
+        <option value="India">India</option>
+        <option value="USA">USA</option>
+        <option value="UK">UK</option>
+        <option value="Australia">Australia</option>
+        <option value="Other">Other</option>
+      </select>
 
       <label>Mobile Number:</label>
       <input name="mobile" required>
-
       <label>State:</label>
       <input name="state" required>
-
-      <button type="submit">Register</button>
+      <div class="actions">
+        <button type="submit">Register</button>
+        <button type="button" onclick="window.location.href='/'">Cancel</button>
+      </div>
     </form>
   </div>
   <script>
     document.getElementById('signupForm').onsubmit = async (e) => {
       e.preventDefault();
-      let obj = {};
-      Array.from(e.target.elements).forEach(el => { if(el.name) obj[el.name] = el.value; });
+      let form = e.target;
+      if(form.password.value !== form.confirm_password.value){
+        alert("Passwords do not match."); return;
+      }
+      let fields = {};
+      Array.from(form.elements).forEach(el => { if(el.name && el.type!=="button") fields[el.name] = el.value; });
       let res = await fetch('/signup', {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(obj)
+        body: JSON.stringify(fields)
       });
       let data = await res.json();
       if (data.user_id) {
-        alert('Registration successful! Please note your User ID: ' + data.user_id);
-        window.location.href = '/'; // Redirect to login
+        alert('Registration successful! Your User ID is: ' + data.user_id);
+        window.location.href = '/';
       } else {
         alert(data.message);
       }
