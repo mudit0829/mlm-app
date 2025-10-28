@@ -10,351 +10,87 @@
       color: #eaf1fa;
     }
     .sidebar {
-      width: 260px;
-      background: #11262e;
+      width: 265px;
+      background: #12262e;
       color: #ffb955;
       height: 100vh;
       position: fixed;
-      left: 0;
-      top: 0;
-      padding-top: 0;
-      font-size: 1.13em;
-      box-shadow: 0 0 34px #031013;
+      left: 0; top: 0;
+      font-size: 1.11em;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
+      box-shadow: 0 0 28px #031013;
+      z-index: 1;
     }
     .sb-logo {
-      font-size: 2.1em;
-      text-align: left;
-      letter-spacing: 2px;
-      color: #ffb955;
+      font-size: 2.15em;
       font-weight: bold;
-      padding: 28px 0 18px 24px;
-      margin-bottom: 30px;
+      letter-spacing: 1.4px;
+      padding: 32px 0 18px 28px;
+      color: #ffb955;
+      margin-bottom: 16px;
+      font-family: 'Nunito', 'Segoe UI', Arial, sans-serif;
     }
     .sb-menu {
       list-style: none;
-      padding: 0;
       margin: 0;
+      padding: 0 0 12px 0;
     }
-    .sb-menu li {
-      padding: 16px 32px;
+    .sb-menu > li {
+      padding: 15px 30px;
       cursor: pointer;
-      color: #eaf1fa;
-      transition: background 0.16s;
-    }
-    .sb-menu li.active,
-    .sb-menu li:hover {
-      background: #183342;
-      color: #ffba41;
-      border-left: 4px solid #ffb955;
-    }
-    .sb-footer {
-      position: absolute;
-      bottom: 22px;
-      left: 20px;
-      font-size: 1em;
-      color: #b5e7c4;
-    }
-    .main-panel {
-      margin-left: 260px;
-      padding: 20px 34px 28px 34px;
-      background: linear-gradient(120deg,#122b35 90%,#173544 100%);
-      min-height: 100vh;
-      min-width: 970px;
-    }
-    .dashboard-title-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: #ffb955;
-      margin-top: 14px;
-      margin-bottom: 12px;
-    }
-    .dashboard-title-row h2 {
-      font-size: 2.15em;
-      font-weight: bold;
-      letter-spacing: 2px;
-      margin: 0;
-      color: #ffb955;
-    }
-    .dashboard-title-row .welcome {
-      font-size: 1.1em;
-      color: #f7c477;
-    }
-    .bot-row {
-      display: flex;
-      gap: 22px;
-      margin-bottom: 24px;
-    }
-    .bot-card {
-      background: #13324d;
-      border-radius: 18px;
-      flex: 1;
-      padding: 17px 24px 23px 24px;
-      box-shadow: 0 5px 32px #0004;
-      min-width: 380px;
+      transition: background 0.17s;
+      color: #ededed;
+      font-weight: 500;
+      font-size: 1.08em;
       position: relative;
     }
-    .bot-card h3 {
-      font-size: 1.18em;
-      font-weight: bold;
-      color: #a4ffd2;
-      margin: 0 0 4px 0;
+    .sb-menu > li.active,
+    .sb-menu > li:hover {
+      background: #183342;
+      color: #ffb955;
     }
-    .bot-card .today-label {
-      color: #ffeeb6;
-      font-size: 1em;
-      margin-bottom: 5px;
-      margin-top: 7px;
+    .sb-menu > li.has-dropdown::after {
+      content: "▼";
+      float: right;
+      font-size: 0.7em;
+      color: #ffb955;
+      margin-right: 2px;
+      margin-top: 8px;
     }
-    .bot-card .chartimg {
+    .sb-menu > li.has-dropdown {
+      position:relative;
+    }
+    .sb-menu > li.has-dropdown:hover > .dropdown, .sb-menu > li.has-dropdown:focus-within > .dropdown {
       display: block;
-      margin:13px auto 9px auto;
-      width: 99%;
-      border-radius: 8px;
-      min-height:130px;
-      max-height:155px;
-      background: #efe;
-      object-fit: cover;
-      border: 1.5px solid #355079;
     }
-    .bot-card .bot-subrow {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 14px;
-      font-size: 1.09em;
+    .dropdown {
+      display: none;
+      background: #223441;
+      margin: 0;
+      padding: 0 0 0 8px;
+      border-radius: 0 0 9px 9px;
+      position:absolute;
+      left:0; right:0;
+      top:100%;
+      z-index:2;
+      min-width: 185px;
+      box-shadow: 0 6px 16px #0007;
     }
-    .bot-card .bot-item {
-      color: #f3bd72;
-      font-weight: bold;
+    .dropdown li {
+      padding: 11px 20px;
+      font-size: 0.97em;
+      color: #d7d7d7;
+      font-weight:400;
+      cursor:pointer;
+      border-bottom: 1px solid #233;
+      background:#223441;
+      transition: background 0.19s;
     }
-    .stats-row, .wallet-row {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 18px;
+    .dropdown li:last-child {
+      border-bottom:none;
     }
-    .stat-card, .wallet-card {
-      flex: 1;
-      background: #37476a;
-      border-radius: 15px;
-      text-align: center;
-      padding: 13px 0 10px 0;
-      box-shadow: 0 3px 14px #0004;
+    .dropdown li:hover {
+      background: #2b4362;
+      color:#ffb955;
     }
-    .stat-card-title, .wallet-card-title {
-      font-weight: bold;
-      color: #ffe6b1;
-      margin-bottom: 7px;
-      font-size:1.13em;
-      margin-top:0;
-    }
-    .stat-card-amt, .wallet-card-amt {
-      font-size: 1.37em;
-      font-weight: bold;
-      color: #ffb955;
-      margin-bottom: 2px;
-    }
-    .info-sections-row {
-      display: flex;
-      gap: 32px;
-    }
-    .info-block {
-      background: #141f37;
-      border-radius: 15px;
-      padding: 26px 35px 20px 27px;
-      box-shadow: 0 2px 13px #0003;
-      flex: 1;
-      min-width: 360px;
-    }
-    .info-block .info-title {
-      font-size:1.23em;
-      font-weight: bold;
-      color: #ffb955;
-      margin-bottom: 13px;
-      letter-spacing: 1.2px;
-    }
-    .info-block.detail-block label {
-      color: #a4c7ff;
-      display: inline-block;
-      font-size:1.07em;
-      min-width: 130px;
-      margin-bottom: 3px;
-    }
-    .info-block.detail-block span {
-      color: #ffd085;
-      font-size:1.05em;
-      font-weight: bold;
-    }
-    .ref-row {
-      display: flex; gap:10px; margin-top:20px;
-    }
-    .ref-input {
-      width: 250px;
-      border-radius: 8px;
-      border: none;
-      background: #182640;
-      padding: 7px 14px;
-      color: #fbd378;
-      font-size: 1em;
-      font-family: inherit;
-    }
-    .ref-btn {
-      background: #ffb955;
-      color: #172b3b;
-      border: none;
-      border-radius: 7px;
-      font-weight: bold;
-      font-size: 1.08em;
-      cursor: pointer;
-      padding: 7px 22px;
-      margin-left: 8px;
-    }
-    .ref-btn:hover {
-      background: #ffd473;
-    }
-    .business-block label {
-      color: #ffe7b1;
-      min-width:130px;
-      margin-bottom:3px;
-      display:inline-block;
-    }
-    .business-block span {
-      color: #ffc373;
-      font-weight: bold;
-      margin-left:12px;
-    }
-  </style>
-</head>
-<body>
-  <div class="sidebar">
-    <div class="sb-logo">TRADEERA</div>
-    <ul class="sb-menu">
-      <li class="active">Dashboard</li>
-      <li>New Registration</li>
-      <li>Profile</li>
-      <li>Wallets</li>
-      <li>Reports</li>
-      <li>Referral Link</li>
-      <li>Signout</li>
-    </ul>
-    <div class="sb-footer">Status: <span style="color:#8dfad1;">Active</span></div>
-  </div>
-  <div class="main-panel">
-    <div class="dashboard-title-row">
-      <h2>User Dashboard</h2>
-      <div class="welcome">Welcome <span id="dash-username"></span></div>
-    </div>
-
-    <!-- Bot Chart Row -->
-    <div class="bot-row">
-      <div class="bot-card">
-        <h3>Crypto Trading Bot</h3>
-        <div class="today-label">Today &emsp;<span style="color:#ffeec1;">$0.00</span></div>
-        <img class="chartimg" src="https://www.tradingview.com/x/ZpUokvZn/" alt="Crypto Chart (placeholder)">
-        <div class="bot-subrow">
-          <div>BTC/USDT</div>
-          <div class="bot-item">Profit: $0.00</div>
-        </div>
-      </div>
-      <div class="bot-card">
-        <h3>Forex Trading Bot</h3>
-        <div class="today-label">Today &emsp;<span style="color:#ffeec1;">$0.00</span></div>
-        <img class="chartimg" src="https://www.tradingview.com/x/tNHPi0E0/" alt="Forex Chart (placeholder)">
-        <div class="bot-subrow">
-          <div>EUR/USD</div>
-          <div class="bot-item">Profit: $0.00</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats Row -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-card-title">Last Days Profit</div>
-        <div class="stat-card-amt" id="last_profit">$0.00</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-title">Total Profit 15 Days</div>
-        <div class="stat-card-amt" id="total_profit">$0.00</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-title">Total Investment</div>
-        <div class="stat-card-amt" id="investment">$0.00</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-title">Live Capital</div>
-        <div class="stat-card-amt" id="live_capital">$0.00</div>
-      </div>
-    </div>
-
-    <!-- Wallet Row -->
-    <div class="wallet-row">
-      <div class="wallet-card"><div class="wallet-card-title">Activation Wallet</div><div class="wallet-card-amt">$0.00</div></div>
-      <div class="wallet-card"><div class="wallet-card-title">Credit Wallet</div><div class="wallet-card-amt">$0.00</div></div>
-      <div class="wallet-card"><div class="wallet-card-title">Income Wallet</div><div class="wallet-card-amt">$0.00</div></div>
-      <div class="wallet-card"><div class="wallet-card-title">Profit Wallet</div><div class="wallet-card-amt">$0.00</div></div>
-      <div class="wallet-card"><div class="wallet-card-title">Total Income</div><div class="wallet-card-amt">$0.00</div></div>
-    </div>
-
-    <!-- Info Section -->
-    <div class="info-sections-row">
-      <div class="info-block detail-block">
-        <div class="info-title">Personal Info</div>
-        <div><label>User Id:</label> <span id="user_id"></span></div>
-        <div><label>Username:</label> <span id="username"></span></div>
-        <div><label>Full Name:</label> <span id="full_name"></span></div>
-        <div><label>Mobile:</label> <span id="mobile"></span></div>
-        <div><label>Email:</label> <span id="email"></span></div>
-        <div><label>Designation:</label> <span>Free User</span></div>
-        <div><label>Registration Date:</label> <span id="reg_date"></span></div>
-        <div class="ref-row">
-          <input class="ref-input" id="referralLink" readonly>
-          <button class="ref-btn" onclick="copyReferral()">Copy</button>
-        </div>
-      </div>
-      <div class="info-block business-block">
-        <div class="info-title">Business Info</div>
-        <div><label>Active Bots:</label> <span>0</span></div>
-        <div><label>Inactive Bots:</label> <span>0</span></div>
-        <div><label>Profit Wallet:</label> <span>$0.00</span></div>
-        <div><label>Credit Wallet:</label> <span>$0.00</span></div>
-        <div><label>Income Wallet:</label> <span>$0.00</span></div>
-        <div><label>Total Income:</label> <span>$0.00</span></div>
-      </div>
-    </div>
-  </div>
-  <script>
-    function getQueryParam(param) {
-      let params = new URLSearchParams(window.location.search);
-      return params.get(param) || '';
-    }
-    window.onload = function() {
-      let username = getQueryParam('userid');
-      if(!username){
-        alert("No User ID supplied in URL!");
-        return;
-      }
-      fetch('/users/by-username/' + encodeURIComponent(username))
-      .then(r=>r.json())
-      .then(data=>{
-        if(!data.user_id){ alert("User not found!"); return; }
-        document.getElementById('dash-username').textContent = data.username || "";
-        document.getElementById('user_id').textContent = data.username || "";
-        document.getElementById('username').textContent = data.username || "";
-        document.getElementById('full_name').textContent = (data.first_name?data.first_name:"") + (data.last_name?" "+data.last_name:"");
-        document.getElementById('mobile').textContent = (data.country_code||"") + (data.mobile||"");
-        document.getElementById('email').textContent = data.email || "";
-        document.getElementById('reg_date').textContent = data.reg_date || new Date().toLocaleString();
-        let refLink = window.location.origin + '/signup-page?referral=' + data.username;
-        document.getElementById('referralLink').value = refLink;
-      });
-    }
-    function copyReferral() {
-      let refInput = document.getElementById('referralLink');
-      refInput.select();
-      refInput.setSelectionRange(0, 99999);
-      document.execCommand('copy');
-      alert('Referral link copied!');
-    }
-  </script>
-</body>
-</html>
+    .sb-footer {
