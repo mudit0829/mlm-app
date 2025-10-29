@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra User Dashboard PRO</title>
+  <title>TradeEra User Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
@@ -14,13 +14,16 @@
       display:flex; align-items:center; justify-content:space-between;
       padding:0; box-sizing:border-box;
     }
+    .header .logo-box {height:62px; display:flex; align-items:center; margin-left:20px;}
+    .logo-svg {
+      width:44px; height:44px; margin-right:10px; background:#f7fff3; border-radius:11px; display:inline-block; box-shadow:0 0 4px #d9f7e7;
+    }
+    .logo-text { font-size:2em; letter-spacing:.06em; font-weight:700; color:#14a074; font-family: 'Nunito', Arial, sans-serif;}
     .header .hamburger {
-      display:none; background: none; border: none; width:58px; height:100%; align-items: center;
-      justify-content:center; cursor:pointer; z-index: 999; margin-left:10px; position:relative;
+      display:none;background:none;border:none;width:58px;height:100%;align-items:center;justify-content:center;cursor:pointer;z-index:999; margin-left:8px; position:relative;
     }
     .hamburger-inner, .hamburger-inner:before, .hamburger-inner:after {
-      position:absolute; left: 18px; width: 28px; height: 4.5px; border-radius:2.5px; background: #1975d3; content: ""; transition: all .22s;
-      display:block;
+      position:absolute; left: 18px; width: 28px; height: 4.5px; border-radius:2.5px; background: #1975d3; content: ""; transition: all .22s; display:block;
     }
     .hamburger-inner       { top: 29px;}
     .hamburger-inner:before{ content:""; top: -9px;}
@@ -31,17 +34,20 @@
     .header-space { width:265px; }
     @media (max-width:950px){
       .header-space { width:0;}
+      .header .logo-box{margin-left:8px;}
       .header .hamburger { display:flex;}
+      .logo-svg { width:38px; height:38px;}
+      .logo-text { font-size:1.43em; }
     }
+
     /* --- SIDEBAR --- */
     .sidebar {
       width:265px; background:#fafdfe; color:#273042; height:100vh;
-      position:fixed; left:0; top:0; font-size:1.07em;
+      position:fixed; left:0; top:0; font-size:1.05em;
       box-shadow:0 0 18px #03101309; border-right:1.5px solid #e6e7ea; z-index:850;
       padding-top:64px;
       display:flex; flex-direction:column;
       transition: left .32s cubic-bezier(.4,0,.2,1);
-      /* Only sidebar scrolls, not whole page! */
       overflow: hidden;
     }
     .sidebar-inner {
@@ -51,31 +57,24 @@
       overflow: hidden;
     }
     .sidebar-menu-scroll {
-      flex: 1 1 auto;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
+      flex: 1 1 auto; min-height: 0;
+      overflow-y: auto; overflow-x: hidden;
+      padding-bottom: 10px;
     }
-    .sb-logo { font-size:2em; font-weight:700; color:#0a64c2; padding:19px 0 10px 32px; margin-bottom:5px;}
+    .sb-logo-row {display:flex; align-items:center; gap:8px; margin:0 0 9px 0; }
+    .sb-logo-svg {
+      width:32px; height:32px; background:#e8fff1; border-radius:8px; 
+      display:inline-block; margin-left:10px;
+    }
+    .sb-logo-text { font-size:1.22em; font-weight:700; color:#11a874;letter-spacing:.04em; font-family: 'Nunito', Arial, sans-serif;}
     .sb-menu { list-style:none;margin:0;padding:0 0 9px 0;}
     .sb-menu > li, .sb-menu > li.has-dropdown, .dropdown li {
-      padding:12px 30px;
-      font-weight:500;
-      color:#222d41;
-      border:none;
-      border-radius:8px;
-      margin:1px 7px;
-      font-size:1em;
-      position:relative;
-      user-select:none;
-      transition:background .12s,color .14s;
-      cursor: pointer !important;
-      -webkit-tap-highlight-color:transparent !important;
+      padding:12px 30px; font-weight:500; color:#222d41; border:none;
+      border-radius:8px; margin:1px 7px; font-size:1em; position:relative; user-select:none;
+      transition:background .11s,color .14s;
+      cursor: pointer !important; -webkit-tap-highlight-color:transparent !important;
     }
-    .sb-menu > li.active, .sb-menu > li.open, .sb-menu > li:hover, .dropdown li:active, .dropdown li:focus, .dropdown li:hover {
-      background:#c0fae6;
-      color:#178c85 !important; cursor:pointer !important;
-    }
+    .sb-menu > li.active, .sb-menu > li.open, .sb-menu > li:hover, .dropdown li:active, .dropdown li:focus, .dropdown li:hover { background:#c0fae6; color:#178c85 !important; cursor:pointer !important;}
     .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.96em; float:right; color:#a2b7bb;}
     .sb-menu > li.has-dropdown.open::after { content:'▾'; }
     .sb-menu > li.has-dropdown > .dropdown { display:none;}
@@ -85,74 +84,58 @@
     .sb-footer {
       flex-shrink: 0;
       position: static;
-      margin: 14px 0 6px 32px;
+      margin: 10px 0 7px 30px;
       font-size:.98em;
       color:#bbb; cursor:default !important;
       pointer-events: none; user-select: none;
     }
     /* Sidebar mobile: */
     @media (max-width:950px){
-      .sidebar {
-        left:-290px; width:245px; min-height:100vh; padding-top:64px;
-        box-shadow:2px 0 30px #aaf6;
-      }
+      .sidebar { left:-290px; width:240px; min-height:100vh; padding-top:64px; box-shadow:2px 0 30px #aaf6; }
       .sidebar.open { left:0;}
+      .sb-logo-svg { width:27px; height:27px;}
+      .sb-logo-text {font-size:1.08em;}
     }
     .sidebar-backdrop { display:none; position:fixed;z-index:600;top:0;left:0;width:100vw;height:100vh;background:rgba(9,24,45,0.11);}
     .sidebar-backdrop.show { display:block;}
     /* --- CONTENT --- */
-    .main-content {
-      margin-left:265px; padding-top:73px; padding-bottom:32px;
-      min-width:320px; background:#f8fafd;
-      transition:margin 0.3s; position:relative;
-    }
-    @media (max-width:950px){ .main-content { margin-left:0; padding-top:73px;} }
+    .main-content { margin-left:265px; padding-top:74px; padding-bottom:28px; min-width:320px; background:#f8fafd; transition:margin 0.3s; position:relative; }
+    @media (max-width:950px){ .main-content { margin-left:0; padding-top:74px;} }
     /* Referral, chart, wallets */
-    .ref-card { width:99.5%; background:#fff; min-height:44px; display:flex; flex-direction:column; align-items:flex-start; padding:19px 4vw 17px 4vw; box-shadow:0 1.5px 13px #dde7ff12; border-radius:17px; margin:22px 0 18px 0; font-size:1.16em; gap:10px;}
+    .ref-card { width:99.5%; background:#fff; min-height:44px; display:flex; flex-direction:column; align-items:flex-start; padding:19px 4vw 17px 4vw; box-shadow:0 1.5px 13px #dde7ff12; border-radius:17px; margin:22px 0 18px 0; font-size:1.14em; gap:10px;}
     .ref-block-row { width:100%; display:flex; align-items: center; }
     .ref-link-title {font-weight:700; color:#1d61a4; margin-right:6px;}
     .ref-url {font-size:1em; color:#4d6ea5;}
     .ref-btn { margin-left:10px; padding:7px 15px; background:#e8efff; color:#1752c2; border:1.5px solid #dde6fa; border-radius:8px; font-weight:600; cursor:pointer;}
     .ref-btn:hover {background:#d2e2fa;}
-    .chart-section {
-      width:98.2%; background:#d7f2fa; border-radius:20px; box-shadow:0 2px 15px #aecadd22;
-      margin:15px auto 22px auto; min-height:370px; display:flex;flex-direction:column; align-items:center; padding:16px 0 7px 0; position:relative;z-index:1;
-    }
+    .chart-section { width:98.2%; background:#d7f2fa; border-radius:20px; box-shadow:0 2px 15px #aecadd22; margin:15px auto 22px auto; min-height:370px; display:flex;flex-direction:column; align-items:center; padding:16px 0 7px 0; position:relative;z-index:1;}
     .chart-metrics { display:flex; justify-content:center; gap:39px; padding:17px 0 5px 0; font-size:1.18em; font-weight:600; letter-spacing:.01em; flex-wrap:wrap; }
     .chart-metrics div { color:#2650a0; min-width:135px;}
     .wallet-section-design {position:relative; width:98.2%; margin:0 auto 0 auto; z-index:0;}
     .wallet-design-bg {
       position:absolute;top:-33px;left:-11px;right:-10px;width:104%;height:145px;z-index:0;pointer-events:none; filter:contrast(1.33) brightness(1.41);
     }
-    .wallet-grid {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:24px;
-      margin:0 auto 16px auto;
-      width:100%;
-      z-index:1; position:relative;
-    }
+    .wallet-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin:0 auto 16px auto; width:100%; z-index:1; position:relative;}
     .wallet-box {
       background:#fff; border-radius:17px; box-shadow: 0 2px 17px #a9befb17,0 5px 14px #91f1ae09;
-      display:flex; flex-direction:column; justify-content:space-between;
-      padding:16px 19px 13px 22px; min-height:83px; position:relative; z-index:1;
+      display:flex; flex-direction:column; justify-content:space-between; padding:16px 19px 13px 22px; min-height:85px; position:relative; z-index:1;
     }
-    .wallet-box-title { font-size:1.08em; font-weight:700; color:#1d2954; margin-bottom:5px;}
+    .wallet-box-title { font-size:1.13em; font-weight:700; color:#1d2954; margin-bottom:5px;}
     .wallet-icon { color:#8259f2; font-size:1.35em; margin-right:7px;}
-    .wallet-dollar { font-size:1.27em; font-weight:700; color:#333448; margin-bottom:2px;}
+    .wallet-dollar { font-size:1.36em; font-weight:700; color:#223048; margin-bottom:2px;}
     .wallet-half-arc { position:absolute; right:16px; bottom:11px; width:33px; height:13px; border-bottom:3px solid #bbe5d7; border-radius:50%; opacity:.7;}
     @media (max-width:950px) {
+      .main-content {padding-top:78px;}
       .wallet-grid { grid-template-columns:1fr !important;}
       .wallet-section-design { width:100vw; padding: 0 2vw;}
+      .wallet-box {margin: 0 auto;}
     }
-    /* --- Info and other sections follow same grid --- */
+    /* Info/other sections as before */
     .split-row { display:flex; gap:20px; margin:19px auto 18px auto;width:98.3%; align-items:center; z-index:2; position:relative;}
     .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 15px 15px; min-height:55px;}
     .income-bar { flex:2.1;background:linear-gradient(90deg,#8af499 80%,#eaf8fb 100%); font-size:1.13em; font-weight:700; color:#1e944a; padding-left:28px; height:95px;}
     .withdraw-bar { flex:1.77;background:linear-gradient(to right,#f8c7e0 76%,#e9bbf7 100%); font-size:1.12em; font-weight:700; color:#a52479; padding-left:21px; height:95px;}
-    .grid-3 {
-      display: grid; grid-template-columns: 1.2fr 1fr .99fr; gap:15px; margin:15px auto 0 auto; width:98.5%;
-    }
+    .grid-3 { display: grid; grid-template-columns: 1.2fr 1fr .99fr; gap:15px; margin:15px auto 0 auto; width:98.5%;}
     .profile-info-card, .business-info-card, .income-info-card {
       background:#fff; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; padding:13px 17px 11px 14px; min-height:110px; display:flex;flex-direction:column;margin-bottom:7px;
     }
@@ -169,10 +152,7 @@
     .business-list li,.income-list li {font-size:.89em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
-    @media (max-width:1100px) {
-      .wallet-grid {grid-template-columns:repeat(2,1fr);}
-      .grid-3{grid-template-columns:1fr;}
-    }
+    @media (max-width:1100px) { .wallet-grid {grid-template-columns:repeat(2,1fr);} .grid-3{grid-template-columns:1fr;} }
     @media (max-width:800px){
       .main-content{margin-left:0;}
       .grid-3,.split-row{flex-direction:column;display:flex;}
@@ -188,6 +168,18 @@
   <!-- HEADER -->
   <div class="header">
     <div class="header-space"></div>
+    <div class="logo-box">
+      <span class="logo-svg">
+        <!-- Modern finance wallet+graph sample SVG logo -->
+        <svg viewBox="0 0 42 42" fill="none" style="width:100%;height:100%;">
+          <rect x="7" y="16" width="28" height="15" rx="6" fill="#bef8d4" stroke="#14a074" stroke-width="2"/>
+          <polyline points="13,26 20,20 26,27 34,18" fill="none" stroke="#14a074" stroke-width="2.3" stroke-linecap="round"/>
+          <circle cx="13" cy="26" r="2" fill="#11a874"/>
+          <circle cx="20" cy="20" r="2" fill="#14a074"/>
+        </svg>
+      </span>
+      <span class="logo-text">TRADEERA</span>
+    </div>
     <button class="hamburger" id="sidemenu-toggler" aria-label="Menu">
       <span class="hamburger-inner"></span>
       <span class="hamburger-inner"></span>
@@ -195,11 +187,22 @@
     </button>
   </div>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <!-- Sidebar Navigation (now scrollable, fixed footer) -->
+  <!-- Sidebar Navigation (scrollable, fixed footer) -->
   <aside class="sidebar" id="sidebarPanel">
     <div class="sidebar-inner">
       <div>
-        <div class="sb-logo">TRADEERA</div>
+        <div class="sb-logo-row">
+          <span class="sb-logo-svg">
+            <!-- Small sidebar logo icon (same as header, reduced size) -->
+            <svg viewBox="0 0 38 38" fill="none" style="width:100%;height:100%;">
+              <rect x="6" y="14" width="24" height="11" rx="5" fill="#bef8d4" stroke="#14a074" stroke-width="1.6"/>
+              <polyline points="11,22 16,17 22,23 29,15" fill="none" stroke="#14a074" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="11" cy="22" r="1.5" fill="#11a874"/>
+              <circle cx="16" cy="17" r="1.5" fill="#14a074"/>
+            </svg>
+          </span>
+          <span class="sb-logo-text">TRADEERA</span>
+        </div>
         <div class="sidebar-menu-scroll">
           <ul class="sb-menu">
             <li class="active">Dashboard</li>
@@ -303,7 +306,7 @@
         <div>Total Profit <br><span style="font-weight:400;">$0.00</span></div>
       </div>
     </div>
-    <!-- Wallet cards - always one per row on mobile -->
+    <!-- Wallet cards - use new names -->
     <div class="wallet-section-design">
       <svg class="wallet-design-bg" viewBox="0 0 1200 145" width="100%" height="145">
         <defs>
@@ -320,13 +323,13 @@
       </svg>
       <div class="wallet-grid">
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Angel Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Fuel Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Fuel Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Topup Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Package Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Capital Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Cross Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trade Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Activation Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Matching Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Generation</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Club Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trading Generation</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>IB Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
       </div>
     </div>
     <!-- Income/Withdrawals -->
