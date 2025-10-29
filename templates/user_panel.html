@@ -1,113 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra User Dashboard PRO</title>
+  <title>TradeEra User Dashboard PRO (Mobile Ready)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin:0;background: #f6f7fa; font-family: 'Nunito', Arial, sans-serif; color: #222d41;
-    }
+    html,body { margin:0; padding:0; background: #f6f7fa; height:100%; }
+    body { font-family: 'Nunito', Arial, sans-serif; color: #222d41; min-height:100vh;}
+    /* Sidebar */
     .sidebar {
-      width: 265px; background: #fafdfe; color: #2c3350;
-      height: 100vh; position: fixed; left: 0; top: 0;
-      font-size: 0.85em; /* 15-20% smaller */
-      box-shadow: 0 0 18px #03101309; border-right: 1px solid #e6e7ea; z-index: 5;
+      width:265px; background:#fafdfe; color:#273042; height:100vh;position:fixed; left:0; top:0;
+      font-size:.85em; box-shadow:0 0 18px #03101309; border-right:1px solid #e6e7ea; z-index:50;
+      transition: width 0.23s;
     }
-    .sb-logo {
-      font-size: 2em; font-weight: bold; color: #0a64c2;
-      padding: 32px 0 16px 32px; margin-bottom: 10px; letter-spacing:.4px;
+    .sb-logo { font-size:2em; font-weight:700; color:#0a64c2; padding:32px 0 12px 34px; margin-bottom:10px;}
+    .sb-menu { list-style:none;margin:0;padding:0 0 12px 0;}
+    .sb-menu > li { padding:11px 30px; cursor:pointer; font-weight:500; color:#222d41; border:none;
+      border-radius:7px; margin:1px 6px; font-size:1em; position:relative; transition:background .13s,color .13s; user-select:none;
     }
-    .sb-menu { list-style:none; margin:0;padding:0 0 12px 0;}
-    .sb-menu > li {
-      padding:11px 30px; cursor:pointer; font-weight: 500; color: #252a3c; border:none; transition:background .13s, color .13s;
-      border-radius:7px; margin:1px 6px; font-size: 1em; position:relative;
-    }
-    .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open {
-      background:#e3f1fd; color:#0866d6;
-    }
-    .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.94em; float:right; color:#9aabbb;}
+    .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open { background:#e3f1fd; color:#2b68b5;}
+    .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.95em; float:right; color:#9aabbb;}
     .sb-menu > li.has-dropdown.open::after { content:'▾'; }
-    .sb-menu > li.has-dropdown > .dropdown { display:none;}
-    .sb-menu > li.has-dropdown.open > .dropdown { display:block;}
-    .dropdown { background:none; margin:0; box-shadow:none; border-radius:0; padding: 2px 0 2px 11px;}
-    .dropdown li {
-      color: #9faab2; font-size:1em;font-weight:400; background:none; border-radius:6px; padding: 7px 7px 7px 14px;
-      margin:1px 0 0 0; transition:background .13s;
-    }
+    .sb-menu > li.has-dropdown > .dropdown { display:none; }
+    .sb-menu > li.has-dropdown.open > .dropdown { display:block; }
+    .sb-menu > li, .dropdown li { cursor:pointer !important; }
+    .dropdown { background:none; margin:0; box-shadow:none; border-radius:0; padding:2px 0 2px 13px;}
+    .dropdown li { color:#8390a5; font-size:1em; font-weight:400; background:none; border-radius:6px; padding:7px 7px 7px 14px; margin:1px 0; transition:background .12s;}
     .dropdown li:hover { background:#e8eaf6; color:#2162bb;}
-    .sb-footer {
-      position: absolute; bottom: 21px; left: 32px; font-size: .97em; color: #bbb; font-family: inherit;
+    .sb-footer { position:absolute; bottom:21px; left:32px; font-size:.98em; color:#bbb;}
+    .sidebar, .sb-menu > li, .dropdown li { cursor:pointer !important; }
+    /* Responsive sidebar for mobile */
+    @media (max-width:900px){
+      .sidebar { position:fixed; width:100vw; height:auto; box-shadow:none; border-right:none; top:0; left:0; z-index:15; padding-bottom:10px;}
+      .sb-logo {padding:20px 0 8px 24px;}
+      .sb-footer {display:none;}
     }
     .main-content {
-      margin-left:265px; padding-bottom:32px; min-width:780px; background:#f6f7fa;
+      margin-left:265px; padding-bottom:30px; min-width:310px; background:#f6f7fa; transition:margin 0.2s;
+    }
+    @media (max-width:900px){
+      .main-content { margin-left:0;}
     }
     .ref-card {
       width:100%; background:#fff; min-height:41px;
       display:flex; align-items:center; padding:16px 22px 15px 36px;
       box-shadow:0 2px 13px #dde7ff13; border-radius:16px;
-      margin:26px 0 18px 0; font-size:1.08em;
+      margin:19px 0 16px 0; font-size:1.08em;
     }
     .ref-link-title {font-weight:700; color:#2251b4; margin-right:10px;}
-    .ref-url { font-size:1em; color: #6b7295;}
-    .ref-btn { margin-left:20px; padding:6px 20px; background:#e8efff; color:#1752c2; border:1px solid #dde6fa; border-radius:8px; font-weight:600; cursor:pointer;}
+    .ref-url {font-size:1em; color:#6b7295;}
+    .ref-btn { margin-left:16px; padding:6px 17px; background:#e8efff; color:#1752c2; border:1px solid #dde6fa; border-radius:7px; font-weight:600; cursor:pointer;}
     .ref-btn:hover {background:#d2e2fa;}
     .chart-section {
       width:99%; background:#e0f3f8;
-      border-radius:16px; box-shadow:0 2px 15px #aecadd11;
-      margin:12px auto 15px auto;min-height:389px;
-      display:flex;flex-direction:column;
-      justify-content:flex-start;align-items:center;padding:13px 0 4px 0;
-      position:relative;
-      z-index:1;
+      border-radius:17px; box-shadow:0 2px 15px #aecadd22;
+      margin:8px auto 12px auto; min-height:380px; display:flex;flex-direction:column; align-items:center; padding:14px 0 5px 0; position:relative;z-index:1;
     }
-    /* Stats bar under chart */
     .chart-metrics {
-      display:flex;justify-content:center;gap:46px;padding:17px 0 7px 0;
-      font-size:1.12em;font-weight:600; letter-spacing:.02em;
+      display:flex; justify-content:center; gap:39px; padding:17px 0 7px 0; font-size:1.09em; font-weight:600; letter-spacing:.01em; flex-wrap:wrap;
     }
-    .chart-metrics div { color:#222d41; min-width:135px;}
-    .wallet-section-design {
-      position:relative;width:98.7%;margin:0 auto 0 auto;z-index:0;
-    }
+    .chart-metrics div { color:#28334b; min-width:115px;}
+    /* Card design background - bold and visible */
+    .wallet-section-design { position:relative; width:98.8%; margin:0 auto 0 auto; z-index:0;}
     .wallet-design-bg {
-      position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;
-      pointer-events:none;
+      position:absolute;top:-25px;left:-5px;width:102%;height:125px;z-index:0; pointer-events:none;
+      filter:contrast(1.3) brightness(1.3);
     }
+    /* This SVG is bolder: */
     .wallet-grid {
-      display:grid; grid-template-columns:repeat(4,1fr); gap:21px; margin:0 auto 18px auto; width:99.1%; z-index:1; position:relative;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin:0 auto 16px auto; width:99.2%; z-index:1; position:relative;
     }
     .wallet-box {
       background:#fff;
       border-radius:14px;
-      box-shadow:0 2px 11px #c7c9eb18;
+      box-shadow: 0 2px 16px #a9befb25,0 4px 16px #91f1ae11;
       display:flex; flex-direction:column; justify-content:space-between;
-      padding:12px 18px 9px 14px; min-height:65px; position:relative;
+      padding:12px 18px 9px 14px; min-height:65px; position:relative; z-index:1;
     }
-    .wallet-box-title { font-size:0.97em; font-weight:700; color:#313144; margin-bottom:6px; }
-    .wallet-icon { color:#8a5e69; font-size:1.13em; margin-right:6px;}
-    .wallet-dollar { font-size:1.43em; font-weight:700; color:#313448; margin-bottom:1px;}
-    .wallet-half-arc { position:absolute; right:10px; bottom:9px; width:24px; height:13px; border-bottom:2px solid #e2e7ee; border-radius:50%;}
-    .split-row {
-      display:flex; gap:16px; margin:18px auto 19px auto;width:98.5%;align-items:center;z-index:2;position:relative;
+    .wallet-box-title { font-size:0.97em; font-weight:700; color:#30304a; margin-bottom:6px;}
+    .wallet-icon { color:#7e0596; font-size:1.11em; margin-right:6px;}
+    .wallet-dollar { font-size:1.42em; font-weight:700; color:#373448; margin-bottom:1px;}
+    .wallet-half-arc { position:absolute; right:10px; bottom:11px; width:27px; height:14px; border-bottom:3px solid #e2ebf6; border-radius:50%; opacity:.77;}
+    /* Responsive wallet grid */
+    @media (max-width:1240px) {.wallet-grid {grid-template-columns:repeat(2,1fr);}}
+    @media (max-width:720px){
+      .wallet-grid{grid-template-columns:1fr;}
+      .wallet-section-design{width:99vw;padding:0;}
     }
-    .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 13px 13px; min-height:55px;}
-    .income-bar { flex:2.26;background:#bbdac2; font-size:1.21em; font-weight:700; color:#34723c; padding-left:28px; margin-bottom:0;
-      height: 70px;
-    }
-    .withdraw-bar { flex:1.76;background:#edc3db; font-size:1.18em; font-weight:700; color:#a5387b; padding-left:21px; margin-bottom:0;
-      height: 70px;
-    }
+    /* Income bars */
+    .split-row { display:flex; gap:18px; margin:19px auto 18px auto;width:99.2%; align-items:center; z-index:2; position:relative;}
+    .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 15px 15px; min-height:55px; }
+    .income-bar { flex:2.1;background:linear-gradient(90deg,#a8efb1,#c4e2da); font-size:1.15em; font-weight:700; color:#24713c; padding-left:28px; height:95px;}
+    .withdraw-bar { flex:1.77;background:linear-gradient(90deg,#fce1ed,#f3bbdf); font-size:1.12em; font-weight:700; color:#b93d8d; padding-left:21px; height:95px;}
     .grid-3 {
-      display: grid; grid-template-columns: 1.2fr 1fr .97fr; gap:15px; margin:14px auto 0 auto; width:97.5%;
+      display: grid; grid-template-columns: 1.2fr 1fr .99fr; gap:15px; margin:15px auto 0 auto; width:98.5%;
     }
     .profile-info-card, .business-info-card, .income-info-card {
-      background:#fff; border-radius:14px; box-shadow:0 2px 12px #e4e8fd14; padding:13px 17px 11px 14px; min-height:124px; display:flex;flex-direction:column;margin-bottom:7px;
+      background:#fff; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; padding:13px 17px 11px 14px; min-height:110px; display:flex;flex-direction:column;margin-bottom:7px;
     }
     .profile-info-top { display:flex; align-items:center;gap:10px;margin-bottom:5px;}
     .profile-pic {width:38px;height:38px;border-radius:50%;object-fit:cover;}
     .profile-main {display:flex;flex-direction:column;}
-    .profile-name {font-weight:700;font-size:1.03em; color:#34376b;}
-    .profile-id {font-size:.93em; color:#96a4b2;}
+    .profile-name {font-weight:700;font-size:1.02em; color:#363870;}
+    .profile-id {font-size:.92em; color:#859ebc;}
     .profile-list,.business-list,.income-list {list-style:none; margin:7px 0 0 0; padding:0;}
     .profile-list li {font-size:.90em; color:#5a5f6a;margin:2px 0;}
     .profile-label {color:#a7b0bf;min-width:97px;display:inline-block;}
@@ -116,11 +111,21 @@
     .business-list li,.income-list li {font-size:.89em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
-    @media (max-width:1110px) {
+    /* Mobile grid/cards */
+    @media (max-width:1100px) {
       .wallet-grid {grid-template-columns:repeat(2,1fr);}
       .grid-3{grid-template-columns:1fr;}
     }
-    @media (max-width:730px){ .main-content{margin-left:0;} .wallet-grid{grid-template-columns:1fr;} .split-row, .grid-3{flex-direction:column;} }
+    @media (max-width:780px){
+      .main-content{margin-left:0;}
+      .grid-3,.split-row{flex-direction:column;display:flex;}
+      .profile-info-card,.business-info-card,.income-info-card {min-width: 225px;}
+      .income-bar,.withdraw-bar{width: 99vw; border-radius: 20px;}
+      .ref-card{flex-wrap:wrap;}
+      .chart-metrics{flex-direction:column;align-items:center;}
+    }
+    /* Pointer cursor for sidebar on mobile and desktop */
+    .sb-menu > li, .sb-menu > li.has-dropdown, .dropdown li {cursor:pointer !important;}
   </style>
 </head>
 <body>
@@ -225,17 +230,20 @@
         <div>Total Profit <br><span style="font-weight:400;">$0.00</span></div>
       </div>
     </div>
-    <!-- Wallet cards with SVG design -->
+    <!-- Wallet cards with bold SVG design -->
     <div class="wallet-section-design">
-      <svg class="wallet-design-bg" viewBox="0 0 1200 110" width="100%" height="110">
+      <svg class="wallet-design-bg" viewBox="0 0 1200 125" width="100%" height="125">
         <defs>
           <linearGradient id="walletGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#e2f8ed" offset="0"/>
-            <stop stop-color="#f6fafd" offset="1"/>
+            <stop stop-color="#96eab0" offset="0"/>
+            <stop stop-color="#e3eafc" offset="1"/>
           </linearGradient>
         </defs>
-        <polygon points="0,100 200,40 500,110 800,40 1200,100 1200,110 0,110"
-                fill="url(#walletGrad)" opacity="0.32"/>
+        <polygon points="0,100 210,40 490,120 730,30 900,100 1200,50 1200,125 0,125"
+                fill="url(#walletGrad)" opacity="0.88"/>
+        <polyline points="90,120 270,50 405,70 800,33 1200,100" stroke="#b8b9ff" stroke-width="3.2" fill="none" opacity="0.28"/>
+        <polyline points="30,110 200,68 700,118 1000,72 1200,80" stroke="#8ac6df" stroke-width="2.4" fill="none" opacity="0.27"/>
+        <polyline points="100,30 350,80 700,40 1150,90" stroke="#59bf8a" stroke-width="2" fill="none" opacity="0.34"/>
       </svg>
       <div class="wallet-grid">
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
@@ -250,8 +258,8 @@
     </div>
     <!-- Income/Withdrawals -->
     <div class="split-row">
-      <div class="income-bar" style="height:91px;">Total Income&nbsp;&nbsp;<span>$0</span></div>
-      <div class="withdraw-bar" style="height:91px;">Total Withdraw&nbsp;&nbsp;<span>$0</span></div>
+      <div class="income-bar">Total Income&nbsp;&nbsp;<span>$0</span></div>
+      <div class="withdraw-bar">Total Withdraw&nbsp;&nbsp;<span>$0</span></div>
     </div>
     <!-- Profile/Business/Income Row -->
     <div class="grid-3">
@@ -306,7 +314,7 @@
     </div>
   </div>
   <script>
-    // Sidebar dropdown open/close logic
+    // Sidebar dropdowns and cursor
     document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
       item.addEventListener('click', function(e){
         e.stopPropagation();
