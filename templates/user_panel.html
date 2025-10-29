@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra User Dashboard PRO (Mobile Ready)</title>
+  <title>TradeEra User Dashboard PRO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
-    html,body { margin:0; padding:0; background: #f6f7fa; height:100%; }
+    html,body { margin:0; padding:0; background: #f6f7fa; min-height:100%; }
     body { font-family: 'Nunito', Arial, sans-serif; color: #222d41; min-height:100vh;}
-    /* Sidebar */
     .sidebar {
       width:265px; background:#fafdfe; color:#273042; height:100vh;position:fixed; left:0; top:0;
       font-size:.85em; box-shadow:0 0 18px #03101309; border-right:1px solid #e6e7ea; z-index:50;
@@ -15,21 +14,21 @@
     }
     .sb-logo { font-size:2em; font-weight:700; color:#0a64c2; padding:32px 0 12px 34px; margin-bottom:10px;}
     .sb-menu { list-style:none;margin:0;padding:0 0 12px 0;}
-    .sb-menu > li { padding:11px 30px; cursor:pointer; font-weight:500; color:#222d41; border:none;
-      border-radius:7px; margin:1px 6px; font-size:1em; position:relative; transition:background .13s,color .13s; user-select:none;
+    .sb-menu > li, .dropdown li {
+      padding:11px 30px; font-weight:500; color:#222d41; border:none;
+      border-radius:7px; margin:1px 6px; font-size:1em; position:relative; user-select:none; cursor: pointer !important;
+      transition:background .14s,color .17s;
     }
-    .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open { background:#e3f1fd; color:#2b68b5;}
+    .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open, .dropdown li:active, .dropdown li:focus, .dropdown li:hover {
+      background:#c6f1e5; color:#167388 !important; cursor:pointer !important;
+    }
     .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.95em; float:right; color:#9aabbb;}
     .sb-menu > li.has-dropdown.open::after { content:'▾'; }
-    .sb-menu > li.has-dropdown > .dropdown { display:none; }
-    .sb-menu > li.has-dropdown.open > .dropdown { display:block; }
-    .sb-menu > li, .dropdown li { cursor:pointer !important; }
+    .sb-menu > li.has-dropdown > .dropdown { display:none;}
+    .sb-menu > li.has-dropdown.open > .dropdown { display:block;}
     .dropdown { background:none; margin:0; box-shadow:none; border-radius:0; padding:2px 0 2px 13px;}
-    .dropdown li { color:#8390a5; font-size:1em; font-weight:400; background:none; border-radius:6px; padding:7px 7px 7px 14px; margin:1px 0; transition:background .12s;}
-    .dropdown li:hover { background:#e8eaf6; color:#2162bb;}
+    .dropdown li { color:#8390a5; font-size:1em; font-weight:400; background:none; border-radius:6px; padding:7px 7px 7px 14px; margin:1px 0;}
     .sb-footer { position:absolute; bottom:21px; left:32px; font-size:.98em; color:#bbb;}
-    .sidebar, .sb-menu > li, .dropdown li { cursor:pointer !important; }
-    /* Responsive sidebar for mobile */
     @media (max-width:900px){
       .sidebar { position:fixed; width:100vw; height:auto; box-shadow:none; border-right:none; top:0; left:0; z-index:15; padding-bottom:10px;}
       .sb-logo {padding:20px 0 8px 24px;}
@@ -38,35 +37,29 @@
     .main-content {
       margin-left:265px; padding-bottom:30px; min-width:310px; background:#f6f7fa; transition:margin 0.2s;
     }
-    @media (max-width:900px){
-      .main-content { margin-left:0;}
-    }
+    @media (max-width:900px){ .main-content { margin-left:0;} }
     .ref-card {
-      width:100%; background:#fff; min-height:41px;
-      display:flex; align-items:center; padding:16px 22px 15px 36px;
-      box-shadow:0 2px 13px #dde7ff13; border-radius:16px;
-      margin:19px 0 16px 0; font-size:1.08em;
+      width:100%; background:#fff; min-height:41px; display:flex; align-items:center; padding:16px 22px 15px 36px;
+      box-shadow:0 2px 13px #dde7ff13; border-radius:16px; margin:19px 0 16px 0; font-size:1.08em;
     }
     .ref-link-title {font-weight:700; color:#2251b4; margin-right:10px;}
     .ref-url {font-size:1em; color:#6b7295;}
     .ref-btn { margin-left:16px; padding:6px 17px; background:#e8efff; color:#1752c2; border:1px solid #dde6fa; border-radius:7px; font-weight:600; cursor:pointer;}
     .ref-btn:hover {background:#d2e2fa;}
     .chart-section {
-      width:99%; background:#e0f3f8;
-      border-radius:17px; box-shadow:0 2px 15px #aecadd22;
+      width:99%; background:#e0f3f8; border-radius:17px; box-shadow:0 2px 15px #aecadd22;
       margin:8px auto 12px auto; min-height:380px; display:flex;flex-direction:column; align-items:center; padding:14px 0 5px 0; position:relative;z-index:1;
     }
-    .chart-metrics {
-      display:flex; justify-content:center; gap:39px; padding:17px 0 7px 0; font-size:1.09em; font-weight:600; letter-spacing:.01em; flex-wrap:wrap;
-    }
+    .chart-metrics { display:flex; justify-content:center; gap:39px; padding:17px 0 7px 0; font-size:1.09em; font-weight:600; letter-spacing:.01em; flex-wrap:wrap; }
     .chart-metrics div { color:#28334b; min-width:115px;}
-    /* Card design background - bold and visible */
+    /* Card design background - very bold and clear */
     .wallet-section-design { position:relative; width:98.8%; margin:0 auto 0 auto; z-index:0;}
     .wallet-design-bg {
-      position:absolute;top:-25px;left:-5px;width:102%;height:125px;z-index:0; pointer-events:none;
-      filter:contrast(1.3) brightness(1.3);
+      position:absolute;top:-33px;left:-22px;width:104%;height:145px;z-index:0;pointer-events:none;
+      /* force deep visibility: */
+      filter: contrast(1.33) brightness(1.41) drop-shadow(0px 8px 2px #79f58799);
     }
-    /* This SVG is bolder: */
+    /* The SVG is even more bold! */
     .wallet-grid {
       display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin:0 auto 16px auto; width:99.2%; z-index:1; position:relative;
     }
@@ -77,21 +70,19 @@
       display:flex; flex-direction:column; justify-content:space-between;
       padding:12px 18px 9px 14px; min-height:65px; position:relative; z-index:1;
     }
-    .wallet-box-title { font-size:0.97em; font-weight:700; color:#30304a; margin-bottom:6px;}
-    .wallet-icon { color:#7e0596; font-size:1.11em; margin-right:6px;}
-    .wallet-dollar { font-size:1.42em; font-weight:700; color:#373448; margin-bottom:1px;}
-    .wallet-half-arc { position:absolute; right:10px; bottom:11px; width:27px; height:14px; border-bottom:3px solid #e2ebf6; border-radius:50%; opacity:.77;}
-    /* Responsive wallet grid */
+    .wallet-box-title { font-size:0.97em; font-weight:700; color:#2d3954; margin-bottom:6px;}
+    .wallet-icon { color:#52b962; font-size:1.3em; margin-right:7px;}
+    .wallet-dollar { font-size:1.52em; font-weight:700; color:#333448; margin-bottom:1px;}
+    .wallet-half-arc { position:absolute; right:10px; bottom:11px; width:27px; height:13px; border-bottom:3px solid #bbe5d7; border-radius:50%; opacity:.85;}
     @media (max-width:1240px) {.wallet-grid {grid-template-columns:repeat(2,1fr);}}
     @media (max-width:720px){
       .wallet-grid{grid-template-columns:1fr;}
       .wallet-section-design{width:99vw;padding:0;}
     }
-    /* Income bars */
     .split-row { display:flex; gap:18px; margin:19px auto 18px auto;width:99.2%; align-items:center; z-index:2; position:relative;}
-    .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 15px 15px; min-height:55px; }
-    .income-bar { flex:2.1;background:linear-gradient(90deg,#a8efb1,#c4e2da); font-size:1.15em; font-weight:700; color:#24713c; padding-left:28px; height:95px;}
-    .withdraw-bar { flex:1.77;background:linear-gradient(90deg,#fce1ed,#f3bbdf); font-size:1.12em; font-weight:700; color:#b93d8d; padding-left:21px; height:95px;}
+    .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 15px 15px; min-height:55px;}
+    .income-bar { flex:2.1;background:linear-gradient(90deg,#8af499 80%,#eaf8fb 100%); font-size:1.13em; font-weight:700; color:#1e944a; padding-left:28px; height:95px;}
+    .withdraw-bar { flex:1.77;background:linear-gradient(to right,#f8c7e0 76%,#e9bbf7 100%); font-size:1.12em; font-weight:700; color:#a52479; padding-left:21px; height:95px;}
     .grid-3 {
       display: grid; grid-template-columns: 1.2fr 1fr .99fr; gap:15px; margin:15px auto 0 auto; width:98.5%;
     }
@@ -111,7 +102,6 @@
     .business-list li,.income-list li {font-size:.89em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
-    /* Mobile grid/cards */
     @media (max-width:1100px) {
       .wallet-grid {grid-template-columns:repeat(2,1fr);}
       .grid-3{grid-template-columns:1fr;}
@@ -124,8 +114,6 @@
       .ref-card{flex-wrap:wrap;}
       .chart-metrics{flex-direction:column;align-items:center;}
     }
-    /* Pointer cursor for sidebar on mobile and desktop */
-    .sb-menu > li, .sb-menu > li.has-dropdown, .dropdown li {cursor:pointer !important;}
   </style>
 </head>
 <body>
@@ -232,18 +220,18 @@
     </div>
     <!-- Wallet cards with bold SVG design -->
     <div class="wallet-section-design">
-      <svg class="wallet-design-bg" viewBox="0 0 1200 125" width="100%" height="125">
+      <svg class="wallet-design-bg" viewBox="0 0 1200 145" width="100%" height="145">
         <defs>
           <linearGradient id="walletGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop stop-color="#96eab0" offset="0"/>
-            <stop stop-color="#e3eafc" offset="1"/>
+            <stop stop-color="#17dd65" offset="0"/>
+            <stop stop-color="#d7f8fb" offset="1"/>
           </linearGradient>
         </defs>
-        <polygon points="0,100 210,40 490,120 730,30 900,100 1200,50 1200,125 0,125"
-                fill="url(#walletGrad)" opacity="0.88"/>
-        <polyline points="90,120 270,50 405,70 800,33 1200,100" stroke="#b8b9ff" stroke-width="3.2" fill="none" opacity="0.28"/>
-        <polyline points="30,110 200,68 700,118 1000,72 1200,80" stroke="#8ac6df" stroke-width="2.4" fill="none" opacity="0.27"/>
-        <polyline points="100,30 350,80 700,40 1150,90" stroke="#59bf8a" stroke-width="2" fill="none" opacity="0.34"/>
+        <polygon points="0,100 210,40 490,120 730,30 900,100 1200,50 1200,145 0,145"
+                fill="url(#walletGrad)" opacity="0.99"/>
+        <polyline points="90,135 270,40 405,95 789,18 1000,132 1180,40" stroke="#24a376" stroke-width="7" fill="none" opacity="0.55"/>
+        <polyline points="40,115 200,88 740,137 1040,52 1200,99" stroke="#229bf2" stroke-width="4.5" fill="none" opacity="0.42"/>
+        <polyline points="120,49 341,128 800,37 1020,108 1170,56" stroke="#ed54e8" stroke-width="4" fill="none" opacity="0.35"/>
       </svg>
       <div class="wallet-grid">
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
@@ -314,7 +302,7 @@
     </div>
   </div>
   <script>
-    // Sidebar dropdowns and cursor
+    // Sidebar dropdowns and pointer/cursor
     document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
       item.addEventListener('click', function(e){
         e.stopPropagation();
