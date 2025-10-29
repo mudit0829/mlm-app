@@ -1,133 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>TradeEra User Dashboard</title>
+  <title>TradeEra User Dashboard PRO</title>
   <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap" rel="stylesheet">
   <style>
     body {
-      margin: 0; background: #f6f7fa;
-      font-family: 'Nunito', Arial, sans-serif;
-      color: #2c3350;
+      margin:0;background: #f6f7fa; font-family: 'Nunito', Arial, sans-serif; color: #222d41;
     }
     .sidebar {
-      width: 265px;
-      background: #fafdfe;
-      color: #2c3350;
-      height: 100vh;
-      position: fixed; left: 0; top: 0; font-size: .89em;
-      box-shadow: 0 0 18px #03101309; border-right: 1px solid #e6e7ea;
-      z-index:5;
+      width: 265px; background: #fafdfe; color: #2c3350;
+      height: 100vh; position: fixed; left: 0; top: 0;
+      font-size: 0.85em; /* 15-20% smaller */
+      box-shadow: 0 0 18px #03101309; border-right: 1px solid #e6e7ea; z-index: 5;
     }
     .sb-logo {
-      font-size: 2.08em; font-weight: bold; color: #0A59B4; padding: 34px 0 18px 28px; margin-bottom:8px; letter-spacing: .5px;
+      font-size: 2em; font-weight: bold; color: #0a64c2;
+      padding: 32px 0 16px 32px; margin-bottom: 10px; letter-spacing:.4px;
     }
-    .sb-menu { list-style:none; margin:0; padding:0 0 12px 0;}
+    .sb-menu { list-style:none; margin:0;padding:0 0 12px 0;}
     .sb-menu > li {
-      padding:11px 30px; cursor: pointer; font-weight: 500;
-      color: #232b42; border:none; transition: background .14s, color .18s;
-      border-radius:7px; margin:1px 6px; font-size: 1em;
-      position:relative;
+      padding:11px 30px; cursor:pointer; font-weight: 500; color: #252a3c; border:none; transition:background .13s, color .13s;
+      border-radius:7px; margin:1px 6px; font-size: 1em; position:relative;
     }
     .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open {
-      background:#e1eeff; color:#0866d6;
+      background:#e3f1fd; color:#0866d6;
     }
-    .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.95em; float:right; color:#7c95b7;}
+    .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.94em; float:right; color:#9aabbb;}
     .sb-menu > li.has-dropdown.open::after { content:'▾'; }
     .sb-menu > li.has-dropdown > .dropdown { display:none;}
     .sb-menu > li.has-dropdown.open > .dropdown { display:block;}
-    .dropdown {
-      background:none; margin:0; box-shadow:none; border-radius:0; padding: 2px 0 4px 9px;
-    }
+    .dropdown { background:none; margin:0; box-shadow:none; border-radius:0; padding: 2px 0 2px 11px;}
     .dropdown li {
-      color: #9099a4; font-size:1em;font-weight:400; background:none; border-radius:6px;
-      padding: 7px 7px 7px 14px;margin:1px 0 0 0; transition:background .14s;
+      color: #9faab2; font-size:1em;font-weight:400; background:none; border-radius:6px; padding: 7px 7px 7px 14px;
+      margin:1px 0 0 0; transition:background .13s;
     }
-    .dropdown li:hover { background:#e8eaf6; color:#0a4e9e;}
+    .dropdown li:hover { background:#e8eaf6; color:#2162bb;}
     .sb-footer {
-      position: absolute; bottom: 16px; left: 32px; font-size: .98em; color: #bbb;
-      font-family: inherit;
+      position: absolute; bottom: 21px; left: 32px; font-size: .97em; color: #bbb; font-family: inherit;
     }
     .main-content {
-      margin-left:265px; padding-bottom:25px; min-width:780px; background:#f6f7fa;
+      margin-left:265px; padding-bottom:32px; min-width:780px; background:#f6f7fa;
     }
-    .header-bar {
-      height: 54px; background:#fff;
-      border-bottom:1px solid #edeef0;
-      display:flex; align-items:center; justify-content:space-between;
+    .ref-card {
+      width:100%; background:#fff; min-height:41px;
+      display:flex; align-items:center; padding:16px 22px 15px 36px;
+      box-shadow:0 2px 13px #dde7ff13; border-radius:16px;
+      margin:26px 0 18px 0; font-size:1.08em;
     }
-    .header-placeholder { font-size:1.1em; }
-    .header-user { margin-right:32px; font-size:.97em; color:#607692; }
-    .main-content-inner { max-width: 1400px; margin:0 auto;}
-    /* Trading chart section - full width, on top */
+    .ref-link-title {font-weight:700; color:#2251b4; margin-right:10px;}
+    .ref-url { font-size:1em; color: #6b7295;}
+    .ref-btn { margin-left:20px; padding:6px 20px; background:#e8efff; color:#1752c2; border:1px solid #dde6fa; border-radius:8px; font-weight:600; cursor:pointer;}
+    .ref-btn:hover {background:#d2e2fa;}
     .chart-section {
-      width:97.8%; background:#e0f3f8;
-      border-radius:17px; box-shadow:0 2px 16px #aecadd14;
-      margin:26px auto 25px auto;min-height:369px;
-      display:flex;justify-content:center;align-items:center;
-      padding:28px 0 20px 0;
+      width:99%; background:#e0f3f8;
+      border-radius:16px; box-shadow:0 2px 15px #aecadd11;
+      margin:12px auto 15px auto;min-height:389px;
+      display:flex;flex-direction:column;
+      justify-content:flex-start;align-items:center;padding:13px 0 4px 0;
+      position:relative;
+      z-index:1;
     }
-    /* Wallet cards grid */
+    /* Stats bar under chart */
+    .chart-metrics {
+      display:flex;justify-content:center;gap:46px;padding:17px 0 7px 0;
+      font-size:1.12em;font-weight:600; letter-spacing:.02em;
+    }
+    .chart-metrics div { color:#222d41; min-width:135px;}
+    .wallet-section-design {
+      position:relative;width:98.7%;margin:0 auto 0 auto;z-index:0;
+    }
+    .wallet-design-bg {
+      position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;
+      pointer-events:none;
+    }
     .wallet-grid {
-      display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin:0 auto 18px auto; width:98%;
+      display:grid; grid-template-columns:repeat(4,1fr); gap:21px; margin:0 auto 18px auto; width:99.1%; z-index:1; position:relative;
     }
     .wallet-box {
       background:#fff;
       border-radius:14px;
-      box-shadow:0 2px 16px #c7c9eb10;
+      box-shadow:0 2px 11px #c7c9eb18;
       display:flex; flex-direction:column; justify-content:space-between;
-      padding:11px 18px 12px 15px; min-height:65px;
-      position:relative;
+      padding:12px 18px 9px 14px; min-height:65px; position:relative;
     }
-    .wallet-box-title { font-size:1.01em; font-weight:600; color:#393664; margin-bottom:6px;}
-    .wallet-icon { color:#8a5e69; font-size:1.16em; margin-right:7px;}
-    .wallet-dollar { font-size:1.65em; font-weight:700; color:#313448; margin-bottom:1px;}
-    .wallet-half-arc { position:absolute; right:10px; bottom:9px; width:25px; height:15px; border-bottom:2px solid #e2e7ee; border-radius:50%;}
-    /* Referral link card */
-    .ref-card {
-      background:#fff;
-      display:flex; align-items:center; padding:13px 18px; border-radius:15px; box-shadow:0 4px 14px #6475a517; margin:9px auto 8px auto; width:98.3%; min-width:360px;
-      font-size:0.96em;
-    }
-    .ref-link-title {font-size:1em;color:#253164;font-weight:700;margin-right:8px;}
-    .ref-url {font-size:.94em; color:#5e6279;}
-    .ref-btn {
-      background: #eeeafd; color: #0946ec; border: 1.4px solid #dad8fd;
-      border-radius:8px; font-weight:600; font-size: .98em; cursor:pointer; padding:5px 16px; margin-left:13px;
-    }
-    .ref-btn:hover { background:#e4f1f8;}
+    .wallet-box-title { font-size:0.97em; font-weight:700; color:#313144; margin-bottom:6px; }
+    .wallet-icon { color:#8a5e69; font-size:1.13em; margin-right:6px;}
+    .wallet-dollar { font-size:1.43em; font-weight:700; color:#313448; margin-bottom:1px;}
+    .wallet-half-arc { position:absolute; right:10px; bottom:9px; width:24px; height:13px; border-bottom:2px solid #e2e7ee; border-radius:50%;}
     .split-row {
-      display:flex; gap:16px; margin:9px auto 13px auto;width:98%;align-items:center;
+      display:flex; gap:16px; margin:18px auto 19px auto;width:98.5%;align-items:center;z-index:2;position:relative;
     }
-    .income-bar {
-      flex:2.2; background:#bbdac2; border-radius:0 0 13px 13px; min-height:42px; display:flex; align-items:center; padding-left:22px;font-size:1.12em; font-weight:700; color:#35673c;}
-    .withdraw-bar {
-      flex:1.7; background:#edc3db; border-radius:0 0 13px 13px; min-height:42px; display:flex; align-items:center; padding-left:17px;font-size:1.10em; font-weight:700; color:#a53a7f;}
+    .income-bar, .withdraw-bar { display:flex; align-items:center; border-radius:0 0 13px 13px; min-height:55px;}
+    .income-bar { flex:2.26;background:#bbdac2; font-size:1.21em; font-weight:700; color:#34723c; padding-left:28px; margin-bottom:0;
+      height: 70px;
+    }
+    .withdraw-bar { flex:1.76;background:#edc3db; font-size:1.18em; font-weight:700; color:#a5387b; padding-left:21px; margin-bottom:0;
+      height: 70px;
+    }
     .grid-3 {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr .95fr;
-      gap:16px; margin:14px auto 0 auto; width:97.3%;
+      display: grid; grid-template-columns: 1.2fr 1fr .97fr; gap:15px; margin:14px auto 0 auto; width:97.5%;
     }
     .profile-info-card, .business-info-card, .income-info-card {
-      background:#fff; border-radius:14px; box-shadow:0 2px 14px #e7ecfd10; padding:13px 17px 12px 16px; min-height:124px; display:flex;flex-direction:column;margin-bottom:9px;
+      background:#fff; border-radius:14px; box-shadow:0 2px 12px #e4e8fd14; padding:13px 17px 11px 14px; min-height:124px; display:flex;flex-direction:column;margin-bottom:7px;
     }
-    .profile-info-top { display:flex; align-items:center;gap:11px;margin-bottom:5px;}
-    .profile-pic {width:40px;height:40px;border-radius:50%;object-fit:cover;}
+    .profile-info-top { display:flex; align-items:center;gap:10px;margin-bottom:5px;}
+    .profile-pic {width:38px;height:38px;border-radius:50%;object-fit:cover;}
     .profile-main {display:flex;flex-direction:column;}
-    .profile-name {font-weight:700;font-size:1.11em; color:#30354d;}
-    .profile-id {font-size:.95em; color:#7693ad;}
+    .profile-name {font-weight:700;font-size:1.03em; color:#34376b;}
+    .profile-id {font-size:.93em; color:#96a4b2;}
     .profile-list,.business-list,.income-list {list-style:none; margin:7px 0 0 0; padding:0;}
-    .profile-list li {font-size:.92em; color:#6a6a6a;margin:2px 0;}
-    .profile-label {color:#a5adc0;min-width:98px;display:inline-block;}
-    .profile-btn {margin-top:10px;padding:5px 12px;border:none;background:#255adc;color:#fff;font-weight:600;border-radius:6px;font-size:.96em;cursor:pointer;}
-    .info-title {font-size:1.07em;font-weight:700;color:#2b3567;margin-bottom:4px;}
-    .business-list li,.income-list li {font-size:.90em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
+    .profile-list li {font-size:.90em; color:#5a5f6a;margin:2px 0;}
+    .profile-label {color:#a7b0bf;min-width:97px;display:inline-block;}
+    .profile-btn {margin-top:10px;padding:5px 12px;border:none;background:#255adc;color:#fff;font-weight:600;border-radius:6px;font-size:.95em;cursor:pointer;}
+    .info-title {font-size:1.01em;font-weight:700;color:#2a3767;margin-bottom:4px;}
+    .business-list li,.income-list li {font-size:.89em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
-    @media (max-width:1100px) {
+    @media (max-width:1110px) {
       .wallet-grid {grid-template-columns:repeat(2,1fr);}
       .grid-3{grid-template-columns:1fr;}
     }
-    @media (max-width:700px){ .main-content{margin-left:0;} .wallet-grid{grid-template-columns:1fr;} .split-row, .grid-3{flex-direction:column;} }
+    @media (max-width:730px){ .main-content{margin-left:0;} .wallet-grid{grid-template-columns:1fr;} .split-row, .grid-3{flex-direction:column;} }
   </style>
 </head>
 <body>
@@ -216,18 +209,36 @@
   </aside>
   <!-- Page Content -->
   <div class="main-content">
-    <div class="header-bar">
-      <span class="header-placeholder"></span>
-      <span class="header-user">Need Help</span>
+    <!-- Referral link at top -->
+    <div class="ref-card">
+      <span class="ref-link-title">Referral Link</span>
+      <span class="ref-url" id="referralUrl">https://tradeera.com/signup?referral=XM11622579</span>
+      <button class="ref-btn" onclick="copyReferral()">Copy</button>
     </div>
-    <div class="main-content-inner">
-      <!-- Trading chart on top -->
-      <div class="chart-section">
-        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=Light&style=1&hidesidetoolbar=1" width="96%" height="350" frameborder="0" allowtransparency="true"></iframe>
+    <!-- Trading chart and metrics -->
+    <div class="chart-section">
+      <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=Light&style=1&hidesidetoolbar=1" width="96%" height="270" frameborder="0" allowtransparency="true"></iframe>
+      <div class="chart-metrics">
+        <div>Investment <br><span style="font-weight:400;">$0.00</span></div>
+        <div>Today's Profit <br><span style="font-weight:400;">$0.00</span></div>
+        <div>Total Profit 15 Days <br><span style="font-weight:400;">$0.00</span></div>
+        <div>Total Profit <br><span style="font-weight:400;">$0.00</span></div>
       </div>
-      <!-- Wallets -->
+    </div>
+    <!-- Wallet cards with SVG design -->
+    <div class="wallet-section-design">
+      <svg class="wallet-design-bg" viewBox="0 0 1200 110" width="100%" height="110">
+        <defs>
+          <linearGradient id="walletGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="#e2f8ed" offset="0"/>
+            <stop stop-color="#f6fafd" offset="1"/>
+          </linearGradient>
+        </defs>
+        <polygon points="0,100 200,40 500,110 800,40 1200,100 1200,110 0,110"
+                fill="url(#walletGrad)" opacity="0.32"/>
+      </svg>
       <div class="wallet-grid">
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span> <span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Angel Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Fuel Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Fuel Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
@@ -236,67 +247,61 @@
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Capital Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
         <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Cross Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
       </div>
-      <!-- Referral Link -->
-      <div class="ref-card">
-        <span class="ref-link-title">Referral Link</span>
-        <span class="ref-url" id="referralUrl">https://tradeera.com/signup?referral=XM11622579</span>
-        <button class="ref-btn" onclick="copyReferral()">Copy</button>
-      </div>
-      <!-- Income/Withdrawals -->
-      <div class="split-row">
-        <div class="income-bar">Total Income&nbsp;&nbsp;<span>$0</span></div>
-        <div class="withdraw-bar">Total Withdraw&nbsp;&nbsp;<span>$0</span></div>
-      </div>
-      <!-- Profile/Business/Income Row -->
-      <div class="grid-3">
-        <div class="profile-info-card">
-          <div class="profile-info-top">
-            <img src="https://randomuser.me/api/portraits/men/31.jpg" class="profile-pic" alt="">
-            <div class="profile-main">
-              <span class="profile-name">Mudit Tiwari</span>
-              <span class="profile-id">XM11622579</span>
-            </div>
+    </div>
+    <!-- Income/Withdrawals -->
+    <div class="split-row">
+      <div class="income-bar" style="height:91px;">Total Income&nbsp;&nbsp;<span>$0</span></div>
+      <div class="withdraw-bar" style="height:91px;">Total Withdraw&nbsp;&nbsp;<span>$0</span></div>
+    </div>
+    <!-- Profile/Business/Income Row -->
+    <div class="grid-3">
+      <div class="profile-info-card">
+        <div class="profile-info-top">
+          <img src="https://randomuser.me/api/portraits/men/31.jpg" class="profile-pic" alt="">
+          <div class="profile-main">
+            <span class="profile-name">Mudit Tiwari</span>
+            <span class="profile-id">XM11622579</span>
           </div>
-          <ul class="profile-list">
-            <li><span class="profile-label">Referral ID:</span> X089063</li>
-            <li><span class="profile-label">Bot License:</span> Inactive</li>
-            <li><span class="profile-label">Trading ARB Amount:</span> 0.0000</li>
-            <li><span class="profile-label">Angel ARB Amount:</span> 0.0000</li>
-            <li><span class="profile-label">Cross ARB Amount:</span> 0</li>
-            <li><span class="profile-label">Rank:</span> NA</li>
-            <li><span class="profile-label">Date of Joining:</span> 7/14/2025 6:22:59 PM</li>
-            <li><span class="profile-label">Date of Activation:</span> </li>
-          </ul>
-          <button class="profile-btn">Click to View Closing Report</button>
         </div>
-        <div class="business-info-card">
-          <div class="info-title">Business Details</div>
-          <ul class="business-list">
-            <li><span class="business-key">Direct Bot</span><span class="business-val">0</span></li>
-            <li><span class="business-key">Total Bot</span><span class="business-val">0</span></li>
-            <li><span class="business-key">Team Business (Trading/Angel)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Total Team(Left/Right)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Strong/Weaker Leg Bot</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Total Bot(Left/Right)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Bot Carryforward(Left/Right)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Current Trading Business(Left/Right)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Total Trading Business(Left/Right)</span><span class="business-val">0/0</span></li>
-            <li><span class="business-key">Total Angel Business(Left/Right)</span><span class="business-val">0/0</span></li>
-          </ul>
-        </div>
-        <div class="income-info-card">
-          <div class="info-title">Income Details</div>
-          <ul class="income-list">
-            <li><span class="income-key">Referral Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Generation Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Trading Profit Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Leadership Pool Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Reward Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">IB Income</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Rapid Rise Bonus</span><span class="income-val">0</span></li>
-            <li><span class="income-key">Matching Income</span><span class="income-val">0</span></li>
-          </ul>
-        </div>
+        <ul class="profile-list">
+          <li><span class="profile-label">Referral ID:</span> X089063</li>
+          <li><span class="profile-label">Bot License:</span> Inactive</li>
+          <li><span class="profile-label">Trading ARB Amount:</span> 0.0000</li>
+          <li><span class="profile-label">Angel ARB Amount:</span> 0.0000</li>
+          <li><span class="profile-label">Cross ARB Amount:</span> 0</li>
+          <li><span class="profile-label">Rank:</span> NA</li>
+          <li><span class="profile-label">Date of Joining:</span> 7/14/2025 6:22:59 PM</li>
+          <li><span class="profile-label">Date of Activation:</span> </li>
+        </ul>
+        <button class="profile-btn">Click to View Closing Report</button>
+      </div>
+      <div class="business-info-card">
+        <div class="info-title">Business Details</div>
+        <ul class="business-list">
+          <li><span class="business-key">Direct Bot</span><span class="business-val">0</span></li>
+          <li><span class="business-key">Total Bot</span><span class="business-val">0</span></li>
+          <li><span class="business-key">Team Business (Trading/Angel)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Total Team(Left/Right)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Strong/Weaker Leg Bot</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Total Bot(Left/Right)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Bot Carryforward(Left/Right)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Current Trading Business(Left/Right)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Total Trading Business(Left/Right)</span><span class="business-val">0/0</span></li>
+          <li><span class="business-key">Total Angel Business(Left/Right)</span><span class="business-val">0/0</span></li>
+        </ul>
+      </div>
+      <div class="income-info-card">
+        <div class="info-title">Income Details</div>
+        <ul class="income-list">
+          <li><span class="income-key">Referral Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Generation Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Trading Profit Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Leadership Pool Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Reward Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">IB Income</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Rapid Rise Bonus</span><span class="income-val">0</span></li>
+          <li><span class="income-key">Matching Income</span><span class="income-val">0</span></li>
+        </ul>
       </div>
     </div>
   </div>
