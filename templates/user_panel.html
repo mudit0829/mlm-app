@@ -7,6 +7,7 @@
   <style>
     html,body { margin:0; padding:0; background: #f6f7fa; min-height:100%; }
     body { font-family: 'Nunito', Arial, sans-serif; color: #222d41; min-height:100vh;}
+    /* --- SIDEBAR --- */
     .sidebar {
       width:265px; background:#fafdfe; color:#273042; height:100vh;position:fixed; left:0; top:0;
       font-size:.85em; box-shadow:0 0 18px #03101309; border-right:1px solid #e6e7ea; z-index:50;
@@ -14,12 +15,20 @@
     }
     .sb-logo { font-size:2em; font-weight:700; color:#0a64c2; padding:32px 0 12px 34px; margin-bottom:10px;}
     .sb-menu { list-style:none;margin:0;padding:0 0 12px 0;}
-    .sb-menu > li, .dropdown li {
-      padding:11px 30px; font-weight:500; color:#222d41; border:none;
-      border-radius:7px; margin:1px 6px; font-size:1em; position:relative; user-select:none; cursor: pointer !important;
-      transition:background .14s,color .17s;
+    /* Guarantee pointer everywhere, remove tap highlight */
+    .sb-menu > li, .dropdown li, .sidebar, .sb-menu > li.has-dropdown {
+      cursor: pointer !important;
+      -webkit-tap-highlight-color: transparent !important;
+      -webkit-user-select: none;
+      user-select: none;
+      transition:background .14s,color .15s;
     }
-    .sb-menu > li.active, .sb-menu > li:hover, .sb-menu > li.open, .dropdown li:active, .dropdown li:focus, .dropdown li:hover {
+    .sb-menu > li.active,
+    .sb-menu > li:hover,
+    .sb-menu > li.open,
+    .dropdown li:active,
+    .dropdown li:focus,
+    .dropdown li:hover {
       background:#c6f1e5; color:#167388 !important; cursor:pointer !important;
     }
     .sb-menu > li.has-dropdown::after { content:'▸'; font-size:.95em; float:right; color:#9aabbb;}
@@ -34,6 +43,7 @@
       .sb-logo {padding:20px 0 8px 24px;}
       .sb-footer {display:none;}
     }
+    /* --- MAIN AREA --- */
     .main-content {
       margin-left:265px; padding-bottom:30px; min-width:310px; background:#f6f7fa; transition:margin 0.2s;
     }
@@ -52,14 +62,11 @@
     }
     .chart-metrics { display:flex; justify-content:center; gap:39px; padding:17px 0 7px 0; font-size:1.09em; font-weight:600; letter-spacing:.01em; flex-wrap:wrap; }
     .chart-metrics div { color:#28334b; min-width:115px;}
-    /* Card design background - very bold and clear */
     .wallet-section-design { position:relative; width:98.8%; margin:0 auto 0 auto; z-index:0;}
     .wallet-design-bg {
       position:absolute;top:-33px;left:-22px;width:104%;height:145px;z-index:0;pointer-events:none;
-      /* force deep visibility: */
       filter: contrast(1.33) brightness(1.41) drop-shadow(0px 8px 2px #79f58799);
     }
-    /* The SVG is even more bold! */
     .wallet-grid {
       display:grid; grid-template-columns:repeat(4,1fr); gap:22px; margin:0 auto 16px auto; width:99.2%; z-index:1; position:relative;
     }
@@ -302,13 +309,17 @@
     </div>
   </div>
   <script>
-    // Sidebar dropdowns and pointer/cursor
+    // Sidebar dropdowns with pointer on tap/click/hover for all menu items
     document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
       item.addEventListener('click', function(e){
         e.stopPropagation();
         document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(li => { if(li!==item) li.classList.remove('open'); });
         item.classList.toggle('open');
       });
+    });
+    // On mobile: force pointer cursor on all menu and dropdown items
+    document.querySelectorAll('.sidebar, .sb-menu > li, .sb-menu > li.has-dropdown, .dropdown li').forEach(function(el){
+      el.style.cursor = 'pointer';
     });
     function copyReferral(){
       const url = document.getElementById('referralUrl').textContent;
