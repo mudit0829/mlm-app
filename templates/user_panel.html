@@ -7,13 +7,11 @@
   <style>
     html, body { margin: 0; padding: 0; height: 100%; background: #f6f7fa; overflow-x:hidden;}
     body { font-family: 'Nunito', Arial, sans-serif; color: #222d41; min-height: 100vh; }
-
-    /* HEADER **************************************************************/
     .header {
       width: 100vw; height: 67px; position: fixed; left: 0; top: 0; z-index: 900;
       background: #fff; border-bottom: 1.5px solid #e4e4f0;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 0 0 0; box-sizing: border-box;
+      padding: 0; box-sizing: border-box;
     }
     .header-logo-area {
       flex-shrink:0; display: flex; align-items: center; height: 64px; padding-left: 21px;
@@ -22,7 +20,6 @@
       width: 43px; height: 43px; margin-right: 10px; background: #f7fff3; border-radius: 11px; display: inline-block; box-shadow: 0 0 4px #d9f7e7;
     }
     .logo-text { font-size: 2em; letter-spacing: .05em; font-weight: 700; color: #14a074; font-family: 'Nunito', Arial, sans-serif;}
-
     .header-status-box {
       flex-shrink:0; display: flex; align-items: center; margin-left:18px; gap:7px; background: #edfff9; border-radius: 99px; padding: 2.5px 18px 2.5px 11px; font-size: 1.14em;
       letter-spacing:.01em; font-weight:600; color:#16915d; border: 1.4px solid #e2f6ec; box-shadow: 0 0 3px #e3ffe7;
@@ -44,8 +41,7 @@
     }
     .profile-avatar-btn.active + .profile-dropdown {display:block;}
     .profile-dropdown-item {
-      width:100%; padding:11px 17px; color:#248865; background:none; border:none;
-      font-size:1.08em;text-align:left; border-radius: 7px; cursor:pointer; font-weight:600; transition:background .12s;
+      width:100%; padding:11px 17px; color:#248865; background:none; border:none; font-size:1.08em;text-align:left; border-radius: 7px; cursor:pointer; font-weight:600; transition:background .12s;
     }
     .profile-dropdown-item:hover { background:#e8fcec; color:#177e54;}
     .header .hamburger {
@@ -67,12 +63,10 @@
       .header-logo-area {padding-left:7px;}
       .logo-svg {width:35px;height:35px;}
     }
-    /* SIDEBAR *************************************************************/
     .sidebar {
       width:265px; background:#fafdfe; color:#273042; height:100vh;
       position:fixed; left:0; top:0; font-size:1.05em; box-shadow:0 0 18px #03101309; border-right:1.5px solid #e6e7ea; z-index:850;
-      padding-top:67px; display:flex; flex-direction:column; transition: left .32s cubic-bezier(.4,0,.2,1);
-      overflow: hidden;
+      padding-top:67px; display:flex; flex-direction:column; transition: left .32s cubic-bezier(.4,0,.2,1); overflow: hidden;
     }
     .sidebar-inner { display: flex; flex-direction: column; height: calc(100vh - 67px); overflow: hidden; }
     .sidebar-menu-scroll {
@@ -114,13 +108,19 @@
     }
     .sidebar-backdrop { display: none; position: fixed; z-index: 600; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(9,24,45,0.11);}
     .sidebar-backdrop.show { display: block;}
-
-    /* CONTENT (unchanged, see earlier code for all cards/wallets/wallet-grid) */
     .main-content { margin-left: 265px; padding-top: 82px; padding-bottom: 28px; min-width: 320px; background: #f8fafd; transition: margin 0.3s; position: relative; }
     @media (max-width:950px){ .main-content { margin-left:0; padding-top:87px;} }
+    .wallet-section-design {position:relative; width:98.2%; margin:0 auto 0 auto; z-index:0;}
     .wallet-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin:0 auto 16px auto; width:100%; z-index:1; position:relative;}
     @media (max-width:950px) { .wallet-grid { grid-template-columns:1fr !important;} }
-    /* (Other content/grid, summary, responsive: no changes needed for requests!) */
+    .wallet-box {
+      background:#fff; border-radius:17px; box-shadow: 0 2px 17px #a9befb17,0 5px 14px #91f1ae09;
+      display:flex; flex-direction:column; justify-content:space-between; padding:16px 19px 13px 22px; min-height:85px; position:relative; z-index:1;
+    }
+    .wallet-box-title { font-size:1.13em; font-weight:700; color:#1d2954; margin-bottom:5px;}
+    .wallet-icon { color:#8259f2; font-size:1.35em; margin-right:7px;}
+    .wallet-dollar { font-size:1.36em; font-weight:700; color:#223048; margin-bottom:2px;}
+    .wallet-half-arc { position:absolute; right:16px; bottom:11px; width:33px; height:13px; border-bottom:3px solid #bbe5d7; border-radius:50%; opacity:.7;}
   </style>
 </head>
 <body>
@@ -258,7 +258,19 @@
     </div>
   </aside>
   <div class="main-content">
-    <!-- CONTENT AS BEFORE -->
+    <!-- DASHBOARD CONTENT EXAMPLE: You MUST add your dashboard HTML here -->
+    <div class="wallet-section-design">
+      <div class="wallet-grid">
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trade Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Activation Wallet</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Matching Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Generation</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Club Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trading Generation</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>IB Income</span><span class="wallet-dollar">$0</span><span class="wallet-half-arc"></span></div>
+      </div>
+    </div>
   </div>
   <script>
     // Hamburger for mobile
@@ -300,11 +312,6 @@
       profileBtn.classList.toggle('active');
       setTimeout(()=>{document.addEventListener('click', closeProfileDropdown, {once:true})},10);
     });
-    function copyReferral(){
-      const url = document.getElementById('referralUrl').textContent;
-      navigator.clipboard.writeText(url);
-      alert("Referral link copied!");
-    }
   </script>
 </body>
 </html>
