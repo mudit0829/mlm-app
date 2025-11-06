@@ -1,45 +1,61 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
+from flask_session import Session
 import uuid
 import os
+from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
 CORS(app)
 
-users = {}
+# Session configuration
+app.config['SESSION_TYPE'] = 'filesystem'
+app.config['SECRET_KEY'] = 'your-secret-key-change-this'
+Session(app)
 
-admin_user = {
+# In-memory database (replace with real DB in production)
+users_db = {}
+transactions_db = {}
+commissions_db = {}
+
+# Admin user
+ADMIN_USER = {
     "user_id": "admin-1",
     "username": "admin",
     "password": "admin123",
-    "sponsor_id": None,
-    "directs": [],
-    "power_leg": None,
-    "other_leg": [],
-    "is_admin": True,
     "email": "admin@tradeera.com",
     "first_name": "Admin",
     "last_name": "User",
-    "dob": "",
+    "is_admin": True,
+    "status": "active",
+    "created_at": datetime.now().isoformat(),
+    "wallet_balance": 0,
+    "referral_code": "ADMIN123",
+    "sponsor_id": None,
+    "position": "ADMIN",
+    "directs": [],
+    "power_leg": None,
+    "other_leg": [],
+    "total_income": 0,
+    "phone": "",
     "country": "India",
-    "mobile": "",
     "state": "",
-    "position": "",
-    "reg_date": ""
+    "dob": ""
 }
-users[admin_user["user_id"]] = admin_user
+users_db["admin-1"] = ADMIN_USER
+
+def generate_referral_code():
+    return str(uuid.uuid4())[:8].upper()
 
 def create_user(data):
+    """Create new user with MLM structure"""
     user_id = str(uuid.uuid4())
+    referral_code = generate_referral_code()
+    
     user = {
         "user_id": user_id,
         "username": data['username'],
-        "password": data['password'],
-        "sponsor_id": data.get('referral_code'),
-        "directs": [],
-        "power_leg": None,
-        "other_leg": [],
-        "is_admin": False,
+        "password": data['password'],  # Hash in production!
         "email": data['email'],
         "first_name": data['first_name'],
         "last_name": data['last_name'],
@@ -47,229 +63,319 @@ def create_user(data):
         "country": data.get('country', ''),
         "mobile": data.get('mobile', ''),
         "state": data.get('state', ''),
-        "position": data.get('position', ''),
         "country_code": data.get('country_code', ''),
-        "reg_date": data.get("reg_date", "")
+        "position": data.get('position', 'LEFT'),
+        "is_admin": False,
+        "status": "pending",  # pending, active, inactive
+        "created_at": datetime.now().isoformat(),
+        "wallet_balance": 0,
+        "referral_code": referral_code,
+        "sponsor_id": data.get('referral_code'),
+        "directs": [],  # Direct referrals
+        "power_leg": None,
+        "other_leg": [],
+        "total_income": 0,
+        "commission_received": 0
     }
-    users[user_id] = user
     
-    # Placement logic
+    users_db[user_id] = user
+    
+    # Add to sponsor's network
     sponsor_id = data.get('referral_code')
-    if sponsor_id and sponsor_id in users:
-        sponsor = users[sponsor_id]
-        if data.get('position') == "LEFT":
-            left_count = sum(1 for uid in sponsor['directs'] if users[uid].get('position') == 'LEFT')
-            if left_count >= 6:
-                return None, "Left position filled under this sponsor"
-            sponsor['directs'].append(user_id)
-            if not sponsor['power_leg'] or sponsor['power_leg'] == user_id:
+    if sponsor_id and sponsor_id in users_db:
+        sponsor = users_db[sponsor_id]
+        
+        if data.get('position') == 'LEFT':
+            if not sponsor['power_leg']:
                 sponsor['power_leg'] = user_id
         else:
-            right_count = sum(1 for uid in sponsor['directs'] if users[uid].get('position') == 'RIGHT')
-            if right_count >= 6:
-                return None, "Right position filled under this sponsor"
-            sponsor['directs'].append(user_id)
             sponsor['other_leg'].append(user_id)
+        
+        sponsor['directs'].append(user_id)
     
     return user, None
 
-# SERVE HTML PAGES
-@app.route('/', methods=['GET'])
+# ===== PAGE ROUTES =====
+@app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/signup', methods=['GET'])
-def signup_page():
-    return render_template('signup.html')
-
-@app.route('/login', methods=['GET'])
+@app.route('/login')
 def login_page():
+    if 'user_id' in session:
+        user = users_db.get(session['user_id'])
+        if user['is_admin']:
+            return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('user_dashboard'))
     return render_template('login.html')
 
-@app.route('/dashboard', methods=['GET'])
-def dashboard():
-    return render_template('dashboard.html')
+@app.route('/signup')
+def signup_page():
+    if 'user_id' in session:
+        return redirect(url_for('user_dashboard'))
+    return render_template('signup.html')
 
-@app.route('/admin-dashboard', methods=['GET'])
+@app.route('/dashboard')
+def user_dashboard():
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    user = users_db.get(session['user_id'])
+    if not user or user['is_admin']:
+        return redirect(url_for('login_page'))
+    return render_template('user_panel.html')
+
+@app.route('/admin/dashboard')
 def admin_dashboard():
-    return render_template('admin_dashboard.html')
+    if 'user_id' not in session:
+        return redirect(url_for('login_page'))
+    user = users_db.get(session['user_id'])
+    if not user or not user['is_admin']:
+        return redirect(url_for('login_page'))
+    return render_template('admin_panel.html')
 
-# API ENDPOINTS
+# ===== AUTH API ENDPOINTS =====
 @app.route('/api/signup', methods=['POST'])
 def api_signup():
-    """Handle user signup"""
+    """Register new user"""
     try:
         data = request.json
         
-        # Validate required fields
-        required_fields = ['username', 'password', 'email', 'first_name', 'last_name', 'dob', 'country', 'mobile', 'state', 'position']
-        missing = [f for f in required_fields if not data.get(f)]
-        if missing:
-            return jsonify({
-                'success': False,
-                'message': f'Missing required fields: {", ".join(missing)}'
-            }), 400
+        # Validate
+        required = ['username', 'password', 'email', 'first_name', 'last_name', 'dob', 'country', 'mobile', 'state', 'position']
+        if not all(data.get(f) for f in required):
+            return jsonify({'success': False, 'message': 'Missing required fields'}), 400
         
-        # Check for unique username
-        if any(u['username'].lower() == data['username'].lower() for u in users.values()):
-            return jsonify({
-                'success': False,
-                'message': 'Username already exists'
-            }), 400
+        # Check duplicates
+        if any(u['username'].lower() == data['username'].lower() for u in users_db.values()):
+            return jsonify({'success': False, 'message': 'Username already exists'}), 400
         
-        # Check for unique email
-        if any(u['email'].lower() == data['email'].lower() for u in users.values()):
-            return jsonify({
-                'success': False,
-                'message': 'Email already registered'
-            }), 400
+        if any(u['email'].lower() == data['email'].lower() for u in users_db.values()):
+            return jsonify({'success': False, 'message': 'Email already registered'}), 400
         
         # Create user
         user, error = create_user(data)
-        
         if error:
-            return jsonify({
-                'success': False,
-                'message': error
-            }), 400
+            return jsonify({'success': False, 'message': error}), 400
+        
+        # Auto-activate for testing (remove in production)
+        user['status'] = 'active'
         
         return jsonify({
             'success': True,
             'message': 'Registration successful',
             'user_id': user['user_id'],
-            'username': user['username']
+            'referral_code': user['referral_code']
         }), 201
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/login', methods=['POST'])
 def api_login():
-    """Handle user login"""
+    """Login user"""
     try:
         data = request.json
         username = data.get('username')
         password = data.get('password')
         
         if not username or not password:
-            return jsonify({
-                'success': False,
-                'message': 'Username and password required'
-            }), 400
+            return jsonify({'success': False, 'message': 'Username and password required'}), 400
         
         # Find user
-        for uid, user in users.items():
+        for uid, user in users_db.items():
             if user['username'].lower() == username.lower() and user['password'] == password:
+                if user['status'] == 'inactive':
+                    return jsonify({'success': False, 'message': 'Account inactive'}), 403
+                
+                # Create session
+                session['user_id'] = uid
+                session['username'] = user['username']
+                session['is_admin'] = user['is_admin']
+                
                 return jsonify({
                     'success': True,
                     'message': 'Login successful',
                     'user_id': uid,
                     'username': user['username'],
                     'is_admin': user['is_admin'],
-                    'email': user['email'],
                     'name': f"{user['first_name']} {user['last_name']}"
                 }), 200
         
-        return jsonify({
-            'success': False,
-            'message': 'Invalid username or password'
-        }), 401
+        return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/logout', methods=['POST'])
+def api_logout():
+    """Logout user"""
+    session.clear()
+    return jsonify({'success': True, 'message': 'Logged out'}), 200
+
+# ===== USER API ENDPOINTS =====
+@app.route('/api/user/profile', methods=['GET'])
+def get_profile():
+    """Get user profile"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user = users_db.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+    
+    return jsonify({
+        'success': True,
+        'user': {
+            'user_id': user['user_id'],
+            'username': user['username'],
+            'email': user['email'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'phone': user['mobile'],
+            'country': user['country'],
+            'state': user['state'],
+            'dob': user['dob'],
+            'wallet_balance': user['wallet_balance'],
+            'referral_code': user['referral_code'],
+            'total_income': user['total_income'],
+            'directs_count': len(user['directs'])
+        }
+    }), 200
+
+@app.route('/api/user/referrals', methods=['GET'])
+def get_referrals():
+    """Get user's referral network"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user = users_db.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+    
+    referrals = []
+    for ref_id in user['directs']:
+        ref_user = users_db.get(ref_id)
+        if ref_user:
+            referrals.append({
+                'user_id': ref_user['user_id'],
+                'username': ref_user['username'],
+                'name': f"{ref_user['first_name']} {ref_user['last_name']}",
+                'position': ref_user['position'],
+                'status': ref_user['status'],
+                'joined': ref_user['created_at']
+            })
+    
+    return jsonify({
+        'success': True,
+        'direct_count': len(user['directs']),
+        'referrals': referrals
+    }), 200
+
+@app.route('/api/user/dashboard', methods=['GET'])
+def get_dashboard():
+    """Get dashboard data"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user = users_db.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+    
+    return jsonify({
+        'success': True,
+        'dashboard': {
+            'wallet_balance': user['wallet_balance'],
+            'total_income': user['total_income'],
+            'commission_received': user.get('commission_received', 0),
+            'direct_referrals': len(user['directs']),
+            'status': user['status'],
+            'referral_code': user['referral_code']
+        }
+    }), 200
 
 @app.route('/api/check-username/<username>', methods=['GET'])
 def check_username(username):
     """Check if username exists"""
-    try:
-        exists = any(u['username'].lower() == username.lower() for u in users.values())
-        if exists:
-            return jsonify({'exists': True}), 200
-        return jsonify({'exists': False}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    exists = any(u['username'].lower() == username.lower() for u in users_db.values())
+    return jsonify({'exists': exists}), 200
 
-@app.route('/users/by-username/<username>', methods=['GET'])
-def get_user_by_username(username):
-    """Get user by username (for backward compatibility)"""
-    try:
-        for user in users.values():
-            if user['username'].lower() == username.lower():
-                return jsonify(user), 200
-        return jsonify({'message': 'User not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/admin/login', methods=['POST'])
-def admin_login():
-    """Handle admin login"""
-    try:
-        data = request.json
-        username = data.get('username')
-        password = data.get('password')
-        
-        if not username or not password:
-            return jsonify({
-                'success': False,
-                'message': 'Username and password required'
-            }), 400
-        
-        # Find admin user
-        for uid, user in users.items():
-            if user['username'].lower() == username.lower() and user['password'] == password and user['is_admin']:
-                return jsonify({
-                    'success': True,
-                    'message': 'Admin login successful',
-                    'user_id': uid,
-                    'username': user['username'],
-                    'is_admin': True
-                }), 200
-        
-        return jsonify({
-            'success': False,
-            'message': 'Invalid admin credentials'
-        }), 401
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route('/api/admin/<admin_id>/users', methods=['GET'])
-def get_all_users(admin_id):
+# ===== ADMIN API ENDPOINTS =====
+@app.route('/api/admin/users', methods=['GET'])
+def admin_get_users():
     """Get all users (admin only)"""
-    try:
-        user = users.get(admin_id)
-        if not user or not user['is_admin']:
-            return jsonify({'message': 'Unauthorized'}), 403
-        
-        return jsonify({
-            'success': True,
-            'users': list(users.values())
-        }), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    user = users_db.get(session['user_id'])
+    if not user or not user['is_admin']:
+        return jsonify({'success': False, 'message': 'Admin access required'}), 403
+    
+    all_users = []
+    for uid, u in users_db.items():
+        if not u['is_admin']:
+            all_users.append({
+                'user_id': u['user_id'],
+                'username': u['username'],
+                'email': u['email'],
+                'name': f"{u['first_name']} {u['last_name']}",
+                'phone': u['mobile'],
+                'status': u['status'],
+                'created_at': u['created_at'],
+                'wallet_balance': u['wallet_balance'],
+                'directs': len(u['directs'])
+            })
+    
+    return jsonify({
+        'success': True,
+        'total_users': len(all_users),
+        'users': all_users
+    }), 200
 
-@app.route('/api/user/<user_id>', methods=['GET'])
-def get_user(user_id):
-    """Get user details"""
-    try:
-        user = users.get(user_id)
-        if not user:
-            return jsonify({'message': 'User not found'}), 404
-        return jsonify({
-            'success': True,
-            'user': user
-        }), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@app.route('/api/admin/user/<user_id>/activate', methods=['PUT'])
+def admin_activate_user(user_id):
+    """Activate/deactivate user"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    admin = users_db.get(session['user_id'])
+    if not admin or not admin['is_admin']:
+        return jsonify({'success': False, 'message': 'Admin access required'}), 403
+    
+    user = users_db.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+    
+    data = request.json
+    user['status'] = data.get('status', 'active')
+    
+    return jsonify({
+        'success': True,
+        'message': f'User {user_id} status changed to {user["status"]}'
+    }), 200
+
+@app.route('/api/admin/stats', methods=['GET'])
+def admin_stats():
+    """Get admin dashboard stats"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    admin = users_db.get(session['user_id'])
+    if not admin or not admin['is_admin']:
+        return jsonify({'success': False, 'message': 'Admin access required'}), 403
+    
+    total_users = len([u for u in users_db.values() if not u['is_admin']])
+    active_users = len([u for u in users_db.values() if u['status'] == 'active' and not u['is_admin']])
+    pending_users = len([u for u in users_db.values() if u['status'] == 'pending' and not u['is_admin']])
+    
+    return jsonify({
+        'success': True,
+        'stats': {
+            'total_users': total_users,
+            'active_users': active_users,
+            'pending_users': pending_users,
+            'total_wallet_balance': sum(u['wallet_balance'] for u in users_db.values() if not u['is_admin'])
+        }
+    }), 200
 
 # Error handlers
 @app.errorhandler(404)
