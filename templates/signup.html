@@ -428,6 +428,7 @@
     function showAlert(message, type) {
       const alertDiv = document.getElementById('alert');
       alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+      window.scrollTo(0, 0);
     }
 
     // Autofill referral code from URL parameter
@@ -436,28 +437,27 @@
       return params.get(param);
     }
 
-    window.onload = function() {
+    window.addEventListener('load', function() {
       let referral = getQueryParam('referral') || getQueryParam('ref');
       let refInput = document.getElementById('referralCode');
       if (referral) {
         refInput.value = referral;
         refInput.readOnly = true;
         refInput.style.background = '#f1f5f9';
-      } else {
-        refInput.readOnly = false;
       }
-    };
+    });
 
     // Copy referral code
-    document.getElementById('copyReferral').onclick = function() {
+    document.getElementById('copyReferral').addEventListener('click', function(e) {
+      e.preventDefault();
       let refCode = document.getElementById('referralCode').value;
       if (refCode) {
         navigator.clipboard.writeText(refCode);
-        showAlert('Referral code copied to clipboard!', 'success');
+        showAlert('✅ Referral code copied to clipboard!', 'success');
       } else {
-        showAlert('Nothing to copy!', 'error');
+        showAlert('❌ Enter a referral code first!', 'error');
       }
-    };
+    });
 
     // Auto-fill country code on country selection
     document.getElementById('countrySelect').addEventListener('change', function(e) {
@@ -468,11 +468,12 @@
     // Real-time username availability check
     document.getElementById('usernameInput').addEventListener('blur', async function() {
       let username = this.value.trim();
-      if (username) {
+      if (username && username.length > 2) {
         try {
-          let res = await fetch('/users/by-username/' + encodeURIComponent(username));
-          if (res.ok) {
-            showAlert('Username already taken. Please choose another.', 'error');
+          let res = await fetch('/api/check-username/' + encodeURIComponent(username));
+          let data = await res.json();
+          if (data.exists) {
+            showAlert('❌ Username already taken!', 'error');
             this.value = '';
             this.focus();
           }
@@ -483,7 +484,7 @@
     });
 
     // Form submission
-    document.getElementById('signupForm').onsubmit = async function(e) {
+    document.getElementById('signupForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
       let form = e.target;
@@ -492,13 +493,13 @@
 
       // Validate passwords match
       if (form.password.value !== form.confirm_password.value) {
-        showAlert('Passwords do not match!', 'error');
+        showAlert('❌ Passwords do not match!', 'error');
         return;
       }
 
       // Validate password strength
       if (form.password.value.length < 8) {
-        showAlert('Password must be at least 8 characters long!', 'error');
+        showAlert('❌ Password must be at least 8 characters long!', 'error');
         return;
       }
 
@@ -516,7 +517,7 @@
       loading.style.display = 'block';
 
       try {
-        let res = await fetch('/signup', {
+        let res = await fetch('/api/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(fields)
@@ -524,23 +525,23 @@
 
         let data = await res.json();
 
-        if (data.success || data.user_id) {
-          showAlert('Registration successful! Redirecting to login...', 'success');
+        if (res.ok && data.success) {
+          showAlert('✅ Registration successful! Redirecting to login...', 'success');
           setTimeout(() => {
             window.location.href = '/login';
           }, 2000);
         } else {
-          showAlert(data.message || 'Registration failed. Please try again.', 'error');
+          showAlert(`❌ ${data.message || 'Registration failed'}`, 'error');
           submitBtn.style.display = 'block';
           loading.style.display = 'none';
         }
       } catch (err) {
         console.error('Error:', err);
-        showAlert('Connection error. Please try again.', 'error');
+        showAlert('❌ Connection error. Please try again.', 'error');
         submitBtn.style.display = 'block';
         loading.style.display = 'none';
       }
-    };
+    });
   </script>
 
 </body>
