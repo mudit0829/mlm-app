@@ -1,155 +1,383 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>TradeEra - Registration</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - TRADEERA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body {
-      background: #22293f;
-      margin: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-    }
-    .container {
-      width: 420px;
-      margin: 56px auto;
-      background: #132338;
-      border-radius: 14px;
-      box-shadow: 0 0 32px #0007;
-      padding: 32px 38px 30px 38px;
-      color: #eaf1fa;
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 18px;
-    }
-    .header h1 {
-      font-size: 2.1em;
-      font-weight: bold;
-      color: #ffb24d;
-      margin-bottom: 0;
-      letter-spacing: 1.2px;
-    }
-    .header .subtitle {
-      font-size: 1.13em;
-      font-weight: 400;
-      color: #ececec;
-      margin-bottom: 10px;
-      margin-top: 4px;
-    }
-    label {
-      font-weight: 600;
-      margin-top: 18px;
-      margin-bottom: 4px;
-      display: block;
-    }
-    .input-row {
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { 
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #f9f5ff 100%);
+      min-height: 100vh;
       display: flex;
-      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
     }
-    .input-row input, .input-row select {
-      flex:1;
-    }
-    input, select {
-      font-size: 1em;
-      margin-bottom: 14px;
-      padding: 9px;
+
+    .signup-container {
       width: 100%;
-      border-radius: 6px;
-      border: 1px solid #435c8d;
-      background: #192645;
-      color: #f8f8f8;
-      transition: border 0.2s;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(37, 99, 235, 0.15);
+      padding: 2.5rem;
+      animation: slideInUp 0.6s ease-out;
     }
+
+    @keyframes slideInUp { 
+      from { opacity: 0; transform: translateY(30px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .logo svg { width: 100%; height: 100%; }
+
+    .logo-text {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #2563eb;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .form-description {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 1.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e0e7ff;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 2fr 1fr 2fr;
+      gap: 0.8rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .label-info {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.85rem;
+      border: 1.5px solid #e0e7ff;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.3s;
+      background: #f9fafb;
+    }
+
     input:focus, select:focus {
       outline: none;
-      border: 1.5px solid #ffb24d;
+      border-color: #2563eb;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    .actions {
+
+    input[readonly] {
+      background: #f1f5f9;
+      cursor: not-allowed;
+    }
+
+    .referral-group {
       display: flex;
-      gap: 16px;
-      margin-top: 22px;
-      justify-content: flex-end;
+      gap: 0.8rem;
+      align-items: flex-end;
     }
-    .actions button {
-      padding: 12px 32px;
-      font-size: 1em;
-      font-weight: bold;
-      border-radius: 7px;
+
+    .referral-group input {
+      flex: 1;
+    }
+
+    .copy-btn {
+      padding: 0.85rem 1.5rem;
+      background: #2563eb;
+      color: #fff;
       border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.3s;
+      white-space: nowrap;
     }
-    .actions .register-btn {
-      background: #ffb24d;
-      color: #22293f;
+
+    .copy-btn:hover {
+      background: #1e40af;
+      transform: translateY(-2px);
     }
-    .actions .cancel-btn {
-      background: #37476a;
-      color: #eaf1fa;
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
     }
-    .info-text {
-      font-size: 0.95em;
-      margin-bottom: 9px;
-      color: #8aa0c6;
+
+    .btn {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
     }
-    .referral-row {
-      display:flex;
-      align-items:center;
-      gap:6px;
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
     }
-    #copyReferral {
-      padding:8px 16px;
-      font-size:0.95em;
-      background:#ffb24d;
-      color:#132338;
-      border:none;
-      border-radius:5px;
-      cursor:pointer;
-      font-weight:bold;
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
     }
-    #copyReferral:hover {
-      background:#ffd999;
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #e0e7ff;
+      color: #64748b;
+    }
+
+    .btn-outline:hover {
+      background: #f9fafb;
+      border-color: #2563eb;
+      color: #2563eb;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+      gap: 1rem;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .divider span {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .login-link {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .login-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.3s;
+    }
+
+    .login-link a:hover {
+      color: #1e40af;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .alert-success {
+      background: #dbeafe;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #2563eb;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+      .signup-container {
+        padding: 2rem 1.5rem;
+      }
+      .form-row, .form-row-3 {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .btn-group {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>TRADEERA</h1>
-      <div class="subtitle">New Registration</div>
+
+  <div class="signup-container">
+    <div class="logo-section">
+      <div class="logo">
+        <svg viewBox="0 0 40 40" fill="none">
+          <rect x="8" y="17" width="24" height="12" rx="5" fill="white"/>
+          <polyline points="13,25 18,20 23,26 31,17" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">TRADEERA</div>
+      <div class="subtitle">Trading Intelligence Platform</div>
     </div>
+
+    <h1>Create Your Account</h1>
+    <p class="form-description">Join thousands of traders and start your journey today</p>
+
+    <div id="alert"></div>
+
     <form id="signupForm">
-      <label>Referral Code Information</label>
-      <div class="info-text">Enter your referral code to register</div>
-      <div class="referral-row">
-        <input name="referral_code" id="referralCode" required>
-        <button type="button" id="copyReferral">Copy</button>
+      
+      <!-- REFERRAL SECTION -->
+      <div class="section-title">📋 Referral Information</div>
+      <div class="form-group">
+        <label for="referral_code">Referral Code</label>
+        <div class="label-info">Enter your referral code to register</div>
+        <div class="referral-group">
+          <input type="text" name="referral_code" id="referralCode" placeholder="Enter referral code" required>
+          <button type="button" class="copy-btn" id="copyReferral">Copy</button>
+        </div>
       </div>
 
-      <label>Select Position</label>
-      <select name="position" required>
-        <option value="LEFT">LEFT</option>
-        <option value="RIGHT">RIGHT</option>
-      </select>
-
-      <label>Create Login Information</label>
-      <input name="username" id="usernameInput" placeholder="Enter Username" required>
-      <div class="input-row">
-        <input name="password" type="password" placeholder="Enter Password" required>
-        <input name="confirm_password" type="password" placeholder="Confirm Password" required>
+      <div class="form-group">
+        <label for="position">Select Position</label>
+        <select name="position" id="position" required>
+          <option value="">-- Choose Position --</option>
+          <option value="LEFT">LEFT</option>
+          <option value="RIGHT">RIGHT</option>
+        </select>
       </div>
 
-      <label>Personal Information</label>
-      <div class="input-row">
-        <input name="first_name" placeholder="First name" required>
-        <input name="last_name" placeholder="Last name" required>
+      <!-- LOGIN INFORMATION -->
+      <div class="section-title">🔐 Login Information</div>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="usernameInput" placeholder="Choose a unique username" required>
       </div>
-      <div class="input-row">
-        <input name="email" type="email" placeholder="Email" required>
-        <input name="dob" type="date" placeholder="DOB" required>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" placeholder="Create password" required>
+        </div>
+        <div class="form-group">
+          <label for="confirm_password">Confirm Password</label>
+          <input type="password" name="confirm_password" id="confirm_password" placeholder="Re-enter password" required>
+        </div>
       </div>
-      <div class="input-row">
+
+      <!-- PERSONAL INFORMATION -->
+      <div class="section-title">👤 Personal Information</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" name="first_name" id="first_name" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" name="last_name" id="last_name" placeholder="Last name" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" name="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" name="dob" id="dob" required>
+        </div>
+      </div>
+
+      <!-- CONTACT INFORMATION -->
+      <div class="form-group">
+        <label for="country">Country</label>
         <select name="country" id="countrySelect" required>
-          <option value="">--Select Country--</option>
+          <option value="">-- Select Country --</option>
           <option value="India" data-code="+91">India (+91)</option>
           <option value="USA" data-code="+1">USA (+1)</option>
           <option value="UK" data-code="+44">UK (+44)</option>
@@ -160,85 +388,160 @@
           <option value="France" data-code="+33">France (+33)</option>
           <option value="Other" data-code="">Other</option>
         </select>
-        <input name="country_code" id="countryCode" placeholder="Code" readonly required>
-        <input name="mobile" placeholder="Mobile" required>
       </div>
-      <input name="state" placeholder="State" required>
-      <div class="actions">
-        <button class="register-btn" type="submit">Register</button>
-        <button class="cancel-btn" type="button" onclick="window.location.href='/'">Cancel</button>
+
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="country_code">Code</label>
+          <input type="text" name="country_code" id="countryCode" placeholder="+91" readonly required>
+        </div>
+        <div style="grid-column: span 2;">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" name="mobile" id="mobile" placeholder="Your mobile number" required>
+        </div>
       </div>
+
+      <div class="form-group">
+        <label for="state">State / Province</label>
+        <input type="text" name="state" id="state" placeholder="Enter your state" required>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary" id="submitBtn">Create Account</button>
+        <button type="button" class="btn btn-outline" onclick="window.location.href='/'">Cancel</button>
+      </div>
+
+      <div class="loading" id="loading">Creating your account...</div>
     </form>
+
+    <div class="divider">
+      <span>Already have an account?</span>
+    </div>
+
+    <div class="login-link">
+      <a href="/login">Sign in here</a>
+    </div>
   </div>
+
   <script>
-    // Autofill referral code from URL parameter (readonly if present)
+    function showAlert(message, type) {
+      const alertDiv = document.getElementById('alert');
+      alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    }
+
+    // Autofill referral code from URL parameter
     function getQueryParam(param) {
       let params = new URLSearchParams(window.location.search);
       return params.get(param);
     }
+
     window.onload = function() {
-      let referral = getQueryParam('referral');
+      let referral = getQueryParam('referral') || getQueryParam('ref');
       let refInput = document.getElementById('referralCode');
       if (referral) {
         refInput.value = referral;
         refInput.readOnly = true;
+        refInput.style.background = '#f1f5f9';
       } else {
         refInput.readOnly = false;
       }
     };
 
+    // Copy referral code
     document.getElementById('copyReferral').onclick = function() {
       let refCode = document.getElementById('referralCode').value;
       if (refCode) {
         navigator.clipboard.writeText(refCode);
-        alert("Referral code copied!");
+        showAlert('Referral code copied to clipboard!', 'success');
       } else {
-        alert("Nothing to copy!");
+        showAlert('Nothing to copy!', 'error');
       }
     };
 
+    // Auto-fill country code on country selection
     document.getElementById('countrySelect').addEventListener('change', function(e) {
       let code = e.target.options[e.target.selectedIndex].getAttribute('data-code');
       document.getElementById('countryCode').value = code || '';
     });
 
-    document.getElementById('signupForm').onsubmit = async function(e) {
-      e.preventDefault();
-      let form = e.target;
-      if(form.password.value !== form.confirm_password.value){
-        alert("Passwords do not match."); return;
-      }
-      let fields = {};
-      Array.from(form.elements).forEach(el => {
-        if(el.name && el.type!=="button") fields[el.name] = el.value;
-      });
-      fields["reg_date"] = new Date().toISOString();
-      let res = await fetch('/signup', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(fields)
-      });
-      let data = await res.json();
-      if (data.user_id) {
-        alert('Registration successful! Your User ID is: ' + fields.username);
-        window.location.href = '/';
-      } else {
-        alert(data.message);
-      }
-    };
-
-    // Real-time username availability
+    // Real-time username availability check
     document.getElementById('usernameInput').addEventListener('blur', async function() {
       let username = this.value.trim();
       if (username) {
-        let res = await fetch('/users/by-username/' + encodeURIComponent(username));
-        if (res.ok) {
-          alert("Username is taken. Please choose another.");
-          this.value = '';
-          this.focus();
+        try {
+          let res = await fetch('/users/by-username/' + encodeURIComponent(username));
+          if (res.ok) {
+            showAlert('Username already taken. Please choose another.', 'error');
+            this.value = '';
+            this.focus();
+          }
+        } catch (err) {
+          console.error('Error checking username:', err);
         }
       }
     });
+
+    // Form submission
+    document.getElementById('signupForm').onsubmit = async function(e) {
+      e.preventDefault();
+      
+      let form = e.target;
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+
+      // Validate passwords match
+      if (form.password.value !== form.confirm_password.value) {
+        showAlert('Passwords do not match!', 'error');
+        return;
+      }
+
+      // Validate password strength
+      if (form.password.value.length < 8) {
+        showAlert('Password must be at least 8 characters long!', 'error');
+        return;
+      }
+
+      // Collect form data
+      let fields = {};
+      Array.from(form.elements).forEach(el => {
+        if (el.name && el.type !== "button" && el.type !== "submit") {
+          fields[el.name] = el.value;
+        }
+      });
+      fields["reg_date"] = new Date().toISOString();
+
+      // Show loading state
+      submitBtn.style.display = 'none';
+      loading.style.display = 'block';
+
+      try {
+        let res = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fields)
+        });
+
+        let data = await res.json();
+
+        if (data.success || data.user_id) {
+          showAlert('Registration successful! Redirecting to login...', 'success');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          showAlert(data.message || 'Registration failed. Please try again.', 'error');
+          submitBtn.style.display = 'block';
+          loading.style.display = 'none';
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        showAlert('Connection error. Please try again.', 'error');
+        submitBtn.style.display = 'block';
+        loading.style.display = 'none';
+      }
+    };
   </script>
+
 </body>
 </html>
