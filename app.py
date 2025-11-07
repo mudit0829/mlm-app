@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, session, redirect, u
 from flask_cors import CORS
 import uuid
 import os
+import json
 from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -11,8 +12,28 @@ app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# In-memory database dict
-users_db = {}
+# Database file (persistent storage)
+DB_FILE = "users_db.json"
+
+def load_db():
+    """Load users from JSON file"""
+    try:
+        if os.path.exists(DB_FILE):
+            with open(DB_FILE, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading DB: {e}")
+    return {}
+
+def save_db(db):
+    """Save users to JSON file"""
+    try:
+        with open(DB_FILE, "w") as f:
+            json.dump(db, f, indent=2, default=str)
+    except Exception as e:
+        print(f"Error saving DB: {e}")
+
+users_db = load_db()
 
 # Admin user
 ADMIN_USER = {
@@ -38,7 +59,11 @@ ADMIN_USER = {
     "state": "",
     "dob": ""
 }
-users_db["admin-1"] = ADMIN_USER
+
+# Add admin if not in DB
+if "admin-1" not in users_db:
+    users_db["admin-1"] = ADMIN_USER
+    save_db(users_db)
 
 def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
@@ -104,6 +129,7 @@ def create_user(data):
         sponsor['other_leg'].append(user_id)
 
     users_db[user_id] = user
+    save_db(users_db)  # SAVE TO FILE
     return user, None
 
 @app.route('/')
@@ -112,15 +138,12 @@ def index():
 
 @app.route('/login')
 def login_page():
-    # Defensive: always clear out bogus sessions before login
     user_id = session.get('user_id')
     user = users_db.get(user_id) if user_id else None
-    # If valid session present, redirect away
     if user_id and user:
         if user['is_admin']:
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('user_dashboard'))
-    # Reset session if invalid
     session.clear()
     return render_template('login.html')
 
@@ -254,7 +277,8 @@ def get_profile():
             'wallet_balance': user['wallet_balance'],
             'referral_code': user['referral_code'],
             'total_income': user['total_income'],
-            'directs_count': len(user['directs'])
+            'directs_count': len(user['directs']),
+            'created_at': user.get('created_at')
         }
     }), 200
 
@@ -299,11 +323,44 @@ def get_dashboard():
             'commission_received': user.get('commission_received', 0),
             'direct_referrals': len(user['directs']),
             'status': user['status'],
-            'referral_code': user['referral_code']
+            'referral_code': user['referral_code'],
+            'created_at': user.get('created_at')
         }
     }), 200
 
-# ADMIN API ENDPOINTS (unchanged)
+# TREE VIEW API - Binary Tree
+@app.route('/api/user/tree', methods=['GET'])
+def get_tree_view():
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    def get_subtree(uid):
+        u = users_db.get(uid)
+        if not u:
+            return None
+        tree = {
+            "user_id": u['user_id'],
+            "username": u['username'],
+            "name": f"{u['first_name']} {u['last_name']}",
+            "position": u['position'],
+            "referral_code": u['referral_code'],
+            "created_at": u.get('created_at'),
+            "left": None,
+            "right": []
+        }
+        # Power_leg is LEFT, other_leg is RIGHT(s)
+        if u.get("power_leg"):
+            tree["left"] = get_subtree(u["power_leg"])
+        if u.get("other_leg"):
+            tree["right"] = [get_subtree(child_id) for child_id in u["other_leg"] if get_subtree(child_id)]
+        return tree
+
+    tree = get_subtree(user_id)
+    return jsonify({'success': True, 'tree': tree}), 200
+
+# ADMIN API ENDPOINTS
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
     user_id = session.get('user_id')
@@ -345,6 +402,7 @@ def admin_activate_user(user_id):
 
     data = request.get_json()
     user['status'] = data.get('status', 'active')
+    save_db(users_db)  # SAVE TO FILE
     return jsonify({
         'success': True,
         'message': f'User {user_id} status changed to {user["status"]}'
@@ -385,4 +443,5 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     print(f"🚀 Server running on http://localhost:{port}")
     print(f"📝 Admin credentials: admin / admin123")
+    print(f"📁 Database file: {DB_FILE}")
     app.run(host='0.0.0.0', port=port, debug=True)
