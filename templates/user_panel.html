@@ -313,51 +313,96 @@
     </div>
   </div>
   <script>
-    // Hamburger for mobile
-    const sidebar = document.getElementById('sidebarPanel');
-    const toggler  = document.getElementById('sidemenu-toggler');
-    const backdrop = document.getElementById('sidebar-backdrop');
-    function hideSidebar() {
-       sidebar.classList.remove('open');
-       backdrop.classList.remove('show');
-       toggler.classList.remove('active');
+  // Hamburger for mobile, sidebar, and profile menu logic (your code unchanged)
+  const sidebar = document.getElementById('sidebarPanel');
+  const toggler  = document.getElementById('sidemenu-toggler');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  function hideSidebar() {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('show');
+    toggler.classList.remove('active');
+  }
+  toggler.addEventListener('click',function(e){
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('show');
+    toggler.classList.toggle('active');
+  });
+  backdrop.addEventListener('click', hideSidebar);
+  document.querySelectorAll('.sb-menu > li, .sb-menu > li > ul > li').forEach(function(item){
+    item.addEventListener('click', function(){
+      if(window.innerWidth < 951) hideSidebar();
+    });
+  });
+  document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
+    item.addEventListener('click', function(e){
+      if(window.innerWidth < 951) e.stopPropagation();
+      document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(li => { if(li!==item) li.classList.remove('open'); });
+      item.classList.toggle('open');
+    });
+  });
+  const profileBtn = document.getElementById('profileAvatarBtn');
+  const profileDropdown = document.getElementById('profileDropdown');
+  function closeProfileDropdown(e){
+    if(!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)){
+      profileBtn.classList.remove('active');
     }
-    toggler.addEventListener('click',function(e){
-      e.stopPropagation(); sidebar.classList.toggle('open');
-      backdrop.classList.toggle('show'); toggler.classList.toggle('active');
-    });
-    backdrop.addEventListener('click', hideSidebar);
-    document.querySelectorAll('.sb-menu > li, .sb-menu > li > ul > li').forEach(function(item){
-      item.addEventListener('click', function(){
-        if(window.innerWidth < 951) hideSidebar();
-      });
-    });
-    document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
-      item.addEventListener('click', function(e){
-        if(window.innerWidth < 951) e.stopPropagation();
-        document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(li => { if(li!==item) li.classList.remove('open'); });
-        item.classList.toggle('open');
-      });
-    });
-    // Profile dropdown
-    const profileBtn = document.getElementById('profileAvatarBtn');
-    const profileDropdown = document.getElementById('profileDropdown');
-    function closeProfileDropdown(e){
-      if(!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)){
-        profileBtn.classList.remove('active');
+  }
+  profileBtn.addEventListener('click',function(e){
+    e.stopPropagation();
+    profileBtn.classList.toggle('active');
+    setTimeout(()=>{document.addEventListener('click', closeProfileDropdown, {once:true})},10);
+  });
+  function copyReferral(){
+    const url = document.getElementById('referralUrl').textContent;
+    navigator.clipboard.writeText(url);
+    alert("Referral link copied!");
+  }
+
+  // ========== DYNAMIC USER DATA: PROFILE FIELDS ONLY ==========
+  async function loadUserProfile() {
+    try {
+      const apiUrl = window.location.origin + '/api/user/profile';
+      const res = await fetch(apiUrl, { credentials: 'include' });
+      const data = await res.json();
+      if (!data.success) {
+        alert(data.message || "Session expired. Please login.");
+        window.location.href = "/login";
+        return;
       }
+      const user = data.user;
+      // PROFILE HEADER
+      document.querySelector('.profile-name').textContent = user.first_name + ' ' + user.last_name;
+      document.querySelector('.profile-id').textContent = user.user_id;
+
+      // REFERRAL FIELDS
+      document.getElementById('referralUrl').textContent = window.location.origin + "/signup?referral=" + user.referral_code;
+      // This assumes your referral code or id element has id="referralCode"—update if not.
+      let codeElem = document.querySelector('.profile-list li:nth-child(1)'); // Update first li in profile-list
+      if(codeElem){
+        codeElem.innerHTML = '<span class="profile-label">Referral ID:</span> ' + user.referral_code;
+      }
+
+      // JOIN DATE
+      let dateElem = document.querySelector('.profile-list li:nth-child(7)');
+      if(dateElem && user.created_at){
+        let dateValue = (new Date(user.created_at)).toLocaleString();
+        dateElem.innerHTML = '<span class="profile-label">Date of Joining:</span> ' + dateValue;
+      }
+
+      // (Optional) Total income field, if you want to show
+      let totalIncomeElem = document.querySelector('.income-bar span');
+      if(totalIncomeElem){
+        totalIncomeElem.textContent = "$" + (user.total_income || 0);
+      }
+    } catch (err) {
+      alert('Session/authentication error. Please login again.');
+      window.location.href = '/login';
     }
-    profileBtn.addEventListener('click',function(e){
-      e.stopPropagation();
-      profileBtn.classList.toggle('active');
-      setTimeout(()=>{document.addEventListener('click', closeProfileDropdown, {once:true})},10);
-    });
-    function copyReferral(){
-      const url = document.getElementById('referralUrl').textContent;
-      navigator.clipboard.writeText(url);
-      alert("Referral link copied!");
-    }
-  </script>
+  }
+  window.addEventListener('DOMContentLoaded', loadUserProfile);
+</script>
 </body>
 </html>
+
 
