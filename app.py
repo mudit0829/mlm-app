@@ -16,7 +16,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ===== MONGODB SETUP =====
 def init_mongodb():
-    """Initialize MongoDB connection with SSL disabled"""
+    """Initialize MongoDB connection"""
     MONGO_URL = os.environ.get('MONGODB_URL')
     
     if not MONGO_URL:
@@ -27,11 +27,8 @@ def init_mongodb():
         print(f"🔗 Connecting to MongoDB...")
         client = MongoClient(
             MONGO_URL,
-            ssl=True,
-            ssl_cert_reqs=ssl.CERT_NONE,
             serverSelectionTimeoutMS=30000,
-            connectTimeoutMS=30000,
-            retryWrites=True
+            connectTimeoutMS=30000
         )
         # Test connection
         client.admin.command('ping')
@@ -480,3 +477,4 @@ if __name__ == "__main__":
     print(f"📊 MongoDB: {'✅ Connected' if users_collection else '❌ Not Connected'}")
     print(f"📂 Users loaded: {len(users_db)}\n")
     app.run(host='0.0.0.0', port=port, debug=True)
+
