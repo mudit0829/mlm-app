@@ -1,10 +1,8 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
-from pymongo import MongoClient
-import urllib.parse
 import uuid
 import os
-import ssl
+import json
 from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -14,69 +12,29 @@ app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# ===== MONGODB SETUP =====
-def init_mongodb():
-    """Initialize MongoDB connection"""
-    MONGO_URL = os.environ.get('MONGODB_URL')
-    
-    if not MONGO_URL:
-        print("⚠️  MONGODB_URL environment variable not set")
-        return None, None
-    
+# ===== FILE-BASED DATABASE =====
+DB_FILE = "users_database.json"
+
+def load_db():
+    """Load users from JSON file"""
+    if os.path.exists(DB_FILE):
+        try:
+            with open(DB_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            return {}
+    return {}
+
+def save_db(db):
+    """Save users to JSON file"""
     try:
-        print(f"🔗 Connecting to MongoDB...")
-        client = MongoClient(
-            MONGO_URL,
-            serverSelectionTimeoutMS=30000,
-            connectTimeoutMS=30000
-        )
-        # Test connection
-        client.admin.command('ping')
-        db = client['tradeera']
-        users_collection = db['users']
-        print("✅ MongoDB connected successfully!")
-        return db, users_collection
+        with open(DB_FILE, 'w') as f:
+            json.dump(db, f, indent=2, default=str)
+        print(f"💾 Database saved to {DB_FILE}")
     except Exception as e:
-        print(f"❌ MongoDB connection error: {e}")
-        return None, None
+        print(f"Error saving database: {e}")
 
-db, users_collection = init_mongodb()
-users_db = {}
-
-def load_db_from_mongo():
-    """Load all users from MongoDB"""
-    global users_db
-    if not users_collection:
-        print("⚠️  MongoDB not available, using in-memory storage")
-        return
-    try:
-        users_db = {}
-        for doc in users_collection.find({}):
-            uid = doc.get('user_id')
-            if uid:
-                doc.pop('_id', None)
-                users_db[uid] = doc
-        print(f"✅ Loaded {len(users_db)} users from MongoDB")
-    except Exception as e:
-        print(f"Error loading from MongoDB: {e}")
-
-def save_user_to_mongo(user_id, user_data):
-    """Save single user to MongoDB"""
-    if not users_collection:
-        return False
-    try:
-        users_collection.update_one(
-            {'user_id': user_id},
-            {'$set': user_data},
-            upsert=True
-        )
-        return True
-    except Exception as e:
-        print(f"Error saving to MongoDB: {e}")
-        return False
-
-# Load existing users on startup
-load_db_from_mongo()
+users_db = load_db()
 
 # Admin user
 ADMIN_USER = {
@@ -105,7 +63,7 @@ ADMIN_USER = {
 
 if "admin-1" not in users_db:
     users_db["admin-1"] = ADMIN_USER
-    save_user_to_mongo("admin-1", ADMIN_USER)
+    save_db(users_db)
 
 def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
@@ -169,9 +127,8 @@ def create_user(data):
         sponsor['other_leg'].append(user_id)
 
     users_db[user_id] = user
-    save_user_to_mongo(user_id, user)
-    save_user_to_mongo(sponsor_user_id, sponsor)
-    print(f"✅ Created user: {user['username']} (ID: {user_id})")
+    save_db(users_db)
+    print(f"✅ Created user: {user['username']}")
     return user, None
 
 # Routes
@@ -437,7 +394,7 @@ def admin_activate_user(user_id):
 
     data = request.get_json() or {}
     user['status'] = data.get('status', 'active')
-    save_user_to_mongo(user_id, user)
+    save_db(users_db)
     return jsonify({'success': True, 'message': f'User status changed to {user["status"]}'}), 200
 
 @app.route('/api/admin/stats', methods=['GET'])
@@ -474,7 +431,6 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 10000))
     print(f"\n🚀 Server starting on port {port}")
     print(f"📝 Admin: admin / admin123")
-    print(f"📊 MongoDB: {'✅ Connected' if users_collection else '❌ Not Connected'}")
-    print(f"📂 Users loaded: {len(users_db)}\n")
+    print(f"📂 Database: {DB_FILE}")
+    print(f"📊 Users loaded: {len(users_db)}\n")
     app.run(host='0.0.0.0', port=port, debug=True)
-
