@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
 from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
 import uuid
 import os
+import sys
 from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -13,58 +13,70 @@ app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# MongoDB Connection
-MONGO_URL = os.environ.get('MONGODB_URL')
-db = None
-users_collection = None
-
-if MONGO_URL:
+# ===== MONGODB SETUP =====
+def init_mongodb():
+    """Initialize MongoDB connection with retry logic"""
+    MONGO_URL = os.environ.get('MONGODB_URL')
+    
+    if not MONGO_URL:
+        print("⚠️  MONGODB_URL environment variable not set")
+        return None, None
+    
     try:
-        client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+        print(f"🔗 Connecting to MongoDB...")
+        client = MongoClient(
+            MONGO_URL,
+            serverSelectionTimeoutMS=10000,
+            connectTimeoutMS=10000,
+            retryWrites=True
+        )
+        # Test connection
         client.admin.command('ping')
         db = client['tradeera']
         users_collection = db['users']
         print("✅ MongoDB connected successfully!")
-    except ConnectionFailure:
-        print("❌ MongoDB connection failed! Check MONGODB_URL in environment.")
-else:
-    print("⚠️ MONGODB_URL not set. Using in-memory database (data will be lost on restart).")
+        return db, users_collection
+    except Exception as e:
+        print(f"❌ MongoDB connection error: {e}")
+        return None, None
 
-# In-memory fallback
+db, users_collection = init_mongodb()
 users_db = {}
 
-# ===== DATABASE FUNCTIONS =====
-def load_db():
-    """Load users from MongoDB"""
-    if users_collection is None:
-        return users_db
+def load_db_from_mongo():
+    """Load all users from MongoDB"""
+    global users_db
+    if not users_collection:
+        print("⚠️  MongoDB not available, using in-memory storage")
+        return
     try:
-        users = {}
-        for user in users_collection.find({}):
-            user['_id'] = str(user['_id'])
-            users[user['user_id']] = user
-        return users
+        users_db = {}
+        for doc in users_collection.find({}):
+            uid = doc.get('user_id')
+            if uid:
+                doc.pop('_id', None)
+                users_db[uid] = doc
+        print(f"✅ Loaded {len(users_db)} users from MongoDB")
     except Exception as e:
         print(f"Error loading from MongoDB: {e}")
-        return users_db
 
-def save_user(user_id, user):
-    """Save a single user to MongoDB"""
-    if users_collection is None:
-        users_db[user_id] = user
-        return
+def save_user_to_mongo(user_id, user_data):
+    """Save single user to MongoDB"""
+    if not users_collection:
+        return False
     try:
         users_collection.update_one(
             {'user_id': user_id},
-            {'$set': user},
+            {'$set': user_data},
             upsert=True
         )
+        return True
     except Exception as e:
-        print(f"Error saving user to MongoDB: {e}")
-        users_db[user_id] = user
+        print(f"Error saving to MongoDB: {e}")
+        return False
 
 # Load existing users on startup
-users_db = load_db()
+load_db_from_mongo()
 
 # Admin user
 ADMIN_USER = {
@@ -93,7 +105,7 @@ ADMIN_USER = {
 
 if "admin-1" not in users_db:
     users_db["admin-1"] = ADMIN_USER
-    save_user("admin-1", ADMIN_USER)
+    save_user_to_mongo("admin-1", ADMIN_USER)
 
 def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
@@ -132,15 +144,15 @@ def create_user(data):
 
     sponsor_user_id = None
     for uid, u in users_db.items():
-        if u['referral_code'] == sponsor_code:
+        if u.get('referral_code') == sponsor_code:
             sponsor_user_id = uid
             break
     if not sponsor_user_id:
         return None, "Invalid Referral Code"
 
     sponsor = users_db[sponsor_user_id]
-    left_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'LEFT')
-    right_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'RIGHT')
+    left_count = sum(1 for uid in sponsor['directs'] if users_db.get(uid, {}).get('position') == 'LEFT')
+    right_count = sum(1 for uid in sponsor['directs'] if users_db.get(uid, {}).get('position') == 'RIGHT')
 
     if position == 'LEFT' and left_count >= 6:
         return None, "Left position already filled (6 max)"
@@ -157,10 +169,12 @@ def create_user(data):
         sponsor['other_leg'].append(user_id)
 
     users_db[user_id] = user
-    save_user(user_id, user)
-    save_user(sponsor_user_id, sponsor)
+    save_user_to_mongo(user_id, user)
+    save_user_to_mongo(sponsor_user_id, sponsor)
+    print(f"✅ Created user: {user['username']} (ID: {user_id})")
     return user, None
 
+# Routes
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -168,7 +182,7 @@ def index():
 @app.route('/login')
 def login_page():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if user_id and user:
         if user['is_admin']:
             return redirect(url_for('admin_dashboard'))
@@ -179,7 +193,7 @@ def login_page():
 @app.route('/signup')
 def signup_page():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if user_id and user and not user.get('is_admin'):
         return redirect(url_for('user_dashboard'))
     session.clear()
@@ -188,8 +202,8 @@ def signup_page():
 @app.route('/dashboard')
 def user_dashboard():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
-    if not user_id or not user or user['is_admin']:
+    user = users_db.get(user_id)
+    if not user_id or not user or user.get('is_admin'):
         session.clear()
         return redirect(url_for('login_page'))
     return render_template('user_panel.html')
@@ -197,8 +211,8 @@ def user_dashboard():
 @app.route('/admin/dashboard')
 def admin_dashboard():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
-    if not user_id or not user or not user['is_admin']:
+    user = users_db.get(user_id)
+    if not user_id or not user or not user.get('is_admin'):
         session.clear()
         return redirect(url_for('login_page'))
     return render_template('admin_panel.html')
@@ -207,22 +221,18 @@ def admin_dashboard():
 @app.route('/api/auth/login', methods=['POST'])
 def api_login():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'message': 'No data provided'}), 400
-        username = data.get('username')
-        password = data.get('password')
-
-        if not username or not password:
-            return jsonify({'success': False, 'message': 'Username and password required'}), 400
+        data = request.get_json() or {}
+        username = data.get('username', '').lower()
+        password = data.get('password', '')
 
         for uid, user in users_db.items():
-            if user['username'].lower() == username.lower() and user['password'] == password:
+            if user['username'].lower() == username and user['password'] == password:
                 if user['status'] == 'inactive':
                     return jsonify({'success': False, 'message': 'Account inactive'}), 403
                 session['user_id'] = uid
                 session['username'] = user['username']
                 session['is_admin'] = user['is_admin']
+                print(f"✅ Login: {username}")
                 return jsonify({
                     'success': True,
                     'message': 'Login successful',
@@ -231,20 +241,18 @@ def api_login():
                     'is_admin': user['is_admin'],
                     'name': f"{user['first_name']} {user['last_name']}"
                 }), 200
-        session.clear()
+
+        print(f"❌ Login failed: {username}")
         return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
 
     except Exception as e:
-        session.clear()
-        print(f"Login error: {str(e)}")
+        print(f"Login error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/auth/signup', methods=['POST'])
 def api_signup():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({'success': False, 'message': 'No data provided'}), 400
+        data = request.get_json() or {}
 
         required = ['username', 'password', 'email', 'first_name', 'last_name', 'dob', 'country', 'mobile', 'state', 'position', 'referral_code']
         missing = [f for f in required if not data.get(f)]
@@ -268,7 +276,7 @@ def api_signup():
         }), 201
 
     except Exception as e:
-        print(f"Signup error: {str(e)}")
+        print(f"Signup error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/api/auth/logout', methods=['POST'])
@@ -278,17 +286,14 @@ def api_logout():
 
 @app.route('/api/check-username/<username>', methods=['GET'])
 def check_username(username):
-    try:
-        exists = any(u['username'].lower() == username.lower() for u in users_db.values())
-        return jsonify({'exists': exists}), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    exists = any(u['username'].lower() == username.lower() for u in users_db.values())
+    return jsonify({'exists': exists}), 200
 
 # USER API ENDPOINTS
 @app.route('/api/user/profile', methods=['GET'])
 def get_profile():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if not user_id or not user or user.get('is_admin'):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
     return jsonify({
@@ -299,14 +304,14 @@ def get_profile():
             'email': user['email'],
             'first_name': user['first_name'],
             'last_name': user['last_name'],
-            'phone': user['mobile'],
-            'country': user['country'],
-            'state': user['state'],
-            'dob': user['dob'],
-            'wallet_balance': user['wallet_balance'],
+            'phone': user.get('mobile', ''),
+            'country': user.get('country', ''),
+            'state': user.get('state', ''),
+            'dob': user.get('dob', ''),
+            'wallet_balance': user.get('wallet_balance', 0),
             'referral_code': user['referral_code'],
-            'total_income': user['total_income'],
-            'directs_count': len(user['directs']),
+            'total_income': user.get('total_income', 0),
+            'directs_count': len(user.get('directs', [])),
             'created_at': user.get('created_at')
         }
     }), 200
@@ -314,44 +319,44 @@ def get_profile():
 @app.route('/api/user/referrals', methods=['GET'])
 def get_referrals():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     referrals = []
-    for ref_id in user['directs']:
+    for ref_id in user.get('directs', []):
         ref_user = users_db.get(ref_id)
         if ref_user:
             referrals.append({
                 'user_id': ref_user['user_id'],
                 'username': ref_user['username'],
                 'name': f"{ref_user['first_name']} {ref_user['last_name']}",
-                'position': ref_user['position'],
-                'status': ref_user['status'],
-                'joined': ref_user['created_at']
+                'position': ref_user.get('position', ''),
+                'status': ref_user.get('status', ''),
+                'joined': ref_user.get('created_at')
             })
 
     return jsonify({
         'success': True,
-        'direct_count': len(user['directs']),
+        'direct_count': len(user.get('directs', [])),
         'referrals': referrals
     }), 200
 
 @app.route('/api/user/dashboard', methods=['GET'])
 def get_dashboard():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     return jsonify({
         'success': True,
         'dashboard': {
-            'wallet_balance': user['wallet_balance'],
-            'total_income': user['total_income'],
+            'wallet_balance': user.get('wallet_balance', 0),
+            'total_income': user.get('total_income', 0),
             'commission_received': user.get('commission_received', 0),
-            'direct_referrals': len(user['directs']),
-            'status': user['status'],
+            'direct_referrals': len(user.get('directs', [])),
+            'status': user.get('status', ''),
             'referral_code': user['referral_code'],
             'created_at': user.get('created_at')
         }
@@ -360,7 +365,7 @@ def get_dashboard():
 @app.route('/api/user/tree', methods=['GET'])
 def get_tree_view():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
+    user = users_db.get(user_id)
     if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
@@ -372,7 +377,7 @@ def get_tree_view():
             "user_id": u['user_id'],
             "username": u['username'],
             "name": f"{u['first_name']} {u['last_name']}",
-            "position": u['position'],
+            "position": u.get('position', ''),
             "referral_code": u['referral_code'],
             "created_at": u.get('created_at'),
             "left": None,
@@ -380,8 +385,10 @@ def get_tree_view():
         }
         if u.get("power_leg"):
             tree["left"] = get_subtree(u["power_leg"])
-        if u.get("other_leg"):
-            tree["right"] = [get_subtree(child_id) for child_id in u["other_leg"] if get_subtree(child_id)]
+        for child_id in u.get("other_leg", []):
+            subtree = get_subtree(child_id)
+            if subtree:
+                tree["right"].append(subtree)
         return tree
 
     tree = get_subtree(user_id)
@@ -391,24 +398,25 @@ def get_tree_view():
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
     user_id = session.get('user_id')
-    user = users_db.get(user_id) if user_id else None
-    if not user_id or not user or not user['is_admin']:
+    user = users_db.get(user_id)
+    if not user_id or not user or not user.get('is_admin'):
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
-    all_users = []
-    for uid, u in users_db.items():
-        if not u['is_admin']:
-            all_users.append({
-                'user_id': u['user_id'],
-                'username': u['username'],
-                'email': u['email'],
-                'name': f"{u['first_name']} {u['last_name']}",
-                'phone': u['mobile'],
-                'status': u['status'],
-                'created_at': u['created_at'],
-                'wallet_balance': u['wallet_balance'],
-                'directs': len(u['directs'])
-            })
+    all_users = [
+        {
+            'user_id': u['user_id'],
+            'username': u['username'],
+            'email': u['email'],
+            'name': f"{u['first_name']} {u['last_name']}",
+            'phone': u.get('mobile', ''),
+            'status': u.get('status', ''),
+            'created_at': u.get('created_at'),
+            'wallet_balance': u.get('wallet_balance', 0),
+            'directs': len(u.get('directs', []))
+        }
+        for u in users_db.values()
+        if not u.get('is_admin')
+    ]
 
     return jsonify({
         'success': True,
@@ -419,32 +427,29 @@ def admin_get_users():
 @app.route('/api/admin/user/<user_id>/activate', methods=['PUT'])
 def admin_activate_user(user_id):
     user_id_admin = session.get('user_id')
-    admin = users_db.get(user_id_admin) if user_id_admin else None
-    if not user_id_admin or not admin or not admin['is_admin']:
+    admin = users_db.get(user_id_admin)
+    if not user_id_admin or not admin or not admin.get('is_admin'):
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
     user = users_db.get(user_id)
     if not user:
         return jsonify({'success': False, 'message': 'User not found'}), 404
 
-    data = request.get_json()
+    data = request.get_json() or {}
     user['status'] = data.get('status', 'active')
-    save_user(user_id, user)
-    return jsonify({
-        'success': True,
-        'message': f'User {user_id} status changed to {user["status"]}'
-    }), 200
+    save_user_to_mongo(user_id, user)
+    return jsonify({'success': True, 'message': f'User status changed to {user["status"]}'}), 200
 
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_stats():
     user_id = session.get('user_id')
-    admin = users_db.get(user_id) if user_id else None
-    if not user_id or not admin or not admin['is_admin']:
+    admin = users_db.get(user_id)
+    if not user_id or not admin or not admin.get('is_admin'):
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
-    total_users = len([u for u in users_db.values() if not u['is_admin']])
-    active_users = len([u for u in users_db.values() if u['status'] == 'active' and not u['is_admin']])
-    pending_users = len([u for u in users_db.values() if u['status'] == 'pending' and not u['is_admin']])
+    total_users = len([u for u in users_db.values() if not u.get('is_admin')])
+    active_users = len([u for u in users_db.values() if u.get('status') == 'active' and not u.get('is_admin')])
+    pending_users = len([u for u in users_db.values() if u.get('status') == 'pending' and not u.get('is_admin')])
 
     return jsonify({
         'success': True,
@@ -452,26 +457,23 @@ def admin_stats():
             'total_users': total_users,
             'active_users': active_users,
             'pending_users': pending_users,
-            'total_wallet_balance': sum(u['wallet_balance'] for u in users_db.values() if not u['is_admin'])
+            'total_wallet_balance': sum(u.get('wallet_balance', 0) for u in users_db.values() if not u.get('is_admin'))
         }
     }), 200
 
-# ERROR HANDLERS
 @app.errorhandler(404)
 def not_found(e):
     return jsonify({'error': 'Not found'}), 404
 
 @app.errorhandler(500)
 def server_error(e):
-    print(f"Server error: {str(e)}")
+    print(f"Server error: {e}")
     return jsonify({'error': 'Server error'}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    print(f"🚀 Server running on http://localhost:{port}")
-    print(f"📝 Admin credentials: admin / admin123")
-    if users_collection:
-        print(f"📊 Database: MongoDB (Connected)")
-    else:
-        print(f"⚠️ Database: In-Memory (Not Persistent)")
+    port = int(os.environ.get('PORT', 10000))
+    print(f"\n🚀 Server starting on port {port}")
+    print(f"📝 Admin: admin / admin123")
+    print(f"📊 MongoDB: {'✅ Connected' if users_collection else '❌ Not Connected'}")
+    print(f"📂 Users loaded: {len(users_db)}\n")
     app.run(host='0.0.0.0', port=port, debug=True)
