@@ -314,8 +314,8 @@
       <!-- REFERRAL SECTION -->
       <div class="section-title">📋 Referral Information</div>
       <div class="form-group">
-        <label for="referral_code">Referral Code</label>
-        <div class="label-info">Enter your referral code to register</div>
+        <label for="referral_code">Referral Code *</label>
+        <div class="label-info">Enter sponsor's referral code (Start with ADMIN123)</div>
         <div class="referral-group">
           <input type="text" name="referral_code" id="referralCode" placeholder="Enter referral code" required>
           <button type="button" class="copy-btn" id="copyReferral">Copy</button>
@@ -323,7 +323,7 @@
       </div>
 
       <div class="form-group">
-        <label for="position">Select Position</label>
+        <label for="position">Select Position *</label>
         <select name="position" id="position" required>
           <option value="">-- Choose Position --</option>
           <option value="LEFT">LEFT</option>
@@ -334,17 +334,17 @@
       <!-- LOGIN INFORMATION -->
       <div class="section-title">🔐 Login Information</div>
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="username">Username *</label>
         <input type="text" name="username" id="usernameInput" placeholder="Choose a unique username" required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">Password *</label>
           <input type="password" name="password" id="password" placeholder="Create password" required>
         </div>
         <div class="form-group">
-          <label for="confirm_password">Confirm Password</label>
+          <label for="confirm_password">Confirm Password *</label>
           <input type="password" name="confirm_password" id="confirm_password" placeholder="Re-enter password" required>
         </div>
       </div>
@@ -353,29 +353,29 @@
       <div class="section-title">👤 Personal Information</div>
       <div class="form-row">
         <div class="form-group">
-          <label for="first_name">First Name</label>
+          <label for="first_name">First Name *</label>
           <input type="text" name="first_name" id="first_name" placeholder="First name" required>
         </div>
         <div class="form-group">
-          <label for="last_name">Last Name</label>
+          <label for="last_name">Last Name *</label>
           <input type="text" name="last_name" id="last_name" placeholder="Last name" required>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="email">Email Address</label>
+          <label for="email">Email Address *</label>
           <input type="email" name="email" id="email" placeholder="your@email.com" required>
         </div>
         <div class="form-group">
-          <label for="dob">Date of Birth</label>
+          <label for="dob">Date of Birth *</label>
           <input type="date" name="dob" id="dob" required>
         </div>
       </div>
 
       <!-- CONTACT INFORMATION -->
       <div class="form-group">
-        <label for="country">Country</label>
+        <label for="country">Country *</label>
         <select name="country" id="countrySelect" required>
           <option value="">-- Select Country --</option>
           <option value="India" data-code="+91">India (+91)</option>
@@ -392,17 +392,17 @@
 
       <div class="form-row-3">
         <div class="form-group">
-          <label for="country_code">Code</label>
+          <label for="country_code">Code *</label>
           <input type="text" name="country_code" id="countryCode" placeholder="+91" readonly required>
         </div>
         <div style="grid-column: span 2;">
-          <label for="mobile">Mobile Number</label>
+          <label for="mobile">Mobile Number *</label>
           <input type="tel" name="mobile" id="mobile" placeholder="Your mobile number" required>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="state">State / Province</label>
+        <label for="state">State / Province *</label>
         <input type="text" name="state" id="state" placeholder="Enter your state" required>
       </div>
 
@@ -425,13 +425,16 @@
   </div>
 
   <script>
+    // Auto-detect API URL (works on both localhost and Render)
+    const API_URL = window.location.origin;
+    console.log('API URL:', API_URL);
+
     function showAlert(message, type) {
       const alertDiv = document.getElementById('alert');
       alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
       window.scrollTo(0, 0);
     }
 
-    // Autofill referral code from URL parameter
     function getQueryParam(param) {
       let params = new URLSearchParams(window.location.search);
       return params.get(param);
@@ -444,33 +447,35 @@
         refInput.value = referral;
         refInput.readOnly = true;
         refInput.style.background = '#f1f5f9';
+      } else {
+        // Default to admin referral code for first user
+        refInput.value = 'ADMIN123';
       }
     });
 
-    // Copy referral code
     document.getElementById('copyReferral').addEventListener('click', function(e) {
       e.preventDefault();
       let refCode = document.getElementById('referralCode').value;
       if (refCode) {
         navigator.clipboard.writeText(refCode);
-        showAlert('✅ Referral code copied to clipboard!', 'success');
+        showAlert('✅ Referral code copied!', 'success');
       } else {
         showAlert('❌ Enter a referral code first!', 'error');
       }
     });
 
-    // Auto-fill country code on country selection
     document.getElementById('countrySelect').addEventListener('change', function(e) {
       let code = e.target.options[e.target.selectedIndex].getAttribute('data-code');
       document.getElementById('countryCode').value = code || '';
     });
 
-    // Real-time username availability check
     document.getElementById('usernameInput').addEventListener('blur', async function() {
       let username = this.value.trim();
       if (username && username.length > 2) {
         try {
-          let res = await fetch('/api/check-username/' + encodeURIComponent(username));
+          let res = await fetch(`${API_URL}/api/check-username/` + encodeURIComponent(username), {
+            credentials: 'include'
+          });
           let data = await res.json();
           if (data.exists) {
             showAlert('❌ Username already taken!', 'error');
@@ -483,7 +488,6 @@
       }
     });
 
-    // Form submission
     document.getElementById('signupForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
@@ -491,15 +495,14 @@
       const submitBtn = document.getElementById('submitBtn');
       const loading = document.getElementById('loading');
 
-      // Validate passwords match
+      // Validate passwords
       if (form.password.value !== form.confirm_password.value) {
         showAlert('❌ Passwords do not match!', 'error');
         return;
       }
 
-      // Validate password strength
       if (form.password.value.length < 8) {
-        showAlert('❌ Password must be at least 8 characters long!', 'error');
+        showAlert('❌ Password must be at least 8 characters!', 'error');
         return;
       }
 
@@ -512,24 +515,27 @@
       });
       fields["reg_date"] = new Date().toISOString();
 
-      // Show loading state
       submitBtn.style.display = 'none';
       loading.style.display = 'block';
 
       try {
-        let res = await fetch('/api/signup', {
+        console.log('Sending signup request:', fields);
+        
+        let res = await fetch(`${API_URL}/api/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(fields)
         });
 
         let data = await res.json();
+        console.log('Signup response:', data);
 
         if (res.ok && data.success) {
-          showAlert('✅ Registration successful! Redirecting to login...', 'success');
+          showAlert(`✅ Registration successful! Your referral code is: ${data.referral_code}. Redirecting to login...`, 'success');
           setTimeout(() => {
             window.location.href = '/login';
-          }, 2000);
+          }, 3000);
         } else {
           showAlert(`❌ ${data.message || 'Registration failed'}`, 'error');
           submitBtn.style.display = 'block';
@@ -537,7 +543,7 @@
         }
       } catch (err) {
         console.error('Error:', err);
-        showAlert('❌ Connection error. Please try again.', 'error');
+        showAlert('❌ Connection error: ' + err.message, 'error');
         submitBtn.style.display = 'block';
         loading.style.display = 'none';
       }
