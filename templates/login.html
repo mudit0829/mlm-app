@@ -289,6 +289,12 @@
   </div>
 
   <script>
+    // Get the correct API URL - works on both localhost and Render
+    const API_URL = window.location.origin;
+    
+    console.log('Current URL:', window.location.href);
+    console.log('API URL:', API_URL);
+
     const form = document.getElementById('loginForm');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
@@ -307,51 +313,61 @@
       const password = passwordInput.value;
 
       if (!username || !password) {
-        showAlert('Please fill in all fields', 'error');
+        showAlert('❌ Please fill in all fields', 'error');
         return;
       }
 
       submitBtn.style.display = 'none';
       loading.style.display = 'block';
 
+      console.log('Attempting login...');
+      console.log('Sending to:', `${API_URL}/api/auth/login`);
+
       // API call to backend
-      fetch('http://localhost:5000/api/auth/login', {
+      fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: username,
           password: password,
           remember_me: document.getElementById('remember').checked
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+      })
       .then(data => {
+        console.log('Response data:', data);
+        
         if (data.success) {
-          // Store token
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
+          // Store session data
+          localStorage.setItem('user_id', data.user_id);
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('is_admin', data.is_admin);
           
-          showAlert('Login successful! Redirecting...', 'success');
+          showAlert('✅ Login successful! Redirecting...', 'success');
           
           // Redirect based on user role
           setTimeout(() => {
-            if (data.user.role === 'admin') {
+            if (data.is_admin) {
               window.location.href = '/admin/dashboard';
             } else {
               window.location.href = '/dashboard';
             }
           }, 1500);
         } else {
-          showAlert(data.message || 'Invalid credentials', 'error');
+          showAlert(`❌ ${data.message || 'Login failed'}`, 'error');
           submitBtn.style.display = 'block';
           loading.style.display = 'none';
         }
       })
       .catch(error => {
-        console.error('Error:', error);
-        showAlert('Connection error. Please try again.', 'error');
+        console.error('Fetch error:', error);
+        showAlert('❌ Connection error: ' + error.message, 'error');
         submitBtn.style.display = 'block';
         loading.style.display = 'none';
       });
