@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure
 import uuid
 import os
-import json
 from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -12,27 +13,57 @@ app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Database file (persistent storage)
-DB_FILE = "users_db.json"
+# MongoDB Connection
+MONGO_URL = os.environ.get('MONGODB_URL')
+db = None
+users_collection = None
 
+if MONGO_URL:
+    try:
+        client = MongoClient(MONGO_URL, serverSelectionTimeoutMS=5000)
+        client.admin.command('ping')
+        db = client['tradeera']
+        users_collection = db['users']
+        print("✅ MongoDB connected successfully!")
+    except ConnectionFailure:
+        print("❌ MongoDB connection failed! Check MONGODB_URL in environment.")
+else:
+    print("⚠️ MONGODB_URL not set. Using in-memory database (data will be lost on restart).")
+
+# In-memory fallback
+users_db = {}
+
+# ===== DATABASE FUNCTIONS =====
 def load_db():
-    """Load users from JSON file"""
+    """Load users from MongoDB"""
+    if users_collection is None:
+        return users_db
     try:
-        if os.path.exists(DB_FILE):
-            with open(DB_FILE, "r") as f:
-                return json.load(f)
+        users = {}
+        for user in users_collection.find({}):
+            user['_id'] = str(user['_id'])
+            users[user['user_id']] = user
+        return users
     except Exception as e:
-        print(f"Error loading DB: {e}")
-    return {}
+        print(f"Error loading from MongoDB: {e}")
+        return users_db
 
-def save_db(db):
-    """Save users to JSON file"""
+def save_user(user_id, user):
+    """Save a single user to MongoDB"""
+    if users_collection is None:
+        users_db[user_id] = user
+        return
     try:
-        with open(DB_FILE, "w") as f:
-            json.dump(db, f, indent=2, default=str)
+        users_collection.update_one(
+            {'user_id': user_id},
+            {'$set': user},
+            upsert=True
+        )
     except Exception as e:
-        print(f"Error saving DB: {e}")
+        print(f"Error saving user to MongoDB: {e}")
+        users_db[user_id] = user
 
+# Load existing users on startup
 users_db = load_db()
 
 # Admin user
@@ -60,10 +91,9 @@ ADMIN_USER = {
     "dob": ""
 }
 
-# Add admin if not in DB
 if "admin-1" not in users_db:
     users_db["admin-1"] = ADMIN_USER
-    save_db(users_db)
+    save_user("admin-1", ADMIN_USER)
 
 def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
@@ -100,7 +130,6 @@ def create_user(data):
         "commission_received": 0
     }
 
-    # Find sponsor from referral code
     sponsor_user_id = None
     for uid, u in users_db.items():
         if u['referral_code'] == sponsor_code:
@@ -110,7 +139,6 @@ def create_user(data):
         return None, "Invalid Referral Code"
 
     sponsor = users_db[sponsor_user_id]
-    # Count directs on each side
     left_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'LEFT')
     right_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'RIGHT')
 
@@ -129,7 +157,8 @@ def create_user(data):
         sponsor['other_leg'].append(user_id)
 
     users_db[user_id] = user
-    save_db(users_db)  # SAVE TO FILE
+    save_user(user_id, user)
+    save_user(sponsor_user_id, sponsor)
     return user, None
 
 @app.route('/')
@@ -328,7 +357,6 @@ def get_dashboard():
         }
     }), 200
 
-# TREE VIEW API - Binary Tree
 @app.route('/api/user/tree', methods=['GET'])
 def get_tree_view():
     user_id = session.get('user_id')
@@ -350,7 +378,6 @@ def get_tree_view():
             "left": None,
             "right": []
         }
-        # Power_leg is LEFT, other_leg is RIGHT(s)
         if u.get("power_leg"):
             tree["left"] = get_subtree(u["power_leg"])
         if u.get("other_leg"):
@@ -402,7 +429,7 @@ def admin_activate_user(user_id):
 
     data = request.get_json()
     user['status'] = data.get('status', 'active')
-    save_db(users_db)  # SAVE TO FILE
+    save_user(user_id, user)
     return jsonify({
         'success': True,
         'message': f'User {user_id} status changed to {user["status"]}'
@@ -443,5 +470,8 @@ if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     print(f"🚀 Server running on http://localhost:{port}")
     print(f"📝 Admin credentials: admin / admin123")
-    print(f"📁 Database file: {DB_FILE}")
+    if users_collection:
+        print(f"📊 Database: MongoDB (Connected)")
+    else:
+        print(f"⚠️ Database: In-Memory (Not Persistent)")
     app.run(host='0.0.0.0', port=port, debug=True)
