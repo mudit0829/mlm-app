@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
 from pymongo import MongoClient
+import urllib.parse
 import uuid
 import os
-import sys
+import ssl
 from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
@@ -15,7 +16,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ===== MONGODB SETUP =====
 def init_mongodb():
-    """Initialize MongoDB connection with retry logic"""
+    """Initialize MongoDB connection with SSL disabled"""
     MONGO_URL = os.environ.get('MONGODB_URL')
     
     if not MONGO_URL:
@@ -26,8 +27,10 @@ def init_mongodb():
         print(f"🔗 Connecting to MongoDB...")
         client = MongoClient(
             MONGO_URL,
-            serverSelectionTimeoutMS=10000,
-            connectTimeoutMS=10000,
+            ssl=True,
+            ssl_cert_reqs=ssl.CERT_NONE,
+            serverSelectionTimeoutMS=30000,
+            connectTimeoutMS=30000,
             retryWrites=True
         )
         # Test connection
