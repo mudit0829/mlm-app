@@ -7,15 +7,14 @@ from datetime import datetime
 app = Flask(__name__, template_folder='templates')
 CORS(app)
 
-# Secure session config
 app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# In-memory database
+# In-memory database dict
 users_db = {}
 
-# Admin user default
+# Admin user
 ADMIN_USER = {
     "user_id": "admin-1",
     "username": "admin",
@@ -45,12 +44,10 @@ def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
 
 def create_user(data):
-    """Create user with MLM binary structure rules"""
     user_id = str(uuid.uuid4())
     referral_code = generate_referral_code()
-
-    sponsor_id = None
     position = data.get('position')
+    sponsor_code = data.get('referral_code')
 
     user = {
         "user_id": user_id,
@@ -70,7 +67,7 @@ def create_user(data):
         "created_at": datetime.now().isoformat(),
         "wallet_balance": 0,
         "referral_code": referral_code,
-        "sponsor_id": data.get('referral_code'),
+        "sponsor_id": sponsor_code,
         "directs": [],
         "power_leg": None,
         "other_leg": [],
@@ -78,34 +75,27 @@ def create_user(data):
         "commission_received": 0
     }
 
-    # Referral/placement logic: sponsor checking and left/right limits
-    sponsor_code = data.get('referral_code')
-    if not sponsor_code or sponsor_code not in [u['referral_code'] for u in users_db.values()]:
-        return None, "Invalid Referral Code"
-
-    # Find sponsor user_id from referral_code
+    # Find sponsor from referral code
     sponsor_user_id = None
     for uid, u in users_db.items():
         if u['referral_code'] == sponsor_code:
             sponsor_user_id = uid
             break
-
     if not sponsor_user_id:
-        return None, "Sponsor not found"
-    sponsor = users_db[sponsor_user_id]
+        return None, "Invalid Referral Code"
 
-    # Enforce max 6 LEFT, 6 RIGHT per sponsor
+    sponsor = users_db[sponsor_user_id]
+    # Count directs on each side
     left_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'LEFT')
     right_count = sum(1 for uid in sponsor['directs'] if users_db[uid]['position'] == 'RIGHT')
 
     if position == 'LEFT' and left_count >= 6:
-        return None, "Left position is already filled (6 max) under this sponsor"
+        return None, "Left position already filled (6 max)"
     if position == 'RIGHT' and right_count >= 6:
-        return None, "Right position is already filled (6 max) under this sponsor"
+        return None, "Right position already filled (6 max)"
     if position not in ['LEFT', 'RIGHT']:
-        return None, "Position must be LEFT or RIGHT"
+        return None, "Invalid position"
 
-    # Attach user to sponsor
     sponsor['directs'].append(user_id)
     if position == 'LEFT':
         if not sponsor['power_leg']:
@@ -116,41 +106,48 @@ def create_user(data):
     users_db[user_id] = user
     return user, None
 
-# PAGE ROUTES
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/login')
 def login_page():
-    if 'user_id' in session:
-        user = users_db.get(session['user_id'])
-        if user and user['is_admin']:
+    # Defensive: always clear out bogus sessions before login
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    # If valid session present, redirect away
+    if user_id and user:
+        if user['is_admin']:
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('user_dashboard'))
+    # Reset session if invalid
+    session.clear()
     return render_template('login.html')
 
 @app.route('/signup')
 def signup_page():
-    if 'user_id' in session:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if user_id and user and not user.get('is_admin'):
         return redirect(url_for('user_dashboard'))
+    session.clear()
     return render_template('signup.html')
 
 @app.route('/dashboard')
 def user_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login_page'))
-    user = users_db.get(session['user_id'])
-    if not user or user['is_admin']:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user or user['is_admin']:
+        session.clear()
         return redirect(url_for('login_page'))
     return render_template('user_panel.html')
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('login_page'))
-    user = users_db.get(session['user_id'])
-    if not user or not user['is_admin']:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user or not user['is_admin']:
+        session.clear()
         return redirect(url_for('login_page'))
     return render_template('admin_panel.html')
 
@@ -182,10 +179,11 @@ def api_login():
                     'is_admin': user['is_admin'],
                     'name': f"{user['first_name']} {user['last_name']}"
                 }), 200
-
+        session.clear()
         return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
 
     except Exception as e:
+        session.clear()
         print(f"Login error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -237,11 +235,10 @@ def check_username(username):
 # USER API ENDPOINTS
 @app.route('/api/user/profile', methods=['GET'])
 def get_profile():
-    if 'user_id' not in session:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user or user.get('is_admin'):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    user = users_db.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found'}), 404
     return jsonify({
         'success': True,
         'user': {
@@ -263,11 +260,10 @@ def get_profile():
 
 @app.route('/api/user/referrals', methods=['GET'])
 def get_referrals():
-    if 'user_id' not in session:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    user = users_db.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found'}), 404
 
     referrals = []
     for ref_id in user['directs']:
@@ -290,12 +286,10 @@ def get_referrals():
 
 @app.route('/api/user/dashboard', methods=['GET'])
 def get_dashboard():
-    if 'user_id' not in session:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-
-    user = users_db.get(session['user_id'])
-    if not user:
-        return jsonify({'success': False, 'message': 'User not found'}), 404
 
     return jsonify({
         'success': True,
@@ -309,13 +303,12 @@ def get_dashboard():
         }
     }), 200
 
-# ADMIN API ENDPOINTS
+# ADMIN API ENDPOINTS (unchanged)
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    user = users_db.get(session['user_id'])
-    if not user or not user['is_admin']:
+    user_id = session.get('user_id')
+    user = users_db.get(user_id) if user_id else None
+    if not user_id or not user or not user['is_admin']:
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
     all_users = []
@@ -341,10 +334,9 @@ def admin_get_users():
 
 @app.route('/api/admin/user/<user_id>/activate', methods=['PUT'])
 def admin_activate_user(user_id):
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    admin = users_db.get(session['user_id'])
-    if not admin or not admin['is_admin']:
+    user_id_admin = session.get('user_id')
+    admin = users_db.get(user_id_admin) if user_id_admin else None
+    if not user_id_admin or not admin or not admin['is_admin']:
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
     user = users_db.get(user_id)
@@ -360,10 +352,9 @@ def admin_activate_user(user_id):
 
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_stats():
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
-    admin = users_db.get(session['user_id'])
-    if not admin or not admin['is_admin']:
+    user_id = session.get('user_id')
+    admin = users_db.get(user_id) if user_id else None
+    if not user_id or not admin or not admin['is_admin']:
         return jsonify({'success': False, 'message': 'Admin access required'}), 403
 
     total_users = len([u for u in users_db.values() if not u['is_admin']])
