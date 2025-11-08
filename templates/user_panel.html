@@ -89,6 +89,25 @@
     .business-list li,.income-list li {font-size:.89em;display:flex;justify-content:space-between;color:#363d60;margin:2px 0;}
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
+
+    /* Page Navigation */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Table styles */
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px #ebf0fb17; }
+    thead { background: linear-gradient(90deg, #14a074, #11a874); color: white; }
+    th { padding: 15px; text-align: left; font-weight: 600; }
+    td { padding: 12px 15px; border-bottom: 1px solid #e9fbe5; }
+    tbody tr:hover { background: #f8fdfc; }
+    .status-badge { display: inline-block; padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+    .status-active { background: #d4f8e8; color: #16915d; }
+    .status-inactive { background: #ffe6e6; color: #c41e3a; }
+
+    @media (max-width:950px) { 
+      .grid-3 { grid-template-columns: 1fr; } 
+      .wallet-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -114,8 +133,8 @@
         <img class="profile-avatar" src="https://randomuser.me/api/portraits/men/31.jpg" alt="User">
       </button>
       <div class="profile-dropdown" id="profileDropdown">
-        <button class="profile-dropdown-item">My Profile</button>
-        <button class="profile-dropdown-item">Logout</button>
+        <button class="profile-dropdown-item" onclick="navigatePage('profile')">My Profile</button>
+        <button class="profile-dropdown-item" onclick="logoutUser()">Logout</button>
       </div>
       <button class="hamburger" id="sidemenu-toggler" aria-label="Menu">
         <span class="hamburger-inner"></span>
@@ -125,7 +144,8 @@
     </div>
   </div>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-  <!-- Sidebar (test with more items to force scroll) -->
+
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebarPanel">
     <div class="sidebar-inner">
       <div>
@@ -142,284 +162,413 @@
         </div>
         <div class="sidebar-menu-scroll">
           <ul class="sb-menu">
-            <li class="active">Dashboard</li>
-            <li>New Registration</li>
+            <li class="active" onclick="navigatePage('dashboard')">Dashboard</li>
+            <li onclick="navigatePage('registration')">New Registration</li>
             <li class="has-dropdown">Profile
               <ul class="dropdown">
-                <li>Manage Profile</li>
-                <li>Change Password</li>
-              </ul>
-            </li>
-            <li class="has-dropdown">Trading Center
-              <ul class="dropdown">
-                <li>Trading</li>
-                <li>Trading History</li>
+                <li onclick="navigatePage('profile')">Manage Profile</li>
+                <li onclick="navigatePage('changepassword')">Change Password</li>
               </ul>
             </li>
             <li class="has-dropdown">Community
               <ul class="dropdown">
-                <li>Direct Referrals</li>
-                <li>Total Team</li>
-                <li>Team Summary</li>
-                <li>Unilevel Tree</li>
-              </ul>
-            </li>
-            <li class="has-dropdown">Activation Wallet
-              <ul class="dropdown">
-                <li>Balance</li>
-                <li>Deposit</li>
-                <li>Fund History</li>
-                <li>P2P Transfer</li>
-                <li>History</li>
+                <li onclick="navigatePage('referrals')">Direct Referrals</li>
+                <li onclick="navigatePage('team')">Total Team</li>
+                <li onclick="navigatePage('tree')">Unilevel Tree</li>
               </ul>
             </li>
             <li class="has-dropdown">Income Wallet
               <ul class="dropdown">
-                <li>Balance</li>
-                <li>Withdrawal</li>
-                <li>Withdrawal History</li>
-                <li>Internal Fund Transfer</li>
-                <li>History</li>
-              </ul>
-            </li>
-            <li class="has-dropdown">Profit Wallet
-              <ul class="dropdown">
-                <li>Profit Wallet Balance</li>
-                <li>History</li>
-                <li>Internal Fund Transfer</li>
-              </ul>
-            </li>
-            <li class="has-dropdown">Credit Wallet
-              <ul class="dropdown">
-                <li>Credit Wallet Balance</li>
-                <li>History</li>
-                <li>P2P Transfer</li>
+                <li onclick="navigatePage('balance')">Balance</li>
+                <li onclick="navigatePage('withdrawal')">Withdrawal</li>
+                <li onclick="navigatePage('withdrawalhistory')">Withdrawal History</li>
               </ul>
             </li>
             <li class="has-dropdown">Income Report
               <ul class="dropdown">
-                <li>Level Income</li>
-                <li>Matching Income</li>
-                <li>Trading Income</li>
-                <li>Trading Level Income</li>
-                <li>Reward Income</li>
-                <li>Leadership Income</li>
+                <li onclick="navigatePage('incomereport')">Income Report</li>
               </ul>
             </li>
-            <li>Wallet Setting</li>
-            <li>Rank &amp; Reward</li>
-            <li>Leadership Criteria</li>
-            <li>Official Announcements</li>
-            <li>Referral Link</li>
-            <li class="has-dropdown">Ticket Management
-              <ul class="dropdown">
-                <li>Open A Ticket</li>
-                <li>View Ticket Response</li>
-              </ul>
-            </li>
-            <li>Signout</li>
+            <li onclick="navigatePage('referrallink')">Referral Link</li>
+            <li onclick="logoutUser()">Logout</li>
           </ul>
         </div>
       </div>
       <div class="sb-footer">Status: <span style="color:#8dfad1;">Active</span></div>
     </div>
   </aside>
+
+  <!-- MAIN CONTENT -->
   <div class="main-content">
-    <div class="ref-card">
-      <div class="ref-block-row">
-        <span class="ref-link-title">Referral Link</span>
-        <span class="ref-url" id="referralUrl"></span>
-        <button class="ref-btn" onclick="copyReferral()">Copy</button>
+    
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="dashboard-page">
+      <div class="ref-card">
+        <div class="ref-block-row">
+          <span class="ref-link-title">Referral Link</span>
+          <span class="ref-url" id="referralUrl"></span>
+          <button class="ref-btn" onclick="copyReferral()">Copy</button>
+        </div>
+      </div>
+      <div class="chart-section">
+        <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=Light&style=1&hidesidetoolbar=1" width="95%" height="270" frameborder="0" allowtransparency="true"></iframe>
+        <div class="chart-metrics">
+          <div>Investment <br><span id="investmentAmt" style="font-weight:400;">$0.00</span></div>
+          <div>Today's Profit <br><span id="todayProfit" style="font-weight:400;">$0.00</span></div>
+          <div>Total Profit 15 Days <br><span id="profit15" style="font-weight:400;">$0.00</span></div>
+          <div>Total Profit <br><span id="totalProfit" style="font-weight:400;">$0.00</span></div>
+        </div>
+      </div>
+      <div class="wallet-section-design">
+        <div class="wallet-grid">
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar" id="incomeWallet">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trade Wallet</span><span class="wallet-dollar" id="tradeWallet">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Activation Wallet</span><span class="wallet-dollar" id="activationWallet">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Matching Income</span><span class="wallet-dollar" id="matchingIncome">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Generation</span><span class="wallet-dollar" id="generationIncome">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Club Income</span><span class="wallet-dollar" id="clubIncome">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trading Generation</span><span class="wallet-dollar" id="tradingGeneration">$0</span><span class="wallet-half-arc"></span></div>
+          <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>IB Income</span><span class="wallet-dollar" id="ibIncome">$0</span><span class="wallet-half-arc"></span></div>
+        </div>
+      </div>
+      <div class="split-row">
+        <div class="income-bar">Total Income&nbsp;&nbsp;<span id="totalIncome">$0</span></div>
+        <div class="withdraw-bar">Total Withdraw&nbsp;&nbsp;<span id="totalWithdraw">$0</span></div>
+      </div>
+      <div class="grid-3">
+        <div class="profile-info-card">
+          <div class="profile-info-top">
+            <img src="https://randomuser.me/api/portraits/men/31.jpg" class="profile-pic" alt="">
+            <div class="profile-main">
+              <span class="profile-name" id="userName"></span>
+              <span class="profile-id" id="userId"></span>
+            </div>
+          </div>
+          <ul class="profile-list">
+            <li><span class="profile-label">Referral ID:</span> <span id="referralCode"></span></li>
+            <li><span class="profile-label">Rank:</span> <span id="userRank">NA</span></li>
+            <li><span class="profile-label">Date of Joining:</span> <span id="dateJoined"></span></li>
+            <li><span class="profile-label">Date of Activation:</span> <span id="dateActivated"></span></li>
+          </ul>
+        </div>
+        <div class="business-info-card">
+          <div class="info-title">Business Details</div>
+          <ul class="business-list">
+            <li><span class="business-key">Direct Referrals</span><span class="business-val" id="directBot">0</span></li>
+            <li><span class="business-key">Total Team</span><span class="business-val" id="totalBot">0</span></li>
+            <li><span class="business-key">Left Leg</span><span class="business-val" id="leftLeg">0</span></li>
+            <li><span class="business-key">Right Leg</span><span class="business-val" id="rightLeg">0</span></li>
+          </ul>
+        </div>
+        <div class="income-info-card">
+          <div class="info-title">Income Summary</div>
+          <ul class="income-list">
+            <li><span class="income-key">Wallet Balance</span><span class="income-val" id="balanceSummary">$0</span></li>
+            <li><span class="income-key">Total Income</span><span class="income-val" id="totalIncSummary">$0</span></li>
+            <li><span class="income-key">Commission</span><span class="income-val" id="commissionSummary">$0</span></li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div class="chart-section">
-      <iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=D&theme=Light&style=1&hidesidetoolbar=1" width="95%" height="270" frameborder="0" allowtransparency="true"></iframe>
-      <div class="chart-metrics">
-        <div>Investment <br><span id="investmentAmt" style="font-weight:400;">$0.00</span></div>
-        <div>Today's Profit <br><span id="todayProfit" style="font-weight:400;">$0.00</span></div>
-        <div>Total Profit 15 Days <br><span id="profit15" style="font-weight:400;">$0.00</span></div>
-        <div>Total Profit <br><span id="totalProfit" style="font-weight:400;">$0.00</span></div>
+
+    <!-- REFERRALS PAGE -->
+    <div class="page" id="referrals-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+        <h2 style="color:#1d61a4; margin:0 0 15px 0;">My Direct Referrals</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Position</th>
+              <th>Joining Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="referralsTable">
+            <tr><td colspan="5" style="text-align:center;">Loading referrals...</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    <div class="wallet-section-design">
-      <div class="wallet-grid">
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Income Wallet</span><span class="wallet-dollar" id="incomeWallet">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trade Wallet</span><span class="wallet-dollar" id="tradeWallet">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Activation Wallet</span><span class="wallet-dollar" id="activationWallet">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Matching Income</span><span class="wallet-dollar" id="matchingIncome">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Generation</span><span class="wallet-dollar" id="generationIncome">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Club Income</span><span class="wallet-dollar" id="clubIncome">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>Trading Generation</span><span class="wallet-dollar" id="tradingGeneration">$0</span><span class="wallet-half-arc"></span></div>
-        <div class="wallet-box"><span class="wallet-box-title"><span class="wallet-icon">💼</span>IB Income</span><span class="wallet-dollar" id="ibIncome">$0</span><span class="wallet-half-arc"></span></div>
-      </div>
-    </div>
-    <div class="split-row">
-      <div class="income-bar">Total Income&nbsp;&nbsp;<span id="totalIncome">$0</span></div>
-      <div class="withdraw-bar">Total Withdraw&nbsp;&nbsp;<span id="totalWithdraw">$0</span></div>
-    </div>
-    <div class="grid-3">
-      <div class="profile-info-card">
-        <div class="profile-info-top">
-          <img src="https://randomuser.me/api/portraits/men/31.jpg" class="profile-pic" alt="">
-          <div class="profile-main">
-            <span class="profile-name" id="userName"></span>
-            <span class="profile-id" id="userId"></span>
+
+    <!-- PROFILE PAGE -->
+    <div class="page" id="profile-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">My Profile</h2>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+          <div>
+            <label style="color:#666; font-weight:600;">Username</label>
+            <input type="text" id="profUsername" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+          </div>
+          <div>
+            <label style="color:#666; font-weight:600;">Email</label>
+            <input type="text" id="profEmail" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+          </div>
+          <div>
+            <label style="color:#666; font-weight:600;">Phone</label>
+            <input type="text" id="profPhone" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+          </div>
+          <div>
+            <label style="color:#666; font-weight:600;">Country</label>
+            <input type="text" id="profCountry" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+          </div>
+          <div>
+            <label style="color:#666; font-weight:600;">Referral Code</label>
+            <input type="text" id="profReferralCode" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+          </div>
+          <div>
+            <label style="color:#666; font-weight:600;">Joining Date</label>
+            <input type="text" id="profJoiningDate" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
           </div>
         </div>
-        <ul class="profile-list">
-          <li><span class="profile-label">Referral ID:</span> <span id="referralCode"></span></li>
-          <li><span class="profile-label">Bot License:</span> <span id="botLicense">Inactive</span></li>
-          <li><span class="profile-label">Trading ARB Amount:</span> <span id="tradingARB">0.0000</span></li>
-          <li><span class="profile-label">Angel ARB Amount:</span> <span id="angelARB">0.0000</span></li>
-          <li><span class="profile-label">Cross ARB Amount:</span> <span id="crossARB">0</span></li>
-          <li><span class="profile-label">Rank:</span> <span id="userRank">NA</span></li>
-          <li><span class="profile-label">Date of Joining:</span> <span id="dateJoined"></span></li>
-          <li><span class="profile-label">Date of Activation:</span> <span id="dateActivated"></span></li>
-        </ul>
-        <button class="profile-btn">Click to View Closing Report</button>
-      </div>
-      <div class="business-info-card">
-        <div class="info-title">Business Details</div>
-        <ul class="business-list">
-          <li><span class="business-key">Direct Bot</span><span class="business-val" id="directBot">0</span></li>
-          <li><span class="business-key">Total Bot</span><span class="business-val" id="totalBot">0</span></li>
-          <li><span class="business-key">Team Business (Trading/Angel)</span><span class="business-val" id="teamBusiness">0/0</span></li>
-          <li><span class="business-key">Total Team(Left/Right)</span><span class="business-val" id="teamLeftRight">0/0</span></li>
-          <li><span class="business-key">Strong/Weaker Leg Bot</span><span class="business-val" id="strengthBot">0/0</span></li>
-          <li><span class="business-key">Total Bot(Left/Right)</span><span class="business-val" id="botLeftRight">0/0</span></li>
-          <li><span class="business-key">Bot Carryforward(Left/Right)</span><span class="business-val" id="carryBotLeftRight">0/0</span></li>
-          <li><span class="business-key">Current Trading Business(Left/Right)</span><span class="business-val" id="currentTradeLeftRight">0/0</span></li>
-          <li><span class="business-key">Total Trading Business(Left/Right)</span><span class="business-val" id="totalTradeLeftRight">0/0</span></li>
-          <li><span class="business-key">Total Angel Business(Left/Right)</span><span class="business-val" id="angelLeftRight">0/0</span></li>
-        </ul>
-      </div>
-      <div class="income-info-card">
-        <div class="info-title">Income Details</div>
-        <ul class="income-list">
-          <li><span class="income-key">Referral Income</span><span class="income-val" id="referralIncome">0</span></li>
-          <li><span class="income-key">Generation Income</span><span class="income-val" id="generationInc">0</span></li>
-          <li><span class="income-key">Trading Profit Income</span><span class="income-val" id="tradingProfitInc">0</span></li>
-          <li><span class="income-key">Leadership Pool Income</span><span class="income-val" id="leadershipInc">0</span></li>
-          <li><span class="income-key">Reward Income</span><span class="income-val" id="rewardInc">0</span></li>
-          <li><span class="income-key">IB Income</span><span class="income-val" id="ibInc">0</span></li>
-          <li><span class="income-key">Matching Income</span><span class="income-val" id="matchingInc">0</span></li>
-        </ul>
       </div>
     </div>
+
+    <!-- TREE VIEW PAGE -->
+    <div class="page" id="tree-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Binary Tree View</h2>
+        <pre id="treeContent" style="background:#f5f5f5; padding:15px; border-radius:8px; overflow-x:auto;">Loading tree...</pre>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER PAGES -->
+    <div class="page" id="registration-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">New Registration</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="changepassword-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Change Password</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="team-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Total Team</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="balance-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Wallet Balance</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="withdrawal-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Withdrawal</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="withdrawalhistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Withdrawal History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="incomereport-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Income Report</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="referrallink-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Referral Link</h2>
+        <div style="background:#edfff9; padding:15px; border-radius:8px; border:1.5px solid #e2f6ec;">
+          <label style="color:#666; font-weight:600; display:block; margin-bottom:10px;">Your Referral Link</label>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="refLinkInput" readonly style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <button onclick="copyRefLink()" style="padding:10px 20px; background:#14a074; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer;">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <!-- DO NOT CHANGE BELOW SCRIPT, just copy-paste -->
+
+  <!-- SCRIPTS -->
   <script>
-    // Hamburger/sidebar/profile menu (all your logic, no change)
+    const API_BASE = window.location.origin;
+    let currentUser = null;
+
+    // ===== SIDEBAR & HEADER INTERACTIONS =====
     const sidebar = document.getElementById('sidebarPanel');
-    const toggler  = document.getElementById('sidemenu-toggler');
+    const toggler = document.getElementById('sidemenu-toggler');
     const backdrop = document.getElementById('sidebar-backdrop');
+    const profileBtn = document.getElementById('profileAvatarBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
     function hideSidebar() {
       sidebar.classList.remove('open');
       backdrop.classList.remove('show');
       toggler.classList.remove('active');
     }
-    toggler.addEventListener('click',function(e){
+
+    toggler.addEventListener('click', function(e) {
       e.stopPropagation();
       sidebar.classList.toggle('open');
       backdrop.classList.toggle('show');
       toggler.classList.toggle('active');
     });
+
     backdrop.addEventListener('click', hideSidebar);
-    document.querySelectorAll('.sb-menu > li, .sb-menu > li > ul > li').forEach(function(item){
-      item.addEventListener('click', function(){
-        if(window.innerWidth < 951) hideSidebar();
-      });
-    });
+
     document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(item => {
-      item.addEventListener('click', function(e){
+      item.addEventListener('click', function(e) {
         if(window.innerWidth < 951) e.stopPropagation();
         document.querySelectorAll('.sb-menu > li.has-dropdown').forEach(li => { if(li!==item) li.classList.remove('open'); });
         item.classList.toggle('open');
       });
     });
-    const profileBtn = document.getElementById('profileAvatarBtn');
-    const profileDropdown = document.getElementById('profileDropdown');
-    function closeProfileDropdown(e){
-      if(!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)){
+
+    profileBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      profileBtn.classList.toggle('active');
+      setTimeout(() => { document.addEventListener('click', closeProfileDropdown, {once:true}); }, 10);
+    });
+
+    function closeProfileDropdown(e) {
+      if(!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
         profileBtn.classList.remove('active');
       }
     }
-    profileBtn.addEventListener('click',function(e){
-      e.stopPropagation();
-      profileBtn.classList.toggle('active');
-      setTimeout(()=>{document.addEventListener('click', closeProfileDropdown, {once:true})},10);
-    });
-    function copyReferral(){
+
+    // ===== PAGE NAVIGATION =====
+    function navigatePage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(page + '-page').classList.add('active');
+      hideSidebar();
+      
+      // Load data for specific pages
+      if(page === 'referrals') loadReferrals();
+      if(page === 'profile') loadProfilePage();
+      if(page === 'tree') loadTreeView();
+      if(page === 'referrallink') loadReferralLink();
+    }
+
+    // ===== LOAD USER PROFILE =====
+    async function loadUserProfile() {
+      try {
+        const res = await fetch(API_BASE + '/api/user/profile', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.success) {
+          window.location.href = '/login';
+          return;
+        }
+        currentUser = data.user;
+
+        // Update Dashboard
+        document.getElementById('userName').textContent = currentUser.first_name + ' ' + currentUser.last_name;
+        document.getElementById('userId').textContent = currentUser.user_id;
+        document.getElementById('referralCode').textContent = currentUser.referral_code;
+        document.getElementById('dateJoined').textContent = new Date(currentUser.created_at).toLocaleDateString();
+        document.getElementById('referralUrl').textContent = API_BASE + "/signup?referral=" + currentUser.referral_code;
+
+        document.getElementById('incomeWallet').textContent = "$" + (currentUser.wallet_balance || 0).toFixed(2);
+        document.getElementById('totalIncome').textContent = "$" + (currentUser.total_income || 0).toFixed(2);
+        document.getElementById('balanceSummary').textContent = "$" + (currentUser.wallet_balance || 0).toFixed(2);
+        document.getElementById('totalIncSummary').textContent = "$" + (currentUser.total_income || 0).toFixed(2);
+
+      } catch (err) {
+        console.error(err);
+        window.location.href = '/login';
+      }
+    }
+
+    async function loadReferrals() {
+      try {
+        const res = await fetch(API_BASE + '/api/user/referrals', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.success) return;
+
+        const tbody = document.getElementById('referralsTable');
+        tbody.innerHTML = '';
+
+        if(data.referrals.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No referrals yet</td></tr>';
+          return;
+        }
+
+        data.referrals.forEach(ref => {
+          const statusClass = ref.status === 'active' ? 'status-active' : 'status-inactive';
+          const row = `<tr>
+            <td>${ref.username}</td>
+            <td>${ref.name}</td>
+            <td>${ref.position}</td>
+            <td>${new Date(ref.joined).toLocaleDateString()}</td>
+            <td><span class="status-badge ${statusClass}">${ref.status}</span></td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+
+        document.getElementById('directBot').textContent = data.direct_count;
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadProfilePage() {
+      if(!currentUser) return;
+      document.getElementById('profUsername').value = currentUser.username;
+      document.getElementById('profEmail').value = currentUser.email;
+      document.getElementById('profPhone').value = currentUser.phone || '-';
+      document.getElementById('profCountry').value = currentUser.country || '-';
+      document.getElementById('profReferralCode').value = currentUser.referral_code;
+      document.getElementById('profJoiningDate').value = new Date(currentUser.created_at).toLocaleString();
+    }
+
+    async function loadTreeView() {
+      try {
+        const res = await fetch(API_BASE + '/api/user/tree', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.success) return;
+
+        const tree = data.tree;
+        const treeText = JSON.stringify(tree, null, 2);
+        document.getElementById('treeContent').textContent = treeText;
+
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function loadReferralLink() {
+      if(!currentUser) return;
+      document.getElementById('refLinkInput').value = API_BASE + "/signup?referral=" + currentUser.referral_code;
+    }
+
+    function copyReferral() {
       const url = document.getElementById('referralUrl').textContent;
       navigator.clipboard.writeText(url);
       alert("Referral link copied!");
     }
 
-    // ========== FULLY DYNAMIC DASHBOARD ==========
-    async function loadUserProfile() {
-      try {
-        const apiUrl = window.location.origin + '/api/user/profile';
-        const res = await fetch(apiUrl, { credentials: 'include' });
-        const data = await res.json();
-        if (!data.success) {
-          alert(data.message || "Session expired. Please login.");
-          window.location.href = "/login";
-          return;
-        }
-        const u = data.user;
-
-        // Profile info
-        document.getElementById('userName').textContent = u.first_name + ' ' + u.last_name;
-        document.getElementById('userId').textContent = u.user_id;
-        document.getElementById('referralCode').textContent = u.referral_code;
-        document.getElementById('dateJoined').textContent = u.created_at ? new Date(u.created_at).toLocaleString() : "";
-        document.getElementById('referralUrl').textContent = window.location.origin + "/signup?referral=" + u.referral_code;
-        // others (botLicense, tradingARB, etc) left as static unless provided in API
-
-        // Wallet section
-        document.getElementById('incomeWallet').textContent = "$" + (u.wallet_balance || 0);
-        document.getElementById('tradeWallet').textContent = "$" + (u.trade_wallet || 0);
-        document.getElementById('activationWallet').textContent = "$" + (u.activation_wallet || 0);
-        document.getElementById('matchingIncome').textContent = "$" + (u.matching_income || 0);
-        document.getElementById('generationIncome').textContent = "$" + (u.generation_income || 0);
-        document.getElementById('clubIncome').textContent = "$" + (u.club_income || 0);
-        document.getElementById('tradingGeneration').textContent = "$" + (u.trading_generation || 0);
-        document.getElementById('ibIncome').textContent = "$" + (u.ib_income || 0);
-
-        // Income/Withdraw split
-        document.getElementById('totalIncome').textContent = "$" + (u.total_income || 0);
-        document.getElementById('totalWithdraw').textContent = "$" + (u.total_withdraw || 0);
-
-        // Business section
-        document.getElementById('directBot').textContent = u.direct_bot || 0;
-        document.getElementById('totalBot').textContent = u.total_bot || 0;
-        document.getElementById('teamBusiness').textContent = (u.team_business_trading || 0) + "/" + (u.team_business_angel || 0);
-        document.getElementById('teamLeftRight').textContent = (u.team_left || 0) + "/" + (u.team_right || 0);
-        document.getElementById('strengthBot').textContent = (u.strong_leg || 0) + "/" + (u.weak_leg || 0);
-        document.getElementById('botLeftRight').textContent = (u.bot_left || 0) + "/" + (u.bot_right || 0);
-        document.getElementById('carryBotLeftRight').textContent = (u.carry_left || 0) + "/" + (u.carry_right || 0);
-        document.getElementById('currentTradeLeftRight').textContent = (u.current_trade_left || 0) + "/" + (u.current_trade_right || 0);
-        document.getElementById('totalTradeLeftRight').textContent = (u.total_trade_left || 0) + "/" + (u.total_trade_right || 0);
-        document.getElementById('angelLeftRight').textContent = (u.angel_left || 0) + "/" + (u.angel_right || 0);
-
-        // Income details card section
-        document.getElementById('referralIncome').textContent = u.referral_income || 0;
-        document.getElementById('generationInc').textContent = u.generation_income || 0;
-        document.getElementById('tradingProfitInc').textContent = u.trading_profit_income || 0;
-        document.getElementById('leadershipInc').textContent = u.leadership_pool_income || 0;
-        document.getElementById('rewardInc').textContent = u.reward_income || 0;
-        document.getElementById('ibInc').textContent = u.ib_income || 0;
-        document.getElementById('matchingInc').textContent = u.matching_income || 0;
-
-        // Chart metrics (optional, make dynamic if you add to backend)
-        // document.getElementById('investmentAmt').textContent = ...;
-        // etc.
-
-      } catch (err) {
-        alert('Session/authentication error. Please login again.');
-        window.location.href = '/login';
-      }
+    function copyRefLink() {
+      const link = document.getElementById('refLinkInput');
+      link.select();
+      document.execCommand('copy');
+      alert("Referral link copied!");
     }
+
+    async function logoutUser() {
+      await fetch(API_BASE + '/api/auth/logout', { method: 'POST', credentials: 'include' });
+      window.location.href = '/login';
+    }
+
+    // Load on page load
     window.addEventListener('DOMContentLoaded', loadUserProfile);
   </script>
 </body>
