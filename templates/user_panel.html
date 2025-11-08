@@ -90,11 +90,10 @@
     .business-key,.income-key {color:#7b7e88;}
     .business-val,.income-val {font-weight:600;color:#313462;}
 
-    /* Page Navigation */
+    /* PAGE NAVIGATION STYLES */
     .page { display: none; }
     .page.active { display: block; }
-
-    /* Table styles */
+    
     table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px #ebf0fb17; }
     thead { background: linear-gradient(90deg, #14a074, #11a874); color: white; }
     th { padding: 15px; text-align: left; font-weight: 600; }
@@ -133,7 +132,6 @@
         <img class="profile-avatar" src="https://randomuser.me/api/portraits/men/31.jpg" alt="User">
       </button>
       <div class="profile-dropdown" id="profileDropdown">
-        <button class="profile-dropdown-item" onclick="navigatePage('profile')">My Profile</button>
         <button class="profile-dropdown-item" onclick="logoutUser()">Logout</button>
       </div>
       <button class="hamburger" id="sidemenu-toggler" aria-label="Menu">
@@ -144,7 +142,6 @@
     </div>
   </div>
   <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
-
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebarPanel">
     <div class="sidebar-inner">
@@ -162,35 +159,82 @@
         </div>
         <div class="sidebar-menu-scroll">
           <ul class="sb-menu">
-            <li class="active" onclick="navigatePage('dashboard')">Dashboard</li>
-            <li onclick="navigatePage('registration')">New Registration</li>
+            <li class="active" onclick="navigatePage('dashboard'); return false;">Dashboard</li>
+            <li onclick="navigatePage('registration'); return false;">New Registration</li>
             <li class="has-dropdown">Profile
               <ul class="dropdown">
-                <li onclick="navigatePage('profile')">Manage Profile</li>
-                <li onclick="navigatePage('changepassword')">Change Password</li>
+                <li onclick="navigatePage('profile'); return false;">Manage Profile</li>
+                <li onclick="navigatePage('changepassword'); return false;">Change Password</li>
+              </ul>
+            </li>
+            <li class="has-dropdown">Trading Center
+              <ul class="dropdown">
+                <li onclick="navigatePage('trading'); return false;">Trading</li>
+                <li onclick="navigatePage('tradinghistory'); return false;">Trading History</li>
               </ul>
             </li>
             <li class="has-dropdown">Community
               <ul class="dropdown">
-                <li onclick="navigatePage('referrals')">Direct Referrals</li>
-                <li onclick="navigatePage('team')">Total Team</li>
-                <li onclick="navigatePage('tree')">Unilevel Tree</li>
+                <li onclick="navigatePage('referrals'); return false;">Direct Referrals</li>
+                <li onclick="navigatePage('team'); return false;">Total Team</li>
+                <li onclick="navigatePage('teamsummary'); return false;">Team Summary</li>
+                <li onclick="navigatePage('tree'); return false;">Unilevel Tree</li>
+              </ul>
+            </li>
+            <li class="has-dropdown">Activation Wallet
+              <ul class="dropdown">
+                <li onclick="navigatePage('activationbalance'); return false;">Balance</li>
+                <li onclick="navigatePage('activationdeposit'); return false;">Deposit</li>
+                <li onclick="navigatePage('activationfund'); return false;">Fund History</li>
+                <li onclick="navigatePage('activationp2p'); return false;">P2P Transfer</li>
+                <li onclick="navigatePage('activationhistory'); return false;">History</li>
               </ul>
             </li>
             <li class="has-dropdown">Income Wallet
               <ul class="dropdown">
-                <li onclick="navigatePage('balance')">Balance</li>
-                <li onclick="navigatePage('withdrawal')">Withdrawal</li>
-                <li onclick="navigatePage('withdrawalhistory')">Withdrawal History</li>
+                <li onclick="navigatePage('incomebalance'); return false;">Balance</li>
+                <li onclick="navigatePage('withdrawal'); return false;">Withdrawal</li>
+                <li onclick="navigatePage('withdrawalhistory'); return false;">Withdrawal History</li>
+                <li onclick="navigatePage('incometransfer'); return false;">Internal Fund Transfer</li>
+                <li onclick="navigatePage('incomehistory'); return false;">History</li>
+              </ul>
+            </li>
+            <li class="has-dropdown">Profit Wallet
+              <ul class="dropdown">
+                <li onclick="navigatePage('profitbalance'); return false;">Profit Wallet Balance</li>
+                <li onclick="navigatePage('profithistory'); return false;">History</li>
+                <li onclick="navigatePage('profittransfer'); return false;">Internal Fund Transfer</li>
+              </ul>
+            </li>
+            <li class="has-dropdown">Credit Wallet
+              <ul class="dropdown">
+                <li onclick="navigatePage('creditbalance'); return false;">Credit Wallet Balance</li>
+                <li onclick="navigatePage('credithistory'); return false;">History</li>
+                <li onclick="navigatePage('creditp2p'); return false;">P2P Transfer</li>
               </ul>
             </li>
             <li class="has-dropdown">Income Report
               <ul class="dropdown">
-                <li onclick="navigatePage('incomereport')">Income Report</li>
+                <li onclick="navigatePage('levelincome'); return false;">Level Income</li>
+                <li onclick="navigatePage('matchingincome'); return false;">Matching Income</li>
+                <li onclick="navigatePage('tradingincome'); return false;">Trading Income</li>
+                <li onclick="navigatePage('tradinglevelincome'); return false;">Trading Level Income</li>
+                <li onclick="navigatePage('rewardincome'); return false;">Reward Income</li>
+                <li onclick="navigatePage('leadershipincome'); return false;">Leadership Income</li>
               </ul>
             </li>
-            <li onclick="navigatePage('referrallink')">Referral Link</li>
-            <li onclick="logoutUser()">Logout</li>
+            <li onclick="navigatePage('walletsetting'); return false;">Wallet Setting</li>
+            <li onclick="navigatePage('rankandreward'); return false;">Rank &amp; Reward</li>
+            <li onclick="navigatePage('leadership'); return false;">Leadership Criteria</li>
+            <li onclick="navigatePage('announcements'); return false;">Official Announcements</li>
+            <li onclick="navigatePage('referrallink'); return false;">Referral Link</li>
+            <li class="has-dropdown">Ticket Management
+              <ul class="dropdown">
+                <li onclick="navigatePage('openticket'); return false;">Open A Ticket</li>
+                <li onclick="navigatePage('viewticket'); return false;">View Ticket Response</li>
+              </ul>
+            </li>
+            <li onclick="logoutUser(); return false;">Signout</li>
           </ul>
         </div>
       </div>
@@ -200,7 +244,7 @@
 
   <!-- MAIN CONTENT -->
   <div class="main-content">
-    
+
     <!-- DASHBOARD PAGE -->
     <div class="page active" id="dashboard-page">
       <div class="ref-card">
@@ -246,26 +290,41 @@
           </div>
           <ul class="profile-list">
             <li><span class="profile-label">Referral ID:</span> <span id="referralCode"></span></li>
+            <li><span class="profile-label">Bot License:</span> <span id="botLicense">Inactive</span></li>
+            <li><span class="profile-label">Trading ARB Amount:</span> <span id="tradingARB">0.0000</span></li>
+            <li><span class="profile-label">Angel ARB Amount:</span> <span id="angelARB">0.0000</span></li>
+            <li><span class="profile-label">Cross ARB Amount:</span> <span id="crossARB">0</span></li>
             <li><span class="profile-label">Rank:</span> <span id="userRank">NA</span></li>
             <li><span class="profile-label">Date of Joining:</span> <span id="dateJoined"></span></li>
             <li><span class="profile-label">Date of Activation:</span> <span id="dateActivated"></span></li>
           </ul>
+          <button class="profile-btn">Click to View Closing Report</button>
         </div>
         <div class="business-info-card">
           <div class="info-title">Business Details</div>
           <ul class="business-list">
-            <li><span class="business-key">Direct Referrals</span><span class="business-val" id="directBot">0</span></li>
-            <li><span class="business-key">Total Team</span><span class="business-val" id="totalBot">0</span></li>
-            <li><span class="business-key">Left Leg</span><span class="business-val" id="leftLeg">0</span></li>
-            <li><span class="business-key">Right Leg</span><span class="business-val" id="rightLeg">0</span></li>
+            <li><span class="business-key">Direct Bot</span><span class="business-val" id="directBot">0</span></li>
+            <li><span class="business-key">Total Bot</span><span class="business-val" id="totalBot">0</span></li>
+            <li><span class="business-key">Team Business (Trading/Angel)</span><span class="business-val" id="teamBusiness">0/0</span></li>
+            <li><span class="business-key">Total Team(Left/Right)</span><span class="business-val" id="teamLeftRight">0/0</span></li>
+            <li><span class="business-key">Strong/Weaker Leg Bot</span><span class="business-val" id="strengthBot">0/0</span></li>
+            <li><span class="business-key">Total Bot(Left/Right)</span><span class="business-val" id="botLeftRight">0/0</span></li>
+            <li><span class="business-key">Bot Carryforward(Left/Right)</span><span class="business-val" id="carryBotLeftRight">0/0</span></li>
+            <li><span class="business-key">Current Trading Business(Left/Right)</span><span class="business-val" id="currentTradeLeftRight">0/0</span></li>
+            <li><span class="business-key">Total Trading Business(Left/Right)</span><span class="business-val" id="totalTradeLeftRight">0/0</span></li>
+            <li><span class="business-key">Total Angel Business(Left/Right)</span><span class="business-val" id="angelLeftRight">0/0</span></li>
           </ul>
         </div>
         <div class="income-info-card">
-          <div class="info-title">Income Summary</div>
+          <div class="info-title">Income Details</div>
           <ul class="income-list">
-            <li><span class="income-key">Wallet Balance</span><span class="income-val" id="balanceSummary">$0</span></li>
-            <li><span class="income-key">Total Income</span><span class="income-val" id="totalIncSummary">$0</span></li>
-            <li><span class="income-key">Commission</span><span class="income-val" id="commissionSummary">$0</span></li>
+            <li><span class="income-key">Referral Income</span><span class="income-val" id="referralIncome">0</span></li>
+            <li><span class="income-key">Generation Income</span><span class="income-val" id="generationInc">0</span></li>
+            <li><span class="income-key">Trading Profit Income</span><span class="income-val" id="tradingProfitInc">0</span></li>
+            <li><span class="income-key">Leadership Pool Income</span><span class="income-val" id="leadershipInc">0</span></li>
+            <li><span class="income-key">Reward Income</span><span class="income-val" id="rewardInc">0</span></li>
+            <li><span class="income-key">IB Income</span><span class="income-val" id="ibInc">0</span></li>
+            <li><span class="income-key">Matching Income</span><span class="income-val" id="matchingInc">0</span></li>
           </ul>
         </div>
       </div>
@@ -295,7 +354,7 @@
     <!-- PROFILE PAGE -->
     <div class="page" id="profile-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
-        <h2 style="color:#1d61a4; margin:0 0 20px 0;">My Profile</h2>
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Manage Profile</h2>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
           <div>
             <label style="color:#666; font-weight:600;">Username</label>
@@ -328,12 +387,26 @@
     <!-- TREE VIEW PAGE -->
     <div class="page" id="tree-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
-        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Binary Tree View</h2>
-        <pre id="treeContent" style="background:#f5f5f5; padding:15px; border-radius:8px; overflow-x:auto;">Loading tree...</pre>
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Unilevel Tree</h2>
+        <pre id="treeContent" style="background:#f5f5f5; padding:15px; border-radius:8px; overflow-x:auto; font-size:0.9em;">Loading tree...</pre>
       </div>
     </div>
 
-    <!-- PLACEHOLDER PAGES -->
+    <!-- REFERRAL LINK PAGE -->
+    <div class="page" id="referrallink-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Referral Link</h2>
+        <div style="background:#edfff9; padding:15px; border-radius:8px; border:1.5px solid #e2f6ec;">
+          <label style="color:#666; font-weight:600; display:block; margin-bottom:10px;">Your Referral Link</label>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="refLinkInput" readonly style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
+            <button onclick="copyRefLink()" style="padding:10px 20px; background:#14a074; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer;">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER PAGES FOR MENU ITEMS -->
     <div class="page" id="registration-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
         <h2 style="color:#1d61a4;">New Registration</h2>
@@ -348,6 +421,20 @@
       </div>
     </div>
 
+    <div class="page" id="trading-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Trading</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="tradinghistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Trading History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
     <div class="page" id="team-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
         <h2 style="color:#1d61a4;">Total Team</h2>
@@ -355,9 +442,9 @@
       </div>
     </div>
 
-    <div class="page" id="balance-page">
+    <div class="page" id="teamsummary-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
-        <h2 style="color:#1d61a4;">Wallet Balance</h2>
+        <h2 style="color:#1d61a4;">Team Summary</h2>
         <p style="color:#666; margin-top:20px;">Coming Soon...</p>
       </div>
     </div>
@@ -376,23 +463,186 @@
       </div>
     </div>
 
-    <div class="page" id="incomereport-page">
+    <!-- ALL OTHER PLACEHOLDER PAGES (Add more as needed) -->
+    <div class="page" id="activationbalance-page">
       <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
-        <h2 style="color:#1d61a4;">Income Report</h2>
+        <h2 style="color:#1d61a4;">Activation Wallet Balance</h2>
         <p style="color:#666; margin-top:20px;">Coming Soon...</p>
       </div>
     </div>
 
-    <div class="page" id="referrallink-page">
-      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
-        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Referral Link</h2>
-        <div style="background:#edfff9; padding:15px; border-radius:8px; border:1.5px solid #e2f6ec;">
-          <label style="color:#666; font-weight:600; display:block; margin-bottom:10px;">Your Referral Link</label>
-          <div style="display:flex; gap:10px;">
-            <input type="text" id="refLinkInput" readonly style="flex:1; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            <button onclick="copyRefLink()" style="padding:10px 20px; background:#14a074; color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer;">Copy</button>
-          </div>
-        </div>
+    <div class="page" id="activationdeposit-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Activation Wallet Deposit</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="activationfund-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Activation Fund History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="activationp2p-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Activation P2P Transfer</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="activationhistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Activation History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="incomebalance-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Income Wallet Balance</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="incometransfer-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Income Internal Fund Transfer</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="incomehistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Income History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="profitbalance-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Profit Wallet Balance</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="profithistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Profit History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="profittransfer-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Profit Transfer</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="creditbalance-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Credit Wallet Balance</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="credithistory-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Credit History</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="creditp2p-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Credit P2P Transfer</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="levelincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Level Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="matchingincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Matching Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="tradingincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Trading Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="tradinglevelincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Trading Level Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="rewardincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Reward Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="leadershipincome-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Leadership Income</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="walletsetting-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Wallet Setting</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="rankandreward-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Rank &amp; Reward</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="leadership-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Leadership Criteria</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="announcements-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Official Announcements</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="openticket-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">Open A Ticket</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
+      </div>
+    </div>
+
+    <div class="page" id="viewticket-page">
+      <div style="margin:20px auto; width:98.5%; background:#fff; padding:40px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17; text-align:center;">
+        <h2 style="color:#1d61a4;">View Ticket Response</h2>
+        <p style="color:#666; margin-top:20px;">Coming Soon...</p>
       </div>
     </div>
 
@@ -461,28 +711,61 @@
     // ===== LOAD USER PROFILE =====
     async function loadUserProfile() {
       try {
-        const res = await fetch(API_BASE + '/api/user/profile', { credentials: 'include' });
+        const apiUrl = window.location.origin + '/api/user/profile';
+        const res = await fetch(apiUrl, { credentials: 'include' });
         const data = await res.json();
         if (!data.success) {
-          window.location.href = '/login';
+          alert(data.message || "Session expired. Please login.");
+          window.location.href = "/login";
           return;
         }
-        currentUser = data.user;
+        const u = data.user;
 
-        // Update Dashboard
-        document.getElementById('userName').textContent = currentUser.first_name + ' ' + currentUser.last_name;
-        document.getElementById('userId').textContent = currentUser.user_id;
-        document.getElementById('referralCode').textContent = currentUser.referral_code;
-        document.getElementById('dateJoined').textContent = new Date(currentUser.created_at).toLocaleDateString();
-        document.getElementById('referralUrl').textContent = API_BASE + "/signup?referral=" + currentUser.referral_code;
+        // Profile info
+        document.getElementById('userName').textContent = u.first_name + ' ' + u.last_name;
+        document.getElementById('userId').textContent = u.user_id;
+        document.getElementById('referralCode').textContent = u.referral_code;
+        document.getElementById('dateJoined').textContent = u.created_at ? new Date(u.created_at).toLocaleString() : "";
+        document.getElementById('referralUrl').textContent = window.location.origin + "/signup?referral=" + u.referral_code;
+        currentUser = u;
 
-        document.getElementById('incomeWallet').textContent = "$" + (currentUser.wallet_balance || 0).toFixed(2);
-        document.getElementById('totalIncome').textContent = "$" + (currentUser.total_income || 0).toFixed(2);
-        document.getElementById('balanceSummary').textContent = "$" + (currentUser.wallet_balance || 0).toFixed(2);
-        document.getElementById('totalIncSummary').textContent = "$" + (currentUser.total_income || 0).toFixed(2);
+        // Wallet section
+        document.getElementById('incomeWallet').textContent = "$" + (u.wallet_balance || 0);
+        document.getElementById('tradeWallet').textContent = "$" + (u.trade_wallet || 0);
+        document.getElementById('activationWallet').textContent = "$" + (u.activation_wallet || 0);
+        document.getElementById('matchingIncome').textContent = "$" + (u.matching_income || 0);
+        document.getElementById('generationIncome').textContent = "$" + (u.generation_income || 0);
+        document.getElementById('clubIncome').textContent = "$" + (u.club_income || 0);
+        document.getElementById('tradingGeneration').textContent = "$" + (u.trading_generation || 0);
+        document.getElementById('ibIncome').textContent = "$" + (u.ib_income || 0);
+
+        // Income/Withdraw split
+        document.getElementById('totalIncome').textContent = "$" + (u.total_income || 0);
+        document.getElementById('totalWithdraw').textContent = "$" + (u.total_withdraw || 0);
+
+        // Business section
+        document.getElementById('directBot').textContent = u.direct_bot || 0;
+        document.getElementById('totalBot').textContent = u.total_bot || 0;
+        document.getElementById('teamBusiness').textContent = (u.team_business_trading || 0) + "/" + (u.team_business_angel || 0);
+        document.getElementById('teamLeftRight').textContent = (u.team_left || 0) + "/" + (u.team_right || 0);
+        document.getElementById('strengthBot').textContent = (u.strong_leg || 0) + "/" + (u.weak_leg || 0);
+        document.getElementById('botLeftRight').textContent = (u.bot_left || 0) + "/" + (u.bot_right || 0);
+        document.getElementById('carryBotLeftRight').textContent = (u.carry_left || 0) + "/" + (u.carry_right || 0);
+        document.getElementById('currentTradeLeftRight').textContent = (u.current_trade_left || 0) + "/" + (u.current_trade_right || 0);
+        document.getElementById('totalTradeLeftRight').textContent = (u.total_trade_left || 0) + "/" + (u.total_trade_right || 0);
+        document.getElementById('angelLeftRight').textContent = (u.angel_left || 0) + "/" + (u.angel_right || 0);
+
+        // Income details card section
+        document.getElementById('referralIncome').textContent = u.referral_income || 0;
+        document.getElementById('generationInc').textContent = u.generation_income || 0;
+        document.getElementById('tradingProfitInc').textContent = u.trading_profit_income || 0;
+        document.getElementById('leadershipInc').textContent = u.leadership_pool_income || 0;
+        document.getElementById('rewardInc').textContent = u.reward_income || 0;
+        document.getElementById('ibInc').textContent = u.ib_income || 0;
+        document.getElementById('matchingInc').textContent = u.matching_income || 0;
 
       } catch (err) {
-        console.error(err);
+        alert('Session/authentication error. Please login again.');
         window.location.href = '/login';
       }
     }
@@ -512,9 +795,6 @@
           </tr>`;
           tbody.innerHTML += row;
         });
-
-        document.getElementById('directBot').textContent = data.direct_count;
-
       } catch (err) {
         console.error(err);
       }
@@ -539,7 +819,6 @@
         const tree = data.tree;
         const treeText = JSON.stringify(tree, null, 2);
         document.getElementById('treeContent').textContent = treeText;
-
       } catch (err) {
         console.error(err);
       }
