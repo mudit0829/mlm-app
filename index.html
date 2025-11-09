@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRADEERA - Enterprise Trading Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { 
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #ffffff;
+      color: #1a2332;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes fadeInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(100px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes floatIn { from { opacity: 0; transform: translateY(20px) rotateX(10deg); } to { opacity: 1; transform: translateY(0) rotateX(0); } }
+    @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-50px, 50px); } }
+
+    /* HEADER */
+    header {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(40px);
+      border-bottom: 1px solid rgba(26, 35, 50, 0.08);
+      padding: 1.5rem 3rem;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 8px 32px rgba(26, 35, 50, 0.08);
+      padding: 1rem 3rem;
+    }
+
+    .header-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo { display: flex; align-items: center; gap: 1rem; text-decoration: none; font-weight: 900; color: #2563eb; font-size: 1.4rem; letter-spacing: -0.5px; }
+    .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+
+    nav { display: flex; gap: 3.5rem; }
+    nav a { text-decoration: none; color: #64748b; font-weight: 600; transition: all 0.3s; position: relative; }
+    nav a:hover { color: #2563eb; }
+    nav a::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px; background: #2563eb; transition: width 0.3s; }
+    nav a:hover::after { width: 100%; }
+
+    .nav-buttons { display: flex; gap: 1rem; }
+    .btn { padding: 0.8rem 2rem; border: none; cursor: pointer; font-weight: 700; border-radius: 10px; transition: all 0.3s; text-decoration: none; display: inline-block; font-size: 0.95rem; position: relative; overflow: hidden; }
+
+    .btn-outline { background: transparent; border: 1.5px solid #2563eb; color: #2563eb; }
+    .btn-outline:hover { background: #eff6ff; }
+
+    .btn-primary { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: #fff; box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4); }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #2563eb;
+    }
+
+    /* HERO SECTION */
+    .hero {
+      min-height: 100vh;
+      padding: 120px 3rem 60px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #f9f5ff 100%);
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .hero-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-content { animation: fadeInUp 1s ease-out; }
+    .hero-badge { display: inline-block; padding: 0.75rem 1.5rem; background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 50px; color: #2563eb; font-weight: 700; font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+    .hero h1 { font-size: 4.2rem; font-weight: 900; line-height: 1.1; margin-bottom: 1.5rem; color: #0f172a; }
+    .hero h1 span { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .hero p { font-size: 1.3rem; color: #475569; margin-bottom: 2.5rem; line-height: 1.8; }
+
+    .hero-buttons { display: flex; gap: 1.5rem; margin-bottom: 3rem; }
+
+    .hero-image { position: relative; animation: fadeInRight 1s ease-out 0.3s both; }
+    .hero-image img { width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 30px 60px rgba(37, 99, 235, 0.15); transition: transform 0.3s; }
+    .hero-image img:hover { transform: scale(1.02) translateY(-10px); }
+
+    /* SECTION BLOCKS */
+    section { position: relative; }
+
+    .section-intro {
+      padding: 100px 3rem;
+      text-align: center;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .section-intro h2 { font-size: 3.2rem; font-weight: 900; margin-bottom: 1.5rem; color: #0f172a; }
+    .section-intro p { font-size: 1.2rem; color: #64748b; max-width: 700px; margin: 0 auto; line-height: 1.8; }
+
+    /* FEATURES BLOCK */
+    .features-block {
+      padding: 80px 3rem;
+      background: #ffffff;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .features-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      margin-top: 4rem;
+    }
+
+    .feature-item {
+      padding: 2.5rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+      border: 1px solid #e0e7ff;
+      border-radius: 16px;
+      transition: all 0.3s;
+      animation: slideUp 0.8s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .feature-item:nth-child(1) { animation-delay: 0.1s; }
+    .feature-item:nth-child(2) { animation-delay: 0.2s; }
+    .feature-item:nth-child(3) { animation-delay: 0.3s; }
+
+    .feature-item:hover {
+      transform: translateY(-10px);
+      border-color: #2563eb;
+      box-shadow: 0 20px 40px rgba(37, 99, 235, 0.1);
+    }
+
+    .feature-icon { font-size: 3rem; margin-bottom: 1.5rem; display: block; }
+    .feature-item h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 1rem; color: #0f172a; }
+    .feature-item p { color: #64748b; line-height: 1.7; }
+
+    /* BENEFITS SECTION */
+    .benefits-section {
+      padding: 100px 3rem;
+      background: linear-gradient(135deg, #f9f5ff 0%, #f0f9ff 100%);
+    }
+
+    .benefits-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .benefits-content { animation: fadeInLeft 1s ease-out; }
+    .benefits-image { animation: fadeInRight 1s ease-out; position: relative; }
+
+    .benefits-image img { width: 100%; max-width: 450px; border-radius: 18px; box-shadow: 0 25px 50px rgba(37, 99, 235, 0.12); transition: transform 0.3s; }
+    .benefits-image img:hover { transform: scale(1.02); }
+
+    .benefits-list { margin-top: 2.5rem; }
+    .benefit-item { display: flex; gap: 1rem; margin-bottom: 1.5rem; animation: slideUp 0.8s ease-out; }
+    .benefit-check { width: 28px; height: 28px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; flex-shrink: 0; }
+    .benefit-text { color: #475569; font-weight: 500; }
+
+    .benefits-content h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 1.5rem; color: #0f172a; }
+    .benefits-content p { font-size: 1.1rem; color: #64748b; margin-bottom: 2rem; line-height: 1.8; }
+
+    /* STATS SECTION */
+    .stats-section {
+      padding: 80px 3rem;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .stats-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 2.5rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+      border-radius: 16px;
+      border: 1px solid #e0e7ff;
+      animation: scaleIn 0.8s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .stat-number { font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, #2563eb, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+    .stat-label { color: #64748b; font-weight: 600; }
+
+    /* USE CASES SECTION */
+    .use-cases-section {
+      padding: 100px 3rem;
+      background: linear-gradient(135deg, #f9f5ff 0%, #f0f9ff 100%);
+    }
+
+    .use-cases-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .use-cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem;
+      margin-top: 4rem;
+    }
+
+    .use-case-card {
+      background: #ffffff;
+      border: 1px solid #e0e7ff;
+      border-radius: 18px;
+      padding: 3rem;
+      animation: slideUp 0.8s ease-out;
+      animation-fill-mode: both;
+      transition: all 0.3s;
+    }
+
+    .use-case-card:nth-child(1) { animation-delay: 0.1s; }
+    .use-case-card:nth-child(2) { animation-delay: 0.2s; }
+    .use-case-card:nth-child(3) { animation-delay: 0.3s; }
+    .use-case-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .use-case-card:hover {
+      transform: translateY(-10px);
+      border-color: #2563eb;
+      box-shadow: 0 25px 50px rgba(37, 99, 235, 0.12);
+    }
+
+    .use-case-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    .use-case-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+
+    .use-case-description {
+      color: #64748b;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+
+    .use-case-roi {
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #2563eb;
+    }
+
+    .use-case-roi-label {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .use-case-roi-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* HOW IT WORKS */
+    .how-it-works {
+      padding: 100px 3rem;
+      background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+    }
+
+    .how-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .step-card {
+      padding: 2.5rem;
+      background: #ffffff;
+      border: 1px solid #e0e7ff;
+      border-radius: 16px;
+      text-align: center;
+      animation: floatIn 0.8s ease-out;
+      animation-fill-mode: both;
+      position: relative;
+    }
+
+    .step-card:nth-child(1) { animation-delay: 0.1s; }
+    .step-card:nth-child(2) { animation-delay: 0.2s; }
+    .step-card:nth-child(3) { animation-delay: 0.3s; }
+    .step-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.5rem;
+      margin: 0 auto 1.5rem;
+    }
+
+    .step-card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; color: #0f172a; }
+    .step-card p { color: #64748b; font-size: 0.95rem; }
+
+    /* CTA FINAL */
+    .cta-final {
+      padding: 80px 3rem;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      text-align: center;
+      border-radius: 20px;
+      margin: 5rem 3rem;
+      color: #fff;
+      animation: slideUp 1s ease-out;
+    }
+
+    .cta-final h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 1rem; }
+    .cta-final p { font-size: 1.2rem; margin-bottom: 2.5rem; opacity: 0.95; }
+
+    .cta-final .btn { background: #fff; color: #2563eb; }
+    .cta-final .btn:hover { background: #f0f9ff; }
+
+    /* TESTIMONIALS */
+    .testimonials {
+      padding: 100px 3rem;
+      background: linear-gradient(135deg, #f9f5ff 0%, #f0f9ff 100%);
+    }
+
+    .testimonials-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+
+    .testimonial-card {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      border: 1px solid #e0e7ff;
+      animation: fadeInUp 0.8s ease-out;
+      animation-fill-mode: both;
+    }
+
+    .testimonial-card:nth-child(1) { animation-delay: 0.1s; }
+    .testimonial-card:nth-child(2) { animation-delay: 0.2s; }
+    .testimonial-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .testimonial-stars { color: #fbbf24; margin-bottom: 1rem; }
+    .testimonial-text { color: #475569; margin-bottom: 1.5rem; font-style: italic; line-height: 1.8; }
+    .testimonial-author { display: flex; align-items: center; gap: 1rem; }
+    .testimonial-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1e40af); }
+    .testimonial-info { display: flex; flex-direction: column; }
+    .testimonial-name { font-weight: 700; color: #0f172a; }
+    .testimonial-role { font-size: 0.85rem; color: #64748b; }
+
+    /* FOOTER */
+    footer {
+      background: #0f172a;
+      color: #cbd5e1;
+      padding: 5rem 3rem 2rem;
+    }
+
+    .footer-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    .footer-col h3 { color: #f1f5f9; margin-bottom: 1.5rem; font-weight: 800; }
+    .footer-col a { display: block; color: #cbd5e1; text-decoration: none; margin-bottom: 1rem; transition: color 0.3s; }
+    .footer-col a:hover { color: #2563eb; }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(203, 213, 225, 0.2);
+      color: #94a3b8;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1000px) {
+      .features-grid, .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+      .use-cases-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+      .benefits-wrapper { grid-template-columns: 1fr; gap: 3rem; }
+      .stats-wrapper { grid-template-columns: repeat(2, 1fr); }
+      .footer-wrapper { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      nav { display: none; }
+      .mobile-menu-btn { display: block; }
+      header { padding: 1rem 2rem; }
+      .header-wrapper { gap: 1rem; }
+      nav.active { display: flex; position: absolute; top: 80px; left: 0; right: 0; flex-direction: column; background: #fff; padding: 1rem; border-bottom: 1px solid #e2e8f0; }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 1rem; }
+      .hero { padding: 6rem 1rem 2rem; }
+      .hero h1 { font-size: 2.2rem; }
+      .features-grid, .testimonials-grid, .stats-wrapper { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .use-cases-grid { grid-template-columns: 1fr; }
+      .section-intro h2 { font-size: 2rem; }
+      .cta-final { margin: 2rem 1rem; }
+      .nav-buttons { flex-direction: column; gap: 0.5rem; }
+      .btn { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="header-wrapper">
+      <a href="/" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" style="width:100%;height:100%;"><rect x="8" y="17" width="24" height="12" rx="5" fill="white"/><polyline points="13,25 18,20 23,26 31,17" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        TRADEERA
+      </a>
+      <nav id="nav-menu">
+        <a href="#features">Features</a>
+        <a href="#use-cases">Use Cases</a>
+        <a href="#how">How It Works</a>
+        <a href="#testimonials">Reviews</a>
+      </nav>
+      <div class="nav-buttons">
+        <a href="https://mlm-app-3d3y.onrender.com/login" class="btn btn-outline">Sign In</a>
+        <a href="https://mlm-app-3d3y.onrender.com/signup" class="btn btn-primary">Get Started</a>
+      </div>
+      <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-wrapper">
+      <div class="hero-content">
+        <div class="hero-badge">🚀 Next-Gen Trading Platform</div>
+        <h1>Intelligent <span>Trading Intelligence</span> Platform</h1>
+        <p>Harness advanced AI and real-time market intelligence to make smarter trading decisions. Enterprise-grade tools for professional traders and institutions.</p>
+        <div class="hero-buttons">
+          <a href="/signup" class="btn btn-primary">Start Free Trial</a>
+          <a href="#how" class="btn btn-outline">Watch Demo</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80" alt="Trading Terminal">
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-block" id="features">
+    <div class="section-intro">
+      <h2>Powerful Features</h2>
+      <p>Everything enterprise traders need to succeed. Advanced analytics, real-time data, and AI-powered insights all in one platform.</p>
+    </div>
+    <div class="features-wrapper">
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-icon">📊</span>
+          <h3>Real-Time Analytics</h3>
+          <p>Advanced charting with live market data. Get instant insights with our proprietary algorithms.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🤖</span>
+          <h3>AI Predictions</h3>
+          <p>Predictive analytics powered by machine learning. Identify opportunities before the market catches on.</p>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🛡️</span>
+          <h3>Enterprise Security</h3>
+          <p>Bank-level encryption and compliance. Your portfolio is protected 24/7 with multi-factor authentication.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="benefits-section">
+    <div class="benefits-wrapper">
+      <div class="benefits-content">
+        <h2>Why Choose TRADEERA?</h2>
+        <p>We combine cutting-edge technology with deep market expertise. Used by 50,000+ professional traders worldwide.</p>
+        <div class="benefits-list">
+          <div class="benefit-item">
+            <div class="benefit-check">✓</div>
+            <div class="benefit-text">99.9% uptime guarantee with SLA</div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-check">✓</div>
+            <div class="benefit-text">Sub-millisecond trade execution</div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-check">✓</div>
+            <div class="benefit-text">24/7 dedicated support</div>
+          </div>
+          <div class="benefit-item">
+            <div class="benefit-check">✓</div>
+            <div class="benefit-text">150+ markets and instruments</div>
+          </div>
+        </div>
+      </div>
+      <div class="benefits-image">
+        <img src="https://images.unsplash.com/photo-1611974519814-96ab84004e83?auto=format&fit=crop&w=600&q=80" alt="Analytics Dashboard">
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-section">
+    <div class="stats-wrapper">
+      <div class="stat-card">
+        <div class="stat-number">50K+</div>
+        <div class="stat-label">Active Traders</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">$2.5B+</div>
+        <div class="stat-label">Daily Volume</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">150+</div>
+        <div class="stat-label">Markets</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">99.9%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES & ROI -->
+  <section class="use-cases-section" id="use-cases">
+    <div class="use-cases-wrapper">
+      <div class="section-intro">
+        <h2>Real Results, Real Impact</h2>
+        <p>See how traders across all experience levels leverage TRADEERA to maximize returns and minimize risk.</p>
+      </div>
+      <div class="use-cases-grid">
+        <div class="use-case-card">
+          <span class="use-case-icon">💼</span>
+          <h3 class="use-case-title">Day Traders</h3>
+          <div class="use-case-description">Execute multiple trades per day with millisecond precision. Our AI identifies intraday patterns and opportunities before competitors.</div>
+          <div class="use-case-roi">
+            <div class="use-case-roi-label">Average ROI Increase</div>
+            <div class="use-case-roi-value">+35%</div>
+          </div>
+        </div>
+        <div class="use-case-card">
+          <span class="use-case-icon">📈</span>
+          <h3 class="use-case-title">Swing Traders</h3>
+          <div class="use-case-description">Hold positions for days or weeks while our algorithms identify breakout points and trend reversals in real-time.</div>
+          <div class="use-case-roi">
+            <div class="use-case-roi-label">Average ROI Increase</div>
+            <div class="use-case-roi-value">+42%</div>
+          </div>
+        </div>
+        <div class="use-case-card">
+          <span class="use-case-icon">🏦</span>
+          <h3 class="use-case-title">Institutional Investors</h3>
+          <div class="use-case-description">Enterprise-grade APIs and whitelabel solutions for hedge funds, asset managers, and financial institutions.</div>
+          <div class="use-case-roi">
+            <div class="use-case-roi-label">Cost Reduction</div>
+            <div class="use-case-roi-value">-45%</div>
+          </div>
+        </div>
+        <div class="use-case-card">
+          <span class="use-case-icon">🎯</span>
+          <h3 class="use-case-title">Portfolio Managers</h3>
+          <div class="use-case-description">Diversify across assets with AI-powered rebalancing and risk management. Optimize returns while minimizing exposure.</div>
+          <div class="use-case-roi">
+            <div class="use-case-roi-label">Risk Reduction</div>
+            <div class="use-case-roi-value">-38%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how">
+    <div class="how-wrapper">
+      <div class="section-intro">
+        <h2>How It Works</h2>
+        <p>Get started in minutes. Simple, transparent process to begin trading smarter today.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Create Account</h3>
+          <p>Sign up in seconds. Instant verification and access to the platform.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Fund Account</h3>
+          <p>Add funds through multiple payment methods. Secure and instant deposit.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Start Trading</h3>
+          <p>Access all features and markets immediately. Full trading capabilities.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Grow Wealth</h3>
+          <p>Use AI insights to make smarter trades. Monitor performance in real-time.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding: 0 3rem;">
+    <div class="cta-final">
+      <h2>Ready to Trade Smarter?</h2>
+      <p>Join 50,000+ traders growing their wealth with TRADEERA. Start free today.</p>
+      <a href="/signup" class="btn">Create Free Account</a>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="testimonials">
+    <div class="testimonials-wrapper">
+      <div class="section-intro">
+        <h2>Trusted by Traders</h2>
+        <p>See what professionals have to say about TRADEERA</p>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <div class="testimonial-text">"Increased my trading profits by 40% in 3 months using TRADEERA's AI predictions. Best platform I've used."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar"></div>
+            <div class="testimonial-info">
+              <div class="testimonial-name">Sarah Johnson</div>
+              <div class="testimonial-role">Pro Trader</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <div class="testimonial-text">"As a beginner, TRADEERA made it incredibly easy to start. The interface is intuitive and support is amazing."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar"></div>
+            <div class="testimonial-info">
+              <div class="testimonial-name">Michael Chen</div>
+              <div class="testimonial-role">New Trader</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
+          <div class="testimonial-text">"Enterprise-grade security and reliability. We've moved our entire operation here. Couldn't be happier."</div>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar"></div>
+            <div class="testimonial-info">
+              <div class="testimonial-name">Emma Davis</div>
+              <div class="testimonial-role">Fund Manager</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-wrapper">
+      <div class="footer-col">
+        <h3>Product</h3>
+        <a href="/features">Platform</a>
+        <a href="#features">Features</a>
+        <a href="/security">Security</a>
+        <a href="/pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h3>Company</h3>
+        <a href="/about">About Us</a>
+        <a href="/blog">Blog</a>
+        <a href="/careers">Careers</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h3>Legal</h3>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms of Service</a>
+        <a href="/disclaimer">Risk Disclaimer</a>
+        <a href="/cookies">Cookie Policy</a>
+      </div>
+      <div class="footer-col">
+        <h3>Social</h3>
+        <a href="https://twitter.com" target="_blank">Twitter</a>
+        <a href="https://linkedin.com" target="_blank">LinkedIn</a>
+        <a href="https://github.com" target="_blank">GitHub</a>
+        <a href="https://facebook.com" target="_blank">Facebook</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2025 TRADEERA. Enterprise Trading Intelligence Platform. All rights reserved.
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    function toggleMenu() {
+      const menu = document.getElementById('nav-menu');
+      menu.classList.toggle('active');
+    }
+
+    // Close menu when link is clicked
+    document.querySelectorAll('#nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('nav-menu').classList.remove('active');
+      });
+    });
+
+    // Header scroll effect
+    window.addEventListener('scroll', () => {
+      const header = document.getElementById('header');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
