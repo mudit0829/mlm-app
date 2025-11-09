@@ -14,6 +14,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ===== FILE-BASED DATABASE =====
 DB_FILE = "users_database.json"
+MAX_DIRECTS = 12  # ===== MAXIMUM 12 DIRECTS PER USER =====
 
 def load_db():
     """Load users from JSON file"""
@@ -50,10 +51,9 @@ ADMIN_USER = {
     "wallet_balance": 0,
     "referral_code": "ADMIN123",
     "sponsor_id": None,
-    "position": "ADMIN",
-    "directs": [],
-    "power_leg": None,
-    "other_leg": [],
+    "direct_referrals": [],
+    "power_leg_user": None,
+    "other_leg_users": [],
     "total_income": 0,
     "phone": "",
     "country": "India",
@@ -68,11 +68,71 @@ if "admin-1" not in users_db:
 def generate_referral_code():
     return str(uuid.uuid4())[:8].upper()
 
+def count_team(user_id, db):
+    """Count total team members (used for power leg calculation)"""
+    count = 1  # Count self
+    user = db.get(user_id)
+    if not user:
+        return 0
+    
+    # Count all directs recursively
+    for direct_id in user.get('direct_referrals', []):
+        count += count_team(direct_id, db)
+    
+    return count
+
+def calculate_power_leg(user_id, db):
+    """Calculate power leg and other leg counts"""
+    user = db.get(user_id)
+    if not user:
+        return {'power_leg': 0, 'other_leg': 0}
+    
+    directs = user.get('direct_referrals', [])
+    
+    if len(directs) == 0:
+        return {'power_leg': 0, 'other_leg': 0}
+    
+    # First direct = Power Leg
+    power_leg_user_id = directs[0]
+    power_leg_count = count_team(power_leg_user_id, db)
+    
+    # All other directs = Other Leg
+    other_leg_count = 0
+    for i in range(1, len(directs)):
+        other_leg_count += count_team(directs[i], db)
+    
+    return {
+        'power_leg': power_leg_count,
+        'other_leg': other_leg_count,
+        'power_leg_user': power_leg_user_id
+    }
+
 def create_user(data):
     user_id = str(uuid.uuid4())
     referral_code = generate_referral_code()
-    position = data.get('position')
     sponsor_code = data.get('referral_code')
+
+    # Find sponsor by referral code
+    sponsor_user_id = None
+    for uid, u in users_db.items():
+        if u.get('referral_code') == sponsor_code:
+            sponsor_user_id = uid
+            break
+    
+    if not sponsor_user_id:
+        return None, "Invalid Referral Code"
+
+    sponsor = users_db[sponsor_user_id]
+    
+    # ===== CHECK IF SPONSOR HAS REACHED MAX 12 DIRECTS =====
+    if len(sponsor.get('direct_referrals', [])) >= MAX_DIRECTS:
+        return None, f"Sponsor has reached maximum limit of {MAX_DIRECTS} direct members. Cannot add more."
+    
+    # Check if username/email exists
+    if any(u['username'].lower() == data['username'].lower() for u in users_db.values()):
+        return None, "Username already exists"
+    if any(u['email'].lower() == data['email'].lower() for u in users_db.values()):
+        return None, "Email already registered"
 
     user = {
         "user_id": user_id,
@@ -86,45 +146,26 @@ def create_user(data):
         "mobile": data.get('mobile', ''),
         "state": data.get('state', ''),
         "country_code": data.get('country_code', ''),
-        "position": position,
         "is_admin": False,
         "status": "active",
         "created_at": datetime.now().isoformat(),
         "wallet_balance": 0,
         "referral_code": referral_code,
-        "sponsor_id": sponsor_code,
-        "directs": [],
-        "power_leg": None,
-        "other_leg": [],
+        "sponsor_id": sponsor_user_id,
+        "direct_referrals": [],
+        "power_leg_user": None,
+        "other_leg_users": [],
         "total_income": 0,
         "commission_received": 0
     }
 
-    sponsor_user_id = None
-    for uid, u in users_db.items():
-        if u.get('referral_code') == sponsor_code:
-            sponsor_user_id = uid
-            break
-    if not sponsor_user_id:
-        return None, "Invalid Referral Code"
+    # Add user to sponsor's direct referrals
+    sponsor['direct_referrals'].append(user_id)
 
-    sponsor = users_db[sponsor_user_id]
-    left_count = sum(1 for uid in sponsor['directs'] if users_db.get(uid, {}).get('position') == 'LEFT')
-    right_count = sum(1 for uid in sponsor['directs'] if users_db.get(uid, {}).get('position') == 'RIGHT')
-
-    if position == 'LEFT' and left_count >= 6:
-        return None, "Left position already filled (6 max)"
-    if position == 'RIGHT' and right_count >= 6:
-        return None, "Right position already filled (6 max)"
-    if position not in ['LEFT', 'RIGHT']:
-        return None, "Invalid position"
-
-    sponsor['directs'].append(user_id)
-    if position == 'LEFT':
-        if not sponsor['power_leg']:
-            sponsor['power_leg'] = user_id
-    else:
-        sponsor['other_leg'].append(user_id)
+    # Update sponsor's power/other leg
+    leg_data = calculate_power_leg(sponsor_user_id, users_db)
+    sponsor['power_leg_user'] = leg_data.get('power_leg_user')
+    sponsor['other_leg_users'] = [d for d in sponsor['direct_referrals'] if d != leg_data.get('power_leg_user')]
 
     users_db[user_id] = user
     save_db(users_db)
@@ -211,15 +252,10 @@ def api_signup():
     try:
         data = request.get_json() or {}
 
-        required = ['username', 'password', 'email', 'first_name', 'last_name', 'dob', 'country', 'mobile', 'state', 'position', 'referral_code']
+        required = ['username', 'password', 'email', 'first_name', 'last_name', 'dob', 'country', 'mobile', 'state', 'referral_code']
         missing = [f for f in required if not data.get(f)]
         if missing:
             return jsonify({'success': False, 'message': f'Missing: {", ".join(missing)}'}), 400
-
-        if any(u['username'].lower() == data['username'].lower() for u in users_db.values()):
-            return jsonify({'success': False, 'message': 'Username already exists'}), 400
-        if any(u['email'].lower() == data['email'].lower() for u in users_db.values()):
-            return jsonify({'success': False, 'message': 'Email already registered'}), 400
 
         user, error = create_user(data)
         if error:
@@ -253,6 +289,11 @@ def get_profile():
     user = users_db.get(user_id)
     if not user_id or not user or user.get('is_admin'):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    # Calculate power/other leg
+    leg_data = calculate_power_leg(user_id, users_db)
+    direct_count = len(user.get('direct_referrals', []))
+    
     return jsonify({
         'success': True,
         'user': {
@@ -268,7 +309,10 @@ def get_profile():
             'wallet_balance': user.get('wallet_balance', 0),
             'referral_code': user['referral_code'],
             'total_income': user.get('total_income', 0),
-            'directs_count': len(user.get('directs', [])),
+            'total_directs': direct_count,
+            'directs_remaining': MAX_DIRECTS - direct_count,
+            'power_leg_count': leg_data['power_leg'],
+            'other_leg_count': leg_data['other_leg'],
             'created_at': user.get('created_at')
         }
     }), 200
@@ -281,21 +325,26 @@ def get_referrals():
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
     referrals = []
-    for ref_id in user.get('directs', []):
+    for i, ref_id in enumerate(user.get('direct_referrals', [])):
         ref_user = users_db.get(ref_id)
         if ref_user:
+            is_power = (i == 0)  # First direct is power leg
             referrals.append({
                 'user_id': ref_user['user_id'],
                 'username': ref_user['username'],
                 'name': f"{ref_user['first_name']} {ref_user['last_name']}",
-                'position': ref_user.get('position', ''),
+                'leg_type': 'Power Leg' if is_power else 'Other Leg',
                 'status': ref_user.get('status', ''),
                 'joined': ref_user.get('created_at')
             })
 
+    direct_count = len(user.get('direct_referrals', []))
+    
     return jsonify({
         'success': True,
-        'direct_count': len(user.get('directs', [])),
+        'direct_count': direct_count,
+        'max_directs': MAX_DIRECTS,
+        'directs_remaining': MAX_DIRECTS - direct_count,
         'referrals': referrals
     }), 200
 
@@ -306,13 +355,20 @@ def get_dashboard():
     if not user_id or not user:
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
+    leg_data = calculate_power_leg(user_id, users_db)
+    direct_count = len(user.get('direct_referrals', []))
+    
     return jsonify({
         'success': True,
         'dashboard': {
             'wallet_balance': user.get('wallet_balance', 0),
             'total_income': user.get('total_income', 0),
             'commission_received': user.get('commission_received', 0),
-            'direct_referrals': len(user.get('directs', [])),
+            'direct_referrals': direct_count,
+            'directs_remaining': MAX_DIRECTS - direct_count,
+            'max_directs': MAX_DIRECTS,
+            'power_leg': leg_data['power_leg'],
+            'other_leg': leg_data['other_leg'],
             'status': user.get('status', ''),
             'referral_code': user['referral_code'],
             'created_at': user.get('created_at')
@@ -334,18 +390,15 @@ def get_tree_view():
             "user_id": u['user_id'],
             "username": u['username'],
             "name": f"{u['first_name']} {u['last_name']}",
-            "position": u.get('position', ''),
             "referral_code": u['referral_code'],
             "created_at": u.get('created_at'),
-            "left": None,
-            "right": []
+            "directs": []
         }
-        if u.get("power_leg"):
-            tree["left"] = get_subtree(u["power_leg"])
-        for child_id in u.get("other_leg", []):
-            subtree = get_subtree(child_id)
+        # Get all directs
+        for direct_id in u.get('direct_referrals', []):
+            subtree = get_subtree(direct_id)
             if subtree:
-                tree["right"].append(subtree)
+                tree["directs"].append(subtree)
         return tree
 
     tree = get_subtree(user_id)
@@ -369,7 +422,8 @@ def admin_get_users():
             'status': u.get('status', ''),
             'created_at': u.get('created_at'),
             'wallet_balance': u.get('wallet_balance', 0),
-            'directs': len(u.get('directs', []))
+            'directs': len(u.get('direct_referrals', [])),
+            'max_directs': MAX_DIRECTS
         }
         for u in users_db.values()
         if not u.get('is_admin')
@@ -432,5 +486,6 @@ if __name__ == "__main__":
     print(f"\n🚀 Server starting on port {port}")
     print(f"📝 Admin: admin / admin123")
     print(f"📂 Database: {DB_FILE}")
-    print(f"📊 Users loaded: {len(users_db)}\n")
+    print(f"📊 Users loaded: {len(users_db)}")
+    print(f"👥 Max Directs per user: {MAX_DIRECTS}\n")
     app.run(host='0.0.0.0', port=port, debug=True)
