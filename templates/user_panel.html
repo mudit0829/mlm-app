@@ -351,38 +351,309 @@
       </div>
     </div>
 
-    <!-- PROFILE PAGE -->
+    <!-- MANAGE PROFILE PAGE -->
     <div class="page" id="profile-page">
-      <div style="margin:20px auto; width:98.5%; background:#fff; padding:20px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
-        <h2 style="color:#1d61a4; margin:0 0 20px 0;">Manage Profile</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+  <div style="margin:20px auto; width:98.5%; background:#fff; padding:30px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+      <h2 style="color:#1d61a4; margin:0;">Manage Profile</h2>
+      <div style="font-size:0.95em; color:#666;">
+        <button onclick="navigatePage('profile')" style="background:none; border:none; color:#14a074; font-weight:600; cursor:pointer; margin-left:20px;">Manage Profile</button>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:30px;">
+      <!-- Left Side - Personal Information Form -->
+      <div>
+        <h3 style="font-size:1.1em; font-weight:700; color:#222d41; margin-bottom:20px;">Personal Information</h3>
+        
+        <div style="margin-bottom:15px;">
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Username:</label>
+          <input type="text" id="editUsername" readonly style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#f0f0f0; color:#666; font-size:0.95em;">
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">First Name:</label>
+          <input type="text" id="editFirstName" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Last Name:</label>
+          <input type="text" id="editLastName" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
+        </div>
+
+        <div style="margin-bottom:15px;">
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Email:</label>
+          <input type="email" id="editEmail" readonly style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#f0f0f0; color:#666; font-size:0.95em;">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
           <div>
-            <label style="color:#666; font-weight:600;">Username</label>
-            <input type="text" id="profUsername" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Address:</label>
+            <input type="text" id="editAddress" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
           </div>
           <div>
-            <label style="color:#666; font-weight:600;">Email</label>
-            <input type="text" id="profEmail" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Country:</label>
+            <select id="editCountry" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
+              <option>UNITED KINGDOM</option>
+              <option>INDIA</option>
+              <option>USA</option>
+              <option>CANADA</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+          <div>
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">State:</label>
+            <input type="text" id="editState" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
           </div>
           <div>
-            <label style="color:#666; font-weight:600;">Phone</label>
-            <input type="text" id="profPhone" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">City:</label>
+            <input type="text" id="editCity" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+          <div>
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Zip Code:</label>
+            <input type="text" id="editZipCode" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
           </div>
           <div>
-            <label style="color:#666; font-weight:600;">Country</label>
-            <input type="text" id="profCountry" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+            <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Contact Number:</label>
+            <input type="text" id="editPhone" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
           </div>
-          <div>
-            <label style="color:#666; font-weight:600;">Referral Code</label>
-            <input type="text" id="profReferralCode" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:8px;">Date of Birth (YYYY-MM-DD):</label>
+          <input type="date" id="editDOB" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; background:#fff; color:#333; font-size:0.95em;">
+        </div>
+
+        <button onclick="updateProfile()" style="background:#c4720d; color:#fff; border:none; padding:10px 30px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer; width:120px;">Update</button>
+      </div>
+
+      <!-- Right Side - Change Profile Photo -->
+      <div>
+        <h3 style="font-size:1.1em; font-weight:700; color:#222d41; margin-bottom:20px;">Change Profile Photo</h3>
+        <div style="background:#f8f9fa; padding:30px; border-radius:12px; text-align:center;">
+          <div style="margin-bottom:20px;">
+            <img id="profilePhotoPreview" src="https://randomuser.me/api/portraits/men/31.jpg" style="width:140px; height:140px; border-radius:8px; border:3px solid #ddd; object-fit:cover;">
           </div>
-          <div>
-            <label style="color:#666; font-weight:600;">Joining Date</label>
-            <input type="text" id="profJoiningDate" readonly style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; margin-top:5px;">
-          </div>
+          
+          <label style="font-weight:600; color:#222d41; font-size:0.95em; display:block; margin-bottom:10px;">Photo</label>
+          <input type="file" id="photoUpload" accept="image/*" style="margin-bottom:15px; width:100%;">
+          
+          <button onclick="uploadProfilePhoto()" style="background:#c4720d; color:#fff; border:none; padding:10px 25px; border-radius:8px; font-weight:600; font-size:0.95em; cursor:pointer; width:100%;">Upload</button>
+
+          <p style="color:#666; font-size:0.9em; margin-top:15px;">If you want to make any changes to your Profile, please contact our support team.</p>
         </div>
       </div>
     </div>
+  </div>
+</div>
+    <!-- TRADING CENTER - ACTIVATION PAGE -->
+<div class="page" id="activationcenter-page">
+  <div style="margin:20px auto; width:98.5%; background:#fff; padding:30px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+    <h2 style="color:#1d61a4; margin:0 0 25px 0;">Activation</h2>
+    
+    <div style="display:flex; justify-content:center; max-width:700px; margin:0 auto;">
+      <div style="background:#2a2a2a; color:#fff; padding:30px; border-radius:12px; width:100%;">
+        <h3 style="text-align:center; margin:0 0 10px 0; font-size:1.15em; font-weight:700;">BOT PACKAGE</h3>
+        <p style="text-align:center; margin:0 0 15px 0; font-size:0.95em; color:#ddd;">Min Investment : 125<br>BV : 1<br><span style="color:#7dd87d;">✓ Daily Capping : 1000 USDT</span></p>
+
+        <div style="margin-bottom:20px;">
+          <input type="text" placeholder="Enter User ID" id="activationUserId" style="width:100%; padding:12px; border:none; border-radius:6px; background:#444; color:#fff; font-size:0.95em; margin-bottom:10px;">
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <select id="activationMode" style="width:100%; padding:12px; border:none; border-radius:6px; background:#444; color:#fff; font-size:0.95em;">
+            <option>Please select mode</option>
+            <option>Mode 1</option>
+            <option>Mode 2</option>
+          </select>
+        </div>
+
+        <button onclick="activateBot()" style="width:100%; padding:12px; border:none; border-radius:6px; background:#fff; color:#2a2a2a; font-weight:700; font-size:1em; cursor:pointer;">ACTIVATE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRADING CENTER - TRADING PAGE -->
+<div class="page" id="trading-page">
+  <div style="margin:20px auto; width:98.5%; background:#fff; padding:30px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+      <h2 style="color:#1d61a4; margin:0;">Trading</h2>
+      <div style="font-size:0.95em; color:#666;">
+        <button onclick="navigatePage('mytrading')" style="background:none; border:none; color:#14a074; font-weight:600; cursor:pointer;">My Trading</button>
+        <button onclick="navigatePage('trading')" style="background:none; border:none; color:#666; font-weight:600; cursor:pointer; margin-left:20px;">Trading</button>
+      </div>
+    </div>
+
+    <div style="color:#555; font-size:0.95em; margin-bottom:20px;">
+      Balance in your Activation Wallet : <span style="font-weight:700;">USDT 0.00</span> &nbsp;&nbsp; Balance in your Credit Wallet : <span style="font-weight:700;">USDT 0.00</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+      <!-- SMART PACKAGE -->
+      <div style="background:#2a2a2a; color:#fff; padding:25px; border-radius:12px;">
+        <h3 style="text-align:center; margin:0 0 10px 0; font-size:1.1em; font-weight:700;">SMART PACKAGE</h3>
+        <p style="text-align:center; margin:0 0 20px 0; font-size:0.9em; color:#ddd;">Min Investment : 100</p>
+
+        <input type="text" placeholder="Enter User ID" class="tradingUserId" style="width:100%; padding:11px; border:none; border-radius:6px; background:#444; color:#fff; font-size:0.9em; margin-bottom:12px;">
+        <input type="number" placeholder="Enter Amount" class="tradingAmount" style="width:100%; padding:11px; border:none; border-radius:6px; background:#444; color:#fff; font-size:0.9em; margin-bottom:12px;">
+        
+        <select class="tradingMode" style="width:100%; padding:11px; border:none; border-radius:6px; background:#444; color:#fff; font-size:0.9em; margin-bottom:15px;">
+          <option>Please select mode</option>
+          <option>Mode 1</option>
+          <option>Mode 2</option>
+        </select>
+
+        <button onclick="tradePackage('smart')" style="width:100%; padding:11px; border:none; border-radius:6px; background:#fff; color:#2a2a2a; font-weight:700; font-size:0.95em; cursor:pointer;">TRADE</button>
+      </div>
+
+      <!-- FREEDOM PACKAGE -->
+      <div style="background:#c4720d; color:#fff; padding:25px; border-radius:12px;">
+        <h3 style="text-align:center; margin:0 0 10px 0; font-size:1.1em; font-weight:700;">FREEDOM PACKAGE</h3>
+        <p style="text-align:center; margin:0 0 20px 0; font-size:0.9em; color:#ffd9a3;">Min Investment : 100</p>
+
+        <input type="text" placeholder="Enter User ID" class="tradingUserId" style="width:100%; padding:11px; border:none; border-radius:6px; background:rgba(255,255,255,0.2); color:#fff; font-size:0.9em; margin-bottom:12px;">
+        <input type="number" placeholder="Enter Amount" class="tradingAmount" style="width:100%; padding:11px; border:none; border-radius:6px; background:rgba(255,255,255,0.2); color:#fff; font-size:0.9em; margin-bottom:12px;">
+        
+        <select class="tradingMode" style="width:100%; padding:11px; border:none; border-radius:6px; background:rgba(255,255,255,0.2); color:#fff; font-size:0.9em; margin-bottom:15px;">
+          <option>Please select mode</option>
+          <option>Mode 1</option>
+          <option>Mode 2</option>
+        </select>
+
+        <button onclick="tradePackage('freedom')" style="width:100%; padding:11px; border:none; border-radius:6px; background:#fff; color:#c4720d; font-weight:700; font-size:0.95em; cursor:pointer;">TRADE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRADING CENTER - TRADING HISTORY PAGE -->
+<div class="page" id="tradinghistory-page">
+  <div style="margin:20px auto; width:98.5%; background:#fff; padding:30px; border-radius:14px; box-shadow:0 2px 12px #ebf0fb17;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+      <h2 style="color:#1d61a4; margin:0;">Active Deposit</h2>
+      <div style="font-size:0.95em; color:#666;">
+        <button onclick="navigatePage('mytrading')" style="background:none; border:none; color:#14a074; font-weight:600; cursor:pointer;">My Deposit</button>
+        <button onclick="navigatePage('tradinghistory')" style="background:none; border:none; color:#666; font-weight:600; cursor:pointer; margin-left:20px;">Active Deposit</button>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        Show <select style="padding:5px 10px; border:1px solid #ddd; border-radius:5px; background:#fff; font-size:0.9em;">
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+        </select> entries
+      </div>
+      <div>
+        Search: <input type="text" style="padding:8px 12px; border:1px solid #ddd; border-radius:5px; background:#fff; font-size:0.9em; margin-left:10px;">
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:50px;">Sr. No</th>
+          <th>Staking ID</th>
+          <th>Investment Name</th>
+          <th>Invested Amount (USDT)</th>
+          <th>Investment Start</th>
+          <th>Investment End</th>
+          <th>Invoice</th>
+          <th>Activation Deduct</th>
+          <th>Credit Deduct</th>
+          <th>Payment Mode</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tradingHistoryTable">
+        <tr>
+          <td>1</td>
+          <td>LIGNX754192618381391</td>
+          <td>Bot Package</td>
+          <td>0</td>
+          <td>2025-10-24</td>
+          <td>2026-10-24</td>
+          <td><a href="#" style="color:#14a074; text-decoration:none; font-weight:600;">View Invoice</a></td>
+          <td>0</td>
+          <td>0</td>
+          <td>-</td>
+          <td><span style="background:#d4f8e8; color:#16915d; padding:5px 10px; border-radius:12px; font-size:0.85em; font-weight:600;">Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center; color:#666; font-size:0.9em;">
+      <div>Showing 1 to 1 of 1 entries</div>
+      <div>
+        <button style="padding:5px 10px; margin-right:5px; border:1px solid #ddd; background:#fff; border-radius:5px; cursor:pointer;">Previous</button>
+        <button style="padding:5px 10px; margin-right:5px; background:#1975d3; color:#fff; border:none; border-radius:5px; cursor:pointer;">1</button>
+        <button style="padding:5px 10px; border:1px solid #ddd; background:#fff; border-radius:5px; cursor:pointer;">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JAVASCRIPT FUNCTIONS -->
+<script>
+function updateProfile() {
+  alert('Profile updated successfully!');
+  // Add API call here later
+}
+
+function uploadProfilePhoto() {
+  const file = document.getElementById('photoUpload').files[0];
+  if(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.getElementById('profilePhotoPreview').src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function activateBot() {
+  const userId = document.getElementById('activationUserId').value;
+  const mode = document.getElementById('activationMode').value;
+  
+  if(!userId || mode === 'Please select mode') {
+    alert('Please fill all fields');
+    return;
+  }
+  alert('Bot activation initiated!');
+}
+
+function tradePackage(package) {
+  const tradingElements = document.querySelectorAll('.' + (package === 'smart' ? '' : '') + 'tradingUserId');
+  alert('Trading initiated for ' + package.toUpperCase() + ' package!');
+}
+
+// Load profile data on page navigation
+document.addEventListener('pageNavigated', function(e) {
+  if(e.detail === 'profile') loadEditProfileData();
+});
+
+function loadEditProfileData() {
+  if(currentUser) {
+    document.getElementById('editUsername').value = currentUser.username || '';
+    document.getElementById('editFirstName').value = currentUser.first_name || '';
+    document.getElementById('editLastName').value = currentUser.last_name || '';
+    document.getElementById('editEmail').value = currentUser.email || '';
+    document.getElementById('editPhone').value = currentUser.phone || '';
+    document.getElementById('editAddress').value = currentUser.address || '';
+    document.getElementById('editCountry').value = currentUser.country || '';
+    document.getElementById('editState').value = currentUser.state || '';
+    document.getElementById('editCity').value = currentUser.city || '';
+    document.getElementById('editZipCode').value = currentUser.zip_code || '';
+  }
+}
+</script>
 
     <!-- TREE VIEW PAGE -->
     <div class="page" id="tree-page">
@@ -852,3 +1123,4 @@
   </script>
 </body>
 </html>
+
