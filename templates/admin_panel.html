@@ -1,55 +1,705 @@
+
 <!DOCTYPE html>
-<html>
-<head><title>Admin Panel</title></head>
-<body>
-  <h2>Admin Panel - View All Users</h2>
-  <div id="usersList"></div>
-
-  <script>
-    async function loadAdminPanel() {
-      // Prompt for admin username and password (simplified demo)
-      let username = prompt("Enter admin username:");
-      let password = prompt("Enter admin password:");
-
-      if (!username || !password) {
-        alert("Admin login required");
-        return;
-      }
-
-      // Admin login to get admin user ID
-      let loginRes = await fetch('https://mlm-app-3d3y.onrender.com/admin/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({username, password})
-      });
-      let loginData = await loginRes.json();
-
-      if (!loginData.user_id) {
-        alert(loginData.message || "Invalid admin credentials");
-        return;
-      }
-
-      // Fetch all users
-      let res = await fetch(`https://mlm-app-3d3y.onrender.com/admin/${loginData.user_id}/all_users`);
-      let users = await res.json();
-
-      if (Array.isArray(users)) {
-        let html = '<table border="1" cellpadding="5"><tr><th>User ID</th><th>Username</th><th>Sponsor ID</th><th>Power Leg</th><th>Directs</th></tr>';
-        users.forEach(u => {
-          html += `<tr>
-            <td>${u.user_id}</td>
-            <td>${u.username}</td>
-            <td>${u.sponsor_id || ''}</td>
-            <td>${u.power_leg || ''}</td>
-            <td>${u.directs.join(', ')}</td>
-          </tr>`;
-        });
-        html += '</table>';
-        document.getElementById('usersList').innerHTML = html;
-      } else {
-        alert('Failed to load users list');
-      }
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - TRADEERA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #f8fafc;
+      color: #1f2937;
     }
 
-    loadAdminPanel();
-  </script
+    .navbar {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .navbar-right {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .user-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      color: #0f172a;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #2563eb;
+    }
+
+    .stat-card h3 {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #2563eb;
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .table-header {
+      background: #f1f5f9;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-header h2 {
+      font-size: 1.3rem;
+      color: #0f172a;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .search-box input {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f8fafc;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .amount {
+      font-weight: 700;
+      color: #2563eb;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .btn-activate-100 {
+      background: #3b82f6;
+      color: white;
+    }
+
+    .btn-activate-100:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+    }
+
+    .btn-activate-free {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-activate-free:hover {
+      background: #059669;
+      transform: translateY(-2px);
+    }
+
+    .btn-view {
+      background: #6b7280;
+      color: white;
+    }
+
+    .btn-view:hover {
+      background: #4b5563;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: #0f172a;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #64748b;
+    }
+
+    .user-detail {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .user-detail label {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .user-detail p {
+      color: #1f2937;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #6ee7b7;
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: #2563eb;
+    }
+
+    .spinner {
+      border: 3px solid #e2e8f0;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #94a3b8;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .navbar-right {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      table {
+        font-size: 0.9rem;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="navbar-brand">👑 TRADEERA ADMIN</div>
+  <div class="navbar-right">
+    <div class="user-info">
+      <span id="adminName">Admin</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <h1>User Management</h1>
+    <button class="btn btn-activate-100" onclick="refreshData()">🔄 Refresh</button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Total Users</h3>
+      <div class="value" id="totalUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Activated</h3>
+      <div class="value" id="activatedUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Inactive</h3>
+      <div class="value" id="inactiveUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Activation Wallets</h3>
+      <div class="value" id="totalActivationWallet">$0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Matching Wallets</h3>
+      <div class="value" id="totalMatchingWallet">$0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Income</h3>
+      <div class="value" id="totalIncome">$0</div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="table-header">
+      <h2>Users</h2>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search username..." onkeyup="filterTable()">
+      </div>
+    </div>
+
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      Loading users...
+    </div>
+
+    <table id="usersTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Activation</th>
+          <th>Activation Wallet</th>
+          <th>Matching Wallet</th>
+          <th>Total Income</th>
+          <th>Directs</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+
+    <div id="emptyState" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <p>No users found</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for user details -->
+<div id="userModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>User Details</h2>
+      <button class="close-btn" onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+  const API_URL = window.location.origin;
+  let allUsers = [];
+
+  // Check if logged in as admin
+  function checkAuth() {
+    if (!sessionStorage.getItem('is_admin') || sessionStorage.getItem('is_admin') !== 'true') {
+      window.location.href = '/login';
+    }
+    document.getElementById('adminName').textContent = sessionStorage.getItem('username') || 'Admin';
+  }
+
+  // Logout
+  function logout() {
+    fetch(`${API_URL}/api/auth/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => {
+      sessionStorage.clear();
+      window.location.href = '/login';
+    });
+  }
+
+  // Fetch users data
+  async function loadUsers() {
+    try {
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('usersTable').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+
+      const response = await fetch(`${API_URL}/api/admin/users`, {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        allUsers = data.users;
+        renderTable();
+      }
+    } catch (error) {
+      console.error('Error loading users:', error);
+    } finally {
+      document.getElementById('loading').style.display = 'none';
+    }
+  }
+
+  // Fetch stats
+  async function loadStats() {
+    try {
+      const response = await fetch(`${API_URL}/api/admin/stats`, {
+        credentials: 'include'
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        const stats = data.stats;
+        document.getElementById('totalUsers').textContent = stats.total_users;
+        document.getElementById('activatedUsers').textContent = stats.activated_users;
+        document.getElementById('inactiveUsers').textContent = stats.inactive_users;
+        document.getElementById('totalActivationWallet').textContent = '$' + stats.total_activation_wallet.toFixed(2);
+        document.getElementById('totalMatchingWallet').textContent = '$' + stats.total_matching_wallet.toFixed(2);
+        document.getElementById('totalIncome').textContent = '$' + (stats.total_activation_wallet + stats.total_matching_wallet).toFixed(2);
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  }
+
+  // Render table
+  function renderTable() {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    if (allUsers.length === 0) {
+      document.getElementById('usersTable').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('usersTable').style.display = 'table';
+    document.getElementById('emptyState').style.display = 'none';
+
+    allUsers.forEach(user => {
+      const activationStatus = user.activation_status === 'active' ? 'status-active' : 'status-inactive';
+      const activationText = user.activation_status === 'active' ? '✅ Active' : '❌ Inactive';
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><strong>${user.username}</strong></td>
+        <td>${user.email}</td>
+        <td><span class="status-badge ${activationStatus}">${activationText}</span></td>
+        <td>${user.activation_status === 'active' ? 'Activated' : 'Pending'}</td>
+        <td class="amount">$${(user.activation_wallet || 0).toFixed(2)}</td>
+        <td class="amount">$${(user.matching_wallet || 0).toFixed(2)}</td>
+        <td class="amount">$${(user.total_income || 0).toFixed(2)}</td>
+        <td>${user.directs}</td>
+        <td>
+          <div class="actions">
+            <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">Activate $100</button>
+            <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate Free</button>
+            <button class="btn btn-view" onclick="viewUserDetails('${user.user_id}')">View</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Activate user
+  async function activateUser(userId, cost) {
+    if (!confirm(`Activate user with $${cost} cost?`)) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/admin/user/${userId}/activate`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'activate', cost: cost })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert(`✅ ${data.message}`);
+        loadUsers();
+        loadStats();
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    }
+  }
+
+  // View user details
+  async function viewUserDetails(userId) {
+    const user = allUsers.find(u => u.user_id === userId);
+    if (!user) return;
+
+    const modalBody = document.getElementById('modalBody');
+    const walletBalance = user.wallet_balance || 0;
+
+    modalBody.innerHTML = `
+      <div id="message"></div>
+      <div class="user-detail">
+        <label>Username</label>
+        <p>${user.username}</p>
+      </div>
+      <div class="user-detail">
+        <label>Email</label>
+        <p>${user.email}</p>
+      </div>
+      <div class="user-detail">
+        <label>Name</label>
+        <p>${user.name}</p>
+      </div>
+      <div class="user-detail">
+        <label>Activation Status</label>
+        <p><span class="status-badge ${user.activation_status === 'active' ? 'status-active' : 'status-inactive'}">${user.activation_status === 'active' ? '✅ Active' : '❌ Inactive'}</span></p>
+      </div>
+      <div class="user-detail">
+        <label>Main Wallet Balance</label>
+        <p class="amount">$${walletBalance.toFixed(2)}</p>
+      </div>
+      <div class="user-detail">
+        <label>Activation Wallet</label>
+        <p class="amount">$${(user.activation_wallet || 0).toFixed(2)}</p>
+      </div>
+      <div class="user-detail">
+        <label>Matching Wallet</label>
+        <p class="amount">$${(user.matching_wallet || 0).toFixed(2)}</p>
+      </div>
+      <div class="user-detail">
+        <label>Total Income</label>
+        <p class="amount">$${(user.total_income || 0).toFixed(2)}</p>
+      </div>
+      <div class="user-detail">
+        <label>Direct Members</label>
+        <p>${user.directs}</p>
+      </div>
+      <div class="user-detail">
+        <label>Created At</label>
+        <p>${new Date(user.created_at).toLocaleString()}</p>
+      </div>
+      <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">Activate $100</button>
+        <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate Free</button>
+        <button class="btn btn-view" onclick="closeModal()">Close</button>
+      </div>
+    `;
+
+    document.getElementById('userModal').classList.add('active');
+  }
+
+  // Close modal
+  function closeModal() {
+    document.getElementById('userModal').classList.remove('active');
+  }
+
+  // Filter table
+  function filterTable() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const tbody = document.getElementById('tableBody');
+    const rows = tbody.getElementsByTagName('tr');
+
+    for (let row of rows) {
+      const username = row.cells[0].textContent.toLowerCase();
+      row.style.display = username.includes(searchText) ? '' : 'none';
+    }
+  }
+
+  // Refresh data
+  function refreshData() {
+    loadUsers();
+    loadStats();
+  }
+
+  // Initialize
+  checkAuth();
+  loadUsers();
+  loadStats();
+
+  // Auto-refresh every 5 seconds
+  setInterval(refreshData, 5000);
+</script>
+
+</body>
+</html>
