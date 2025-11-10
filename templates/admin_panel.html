@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +59,7 @@
     }
 
     .container {
-      max-width: 1400px;
+      max-width: 1600px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
@@ -75,6 +74,15 @@
     .header h1 {
       font-size: 2rem;
       color: #0f172a;
+    }
+
+    .refresh-info {
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
 
     .stats-grid {
@@ -145,6 +153,10 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -158,11 +170,13 @@
       color: #475569;
       border-bottom: 2px solid #e2e8f0;
       font-size: 0.9rem;
+      white-space: nowrap;
     }
 
     td {
       padding: 1rem;
       border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
     }
 
     tr:hover {
@@ -187,6 +201,15 @@
       color: #991b1b;
     }
 
+    .user-id {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-family: 'Courier New', monospace;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .amount {
       font-weight: 700;
       color: #2563eb;
@@ -195,6 +218,7 @@
     .actions {
       display: flex;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -235,6 +259,17 @@
 
     .btn-view:hover {
       background: #4b5563;
+    }
+
+    .btn-copy {
+      background: #8b5cf6;
+      color: white;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    .btn-copy:hover {
+      background: #7c3aed;
     }
 
     .modal {
@@ -301,6 +336,7 @@
       color: #1f2937;
       margin-top: 0.3rem;
       font-size: 0.95rem;
+      word-break: break-all;
     }
 
     .alert {
@@ -396,7 +432,10 @@
 <div class="container">
   <div class="header">
     <h1>User Management</h1>
-    <button class="btn btn-activate-100" onclick="refreshData()">🔄 Refresh</button>
+    <div style="display: flex; gap: 1rem; align-items: center;">
+      <div class="refresh-info" id="refreshInfo">⏱️ Auto-refresh in 5 min</div>
+      <button class="btn btn-activate-100" onclick="refreshData()">🔄 Refresh Now</button>
+    </div>
   </div>
 
   <div class="stats-grid">
@@ -439,23 +478,26 @@
       Loading users...
     </div>
 
-    <table id="usersTable" style="display: none;">
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Activation</th>
-          <th>Activation Wallet</th>
-          <th>Matching Wallet</th>
-          <th>Total Income</th>
-          <th>Directs</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table id="usersTable" style="display: none;">
+        <thead>
+          <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Activation</th>
+            <th>Activation Wallet</th>
+            <th>Matching Wallet</th>
+            <th>Total Income</th>
+            <th>Directs</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+      </table>
+    </div>
 
     <div id="emptyState" class="empty-state">
       <i class="fas fa-inbox"></i>
@@ -478,6 +520,8 @@
 <script>
   const API_URL = window.location.origin;
   let allUsers = [];
+  let autoRefreshInterval;
+  let refreshCountdown = 300;
 
   // Check if logged in as admin
   function checkAuth() {
@@ -560,9 +604,14 @@
     allUsers.forEach(user => {
       const activationStatus = user.activation_status === 'active' ? 'status-active' : 'status-inactive';
       const activationText = user.activation_status === 'active' ? '✅ Active' : '❌ Inactive';
+      const shortUserId = user.user_id.substring(0, 8) + '...';
 
       const row = document.createElement('tr');
       row.innerHTML = `
+        <td>
+          <div class="user-id" title="${user.user_id}">${user.user_id}</div>
+          <button class="btn btn-copy" onclick="copyToClipboard('${user.user_id}')">📋 Copy</button>
+        </td>
         <td><strong>${user.username}</strong></td>
         <td>${user.email}</td>
         <td><span class="status-badge ${activationStatus}">${activationText}</span></td>
@@ -573,13 +622,20 @@
         <td>${user.directs}</td>
         <td>
           <div class="actions">
-            <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">Activate $100</button>
-            <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate Free</button>
+            <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">$100</button>
+            <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">FREE</button>
             <button class="btn btn-view" onclick="viewUserDetails('${user.user_id}')">View</button>
           </div>
         </td>
       `;
       tbody.appendChild(row);
+    });
+  }
+
+  // Copy to clipboard
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('✅ User ID copied to clipboard!');
     });
   }
 
@@ -601,6 +657,7 @@
         alert(`✅ ${data.message}`);
         loadUsers();
         loadStats();
+        resetRefreshTimer();
       } else {
         alert(`❌ ${data.message}`);
       }
@@ -619,6 +676,10 @@
 
     modalBody.innerHTML = `
       <div id="message"></div>
+      <div class="user-detail">
+        <label>User ID</label>
+        <p>${user.user_id} <button class="btn btn-copy" onclick="copyToClipboard('${user.user_id}')">📋 Copy</button></p>
+      </div>
       <div class="user-detail">
         <label>Username</label>
         <p>${user.username}</p>
@@ -659,9 +720,9 @@
         <label>Created At</label>
         <p>${new Date(user.created_at).toLocaleString()}</p>
       </div>
-      <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
         <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">Activate $100</button>
-        <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate Free</button>
+        <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate FREE</button>
         <button class="btn btn-view" onclick="closeModal()">Close</button>
       </div>
     `;
@@ -681,7 +742,7 @@
     const rows = tbody.getElementsByTagName('tr');
 
     for (let row of rows) {
-      const username = row.cells[0].textContent.toLowerCase();
+      const username = row.cells[1].textContent.toLowerCase();
       row.style.display = username.includes(searchText) ? '' : 'none';
     }
   }
@@ -690,15 +751,46 @@
   function refreshData() {
     loadUsers();
     loadStats();
+    resetRefreshTimer();
+  }
+
+  // Reset and start refresh timer
+  function resetRefreshTimer() {
+    refreshCountdown = 300;
+    clearInterval(autoRefreshInterval);
+    updateRefreshInfo();
+    startRefreshTimer();
+  }
+
+  // Update refresh info display
+  function updateRefreshInfo() {
+    const minutes = Math.floor(refreshCountdown / 60);
+    const seconds = refreshCountdown % 60;
+    const display = minutes > 0 
+      ? `⏱️ Auto-refresh in ${minutes}m ${seconds}s`
+      : `⏱️ Auto-refresh in ${seconds}s`;
+    document.getElementById('refreshInfo').textContent = display;
+  }
+
+  // Start refresh timer (5 minutes = 300 seconds)
+  function startRefreshTimer() {
+    autoRefreshInterval = setInterval(() => {
+      refreshCountdown--;
+      updateRefreshInfo();
+      
+      if (refreshCountdown <= 0) {
+        loadUsers();
+        loadStats();
+        resetRefreshTimer();
+      }
+    }, 1000);
   }
 
   // Initialize
   checkAuth();
   loadUsers();
   loadStats();
-
-  // Auto-refresh every 5 seconds
-  setInterval(refreshData, 5000);
+  startRefreshTimer();
 </script>
 
 </body>
