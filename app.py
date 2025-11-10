@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
 import uuid
@@ -12,6 +11,7 @@ CORS(app)
 app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # DISABLE CACHING
 
 # ===== FILE-BASED DATABASE =====
 DB_FILE = "users_database.json"
@@ -289,6 +289,14 @@ def create_user(data):
     print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
+# ===== DISABLE CACHING FOR ALL RESPONSES =====
+@app.after_request
+def set_response_headers(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, public, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
 # Routes
 @app.route('/')
 def index():
@@ -409,7 +417,6 @@ def get_profile():
     if not user_id or not user or user.get('is_admin'):
         return jsonify({'success': False, 'message': 'Unauthorized'}), 401
     
-    # Calculate power/other leg
     leg_data = calculate_power_leg(user_id, users_db)
     direct_count = len(user.get('direct_referrals', []))
     
@@ -460,10 +467,8 @@ def activate_user():
         user['activation_date'] = datetime.now().isoformat()
         user['wallet_balance'] -= ACTIVATION_COST
         
-        # Distribute activation income to upline
         distribute_activation_income(user_id, users_db)
         
-        # Calculate matching income for all upline
         current_sponsor_id = user.get('sponsor_id')
         while current_sponsor_id:
             calculate_matching_income(current_sponsor_id, users_db)
@@ -488,7 +493,7 @@ def get_referrals():
     for i, ref_id in enumerate(user.get('direct_referrals', [])):
         ref_user = users_db.get(ref_id)
         if ref_user:
-            is_power = (i == 0)  # First direct is power leg
+            is_power = (i == 0)
             referrals.append({
                 'user_id': ref_user['user_id'],
                 'username': ref_user['username'],
@@ -560,7 +565,6 @@ def get_tree_view():
             "created_at": u.get('created_at'),
             "directs": []
         }
-        # Get all directs
         for direct_id in u.get('direct_referrals', []):
             subtree = get_subtree(direct_id)
             if subtree:
@@ -631,13 +635,11 @@ def admin_activate_user(user_id):
 
     data = request.get_json() or {}
     action = data.get('action', 'activate')
-    cost = float(data.get('cost', ACTIVATION_COST))  # Accept custom cost
+    cost = float(data.get('cost', ACTIVATION_COST))
     
     if action == 'activate':
         user['activation_status'] = 'active'
         user['activation_date'] = datetime.now().isoformat()
-        
-        # Deduct custom cost from wallet
         user['wallet_balance'] -= cost
         
         distribute_activation_income(user_id, users_db)
@@ -712,4 +714,4 @@ if __name__ == "__main__":
     print(f"💳 Activation Cost: ${ACTIVATION_COST}")
     print(f"💰 Matching Income: ${MATCHING_PER_PAIR} per pair")
     print(f"📈 Level Income: Levels 1-30\n")
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=False)  # DEBUG SET TO FALSE!
