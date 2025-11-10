@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 from flask_cors import CORS
 import uuid
@@ -618,6 +619,7 @@ def admin_get_users():
 
 @app.route('/api/admin/user/<user_id>/activate', methods=['PUT'])
 def admin_activate_user(user_id):
+    """Admin can activate user with custom cost ($100 or $0 for testing)"""
     user_id_admin = session.get('user_id')
     admin = users_db.get(user_id_admin)
     if not user_id_admin or not admin or not admin.get('is_admin'):
@@ -629,10 +631,15 @@ def admin_activate_user(user_id):
 
     data = request.get_json() or {}
     action = data.get('action', 'activate')
+    cost = float(data.get('cost', ACTIVATION_COST))  # Accept custom cost
     
     if action == 'activate':
         user['activation_status'] = 'active'
         user['activation_date'] = datetime.now().isoformat()
+        
+        # Deduct custom cost from wallet
+        user['wallet_balance'] -= cost
+        
         distribute_activation_income(user_id, users_db)
         
         current_sponsor_id = user.get('sponsor_id')
@@ -642,11 +649,18 @@ def admin_activate_user(user_id):
             if not sponsor:
                 break
             current_sponsor_id = sponsor.get('sponsor_id')
+        
+        save_db(users_db)
+        
+        cost_text = f"${cost:.2f}" if cost > 0 else "FREE (Testing)"
+        return jsonify({
+            'success': True,
+            'message': f'User activated with {cost_text} cost. Income distributed to upline.'
+        }), 200
     else:
         user['activation_status'] = 'inactive'
-    
-    save_db(users_db)
-    return jsonify({'success': True, 'message': f'User activation status changed'}), 200
+        save_db(users_db)
+        return jsonify({'success': True, 'message': 'User deactivated'}), 200
 
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_stats():
