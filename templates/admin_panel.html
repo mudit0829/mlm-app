@@ -371,7 +371,7 @@
   <div class="header">
     <h1>User Management</h1>
     <div class="header-right">
-      <div class="refresh-info" id="refreshInfo">⏱️ Auto-refresh: 5m</div>
+      <div class="refresh-info" id="refreshInfo">⏱️ Manual Refresh Only</div>
       <button class="btn btn-activate-100" onclick="refreshDataNow()">🔄 Refresh Now</button>
     </div>
   </div>
@@ -455,17 +455,10 @@
 <script>
   const API_URL = window.location.origin;
   let allUsers = [];
-  let autoRefreshInterval = null;
-  let refreshCountdown = 300;
 
   // Logout function
   function doLogout() {
     console.log("🚪 Logout initiated");
-    
-    if (autoRefreshInterval) {
-      clearInterval(autoRefreshInterval);
-      autoRefreshInterval = null;
-    }
     
     fetch(`${API_URL}/api/auth/logout`, {
       method: 'POST',
@@ -614,7 +607,6 @@
         alert(`✅ ${data.message}`);
         loadUsers();
         loadStats();
-        resetRefreshTimer();
       } else {
         alert(`❌ ${data.message}`);
       }
@@ -708,39 +700,6 @@
     console.log("🔄 Manual refresh");
     loadUsers();
     loadStats();
-    resetRefreshTimer();
-  }
-
-  // Reset refresh timer
-  function resetRefreshTimer() {
-    refreshCountdown = 300;
-    if (autoRefreshInterval) {
-      clearInterval(autoRefreshInterval);
-    }
-    updateRefreshInfo();
-    startRefreshTimer();
-  }
-
-  // Update refresh info
-  function updateRefreshInfo() {
-    const minutes = Math.floor(refreshCountdown / 60);
-    const seconds = refreshCountdown % 60;
-    document.getElementById('refreshInfo').textContent = `⏱️ Auto-refresh: ${minutes}m ${seconds}s`;
-  }
-
-  // Start refresh timer
-  function startRefreshTimer() {
-    autoRefreshInterval = setInterval(() => {
-      refreshCountdown--;
-      updateRefreshInfo();
-      
-      if (refreshCountdown <= 0) {
-        console.log("⏱️ Auto-refresh triggered");
-        loadUsers();
-        loadStats();
-        resetRefreshTimer();
-      }
-    }, 1000);
   }
 
   // Initialize
@@ -748,16 +707,13 @@
     checkAuth();
     loadUsers();
     loadStats();
-    startRefreshTimer();
     
     document.getElementById('logoutBtn').addEventListener('click', doLogout);
   });
 
   // Prevent accidental page reload
   window.addEventListener('beforeunload', function(e) {
-    if (autoRefreshInterval) {
-      clearInterval(autoRefreshInterval);
-    }
+    // Cleanup if needed
   });
 </script>
 
