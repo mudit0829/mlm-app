@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - TRADEERA</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -44,18 +47,20 @@
     }
 
     .logout-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      background: #dc2626;
+      border: none;
       color: white;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 1.5rem;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.3s;
+      font-size: 1rem;
     }
 
     .logout-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: #b91c1c;
+      transform: scale(1.05);
     }
 
     .container {
@@ -79,10 +84,11 @@
     .refresh-info {
       background: #dbeafe;
       color: #1e40af;
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1.5rem;
       border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
+      min-width: 200px;
     }
 
     .stats-grid {
@@ -339,25 +345,6 @@
       word-break: break-all;
     }
 
-    .alert {
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    .alert-success {
-      background: #d1fae5;
-      color: #065f46;
-      border: 1px solid #6ee7b7;
-    }
-
-    .alert-error {
-      background: #fee2e2;
-      color: #991b1b;
-      border: 1px solid #fca5a5;
-    }
-
     .loading {
       display: none;
       text-align: center;
@@ -425,7 +412,7 @@
     <div class="user-info">
       <span id="adminName">Admin</span>
     </div>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+    <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
   </div>
 </div>
 
@@ -433,7 +420,7 @@
   <div class="header">
     <h1>User Management</h1>
     <div style="display: flex; gap: 1rem; align-items: center;">
-      <div class="refresh-info" id="refreshInfo">⏱️ Auto-refresh in 5 min</div>
+      <div class="refresh-info" id="refreshInfo">⏱️ Auto-refresh: 5m</div>
       <button class="btn btn-activate-100" onclick="refreshData()">🔄 Refresh Now</button>
     </div>
   </div>
@@ -485,7 +472,6 @@
             <th>User ID</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Status</th>
             <th>Activation</th>
             <th>Activation Wallet</th>
             <th>Matching Wallet</th>
@@ -520,36 +506,45 @@
 <script>
   const API_URL = window.location.origin;
   let allUsers = [];
-  let autoRefreshInterval;
+  let autoRefreshInterval = null;
   let refreshCountdown = 300;
 
-  // Check if logged in as admin
+  console.log("Admin panel loaded - timestamp: " + new Date().getTime());
+
   function checkAuth() {
     if (!sessionStorage.getItem('is_admin') || sessionStorage.getItem('is_admin') !== 'true') {
+      console.log("Not admin, redirecting to login");
       window.location.href = '/login';
+      return;
     }
     document.getElementById('adminName').textContent = sessionStorage.getItem('username') || 'Admin';
   }
 
-  // Logout
-  function logout() {
+  function doLogout() {
+    console.log("Logout clicked");
+    clearInterval(autoRefreshInterval);
+    
     fetch(`${API_URL}/api/auth/logout`, {
       method: 'POST',
       credentials: 'include'
-    }).then(() => {
+    }).then(response => {
+      console.log("Logout response:", response.status);
       sessionStorage.clear();
+      localStorage.clear();
+      window.location.href = '/login';
+    }).catch(error => {
+      console.error("Logout error:", error);
+      sessionStorage.clear();
+      localStorage.clear();
       window.location.href = '/login';
     });
   }
 
-  // Fetch users data
   async function loadUsers() {
     try {
       document.getElementById('loading').style.display = 'block';
-      document.getElementById('usersTable').style.display = 'none';
-      document.getElementById('emptyState').style.display = 'none';
 
-      const response = await fetch(`${API_URL}/api/admin/users`, {
+      const response = await fetch(`${API_URL}/api/admin/users?t=${new Date().getTime()}`, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -565,10 +560,9 @@
     }
   }
 
-  // Fetch stats
   async function loadStats() {
     try {
-      const response = await fetch(`${API_URL}/api/admin/stats`, {
+      const response = await fetch(`${API_URL}/api/admin/stats?t=${new Date().getTime()}`, {
         credentials: 'include'
       });
       const data = await response.json();
@@ -587,7 +581,6 @@
     }
   }
 
-  // Render table
   function renderTable() {
     const tbody = document.getElementById('tableBody');
     tbody.innerHTML = '';
@@ -604,7 +597,6 @@
     allUsers.forEach(user => {
       const activationStatus = user.activation_status === 'active' ? 'status-active' : 'status-inactive';
       const activationText = user.activation_status === 'active' ? '✅ Active' : '❌ Inactive';
-      const shortUserId = user.user_id.substring(0, 8) + '...';
 
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -615,7 +607,6 @@
         <td><strong>${user.username}</strong></td>
         <td>${user.email}</td>
         <td><span class="status-badge ${activationStatus}">${activationText}</span></td>
-        <td>${user.activation_status === 'active' ? 'Activated' : 'Pending'}</td>
         <td class="amount">$${(user.activation_wallet || 0).toFixed(2)}</td>
         <td class="amount">$${(user.matching_wallet || 0).toFixed(2)}</td>
         <td class="amount">$${(user.total_income || 0).toFixed(2)}</td>
@@ -632,14 +623,14 @@
     });
   }
 
-  // Copy to clipboard
   function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
-      alert('✅ User ID copied to clipboard!');
+      alert('✅ User ID copied!');
+    }).catch(() => {
+      alert('❌ Failed to copy');
     });
   }
 
-  // Activate user
   async function activateUser(userId, cost) {
     if (!confirm(`Activate user with $${cost} cost?`)) return;
 
@@ -666,8 +657,7 @@
     }
   }
 
-  // View user details
-  async function viewUserDetails(userId) {
+  function viewUserDetails(userId) {
     const user = allUsers.find(u => u.user_id === userId);
     if (!user) return;
 
@@ -675,7 +665,6 @@
     const walletBalance = user.wallet_balance || 0;
 
     modalBody.innerHTML = `
-      <div id="message"></div>
       <div class="user-detail">
         <label>User ID</label>
         <p>${user.user_id} <button class="btn btn-copy" onclick="copyToClipboard('${user.user_id}')">📋 Copy</button></p>
@@ -730,12 +719,10 @@
     document.getElementById('userModal').classList.add('active');
   }
 
-  // Close modal
   function closeModal() {
     document.getElementById('userModal').classList.remove('active');
   }
 
-  // Filter table
   function filterTable() {
     const searchText = document.getElementById('searchInput').value.toLowerCase();
     const tbody = document.getElementById('tableBody');
@@ -747,14 +734,13 @@
     }
   }
 
-  // Refresh data
   function refreshData() {
+    console.log("Manual refresh clicked");
     loadUsers();
     loadStats();
     resetRefreshTimer();
   }
 
-  // Reset and start refresh timer
   function resetRefreshTimer() {
     refreshCountdown = 300;
     clearInterval(autoRefreshInterval);
@@ -762,23 +748,19 @@
     startRefreshTimer();
   }
 
-  // Update refresh info display
   function updateRefreshInfo() {
     const minutes = Math.floor(refreshCountdown / 60);
     const seconds = refreshCountdown % 60;
-    const display = minutes > 0 
-      ? `⏱️ Auto-refresh in ${minutes}m ${seconds}s`
-      : `⏱️ Auto-refresh in ${seconds}s`;
-    document.getElementById('refreshInfo').textContent = display;
+    document.getElementById('refreshInfo').textContent = `⏱️ Auto-refresh: ${minutes}m ${seconds}s`;
   }
 
-  // Start refresh timer (5 minutes = 300 seconds)
   function startRefreshTimer() {
     autoRefreshInterval = setInterval(() => {
       refreshCountdown--;
       updateRefreshInfo();
       
       if (refreshCountdown <= 0) {
+        console.log("Auto-refreshing...");
         loadUsers();
         loadStats();
         resetRefreshTimer();
@@ -787,10 +769,12 @@
   }
 
   // Initialize
-  checkAuth();
-  loadUsers();
-  loadStats();
-  startRefreshTimer();
+  window.addEventListener('load', function() {
+    checkAuth();
+    loadUsers();
+    loadStats();
+    startRefreshTimer();
+  });
 </script>
 
 </body>
