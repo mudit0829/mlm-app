@@ -14,7 +14,27 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # ===== FILE-BASED DATABASE =====
 DB_FILE = "users_database.json"
-MAX_DIRECTS = 12  # ===== MAXIMUM 12 DIRECTS PER USER =====
+MAX_DIRECTS = 12
+ACTIVATION_COST = 100
+
+# ===== LEVEL INCOME (Activation Wallet) =====
+LEVEL_INCOME = {
+    1: 10.00, 2: 5.00, 3: 3.00, 4: 2.00,
+    5: 1.00, 6: 1.00, 7: 1.00, 8: 1.00, 9: 1.00, 10: 1.00, 11: 1.00,
+    12: 0.50, 13: 0.50, 14: 0.50, 15: 0.50, 16: 0.50, 17: 0.50, 18: 0.50, 19: 0.50, 20: 0.50,
+    21: 0.25, 22: 0.25, 23: 0.25, 24: 0.25, 25: 0.25, 26: 0.25, 27: 0.25, 28: 0.25, 29: 0.25, 30: 0.25
+}
+
+# ===== DIRECT REQUIREMENTS TO UNLOCK LEVEL INCOME =====
+DIRECT_REQUIREMENTS = {
+    1: 0, 2: 2, 3: 4,
+    4: 6, 5: 6, 6: 6, 7: 6, 8: 6, 9: 6, 10: 6,
+    11: 8, 12: 8, 13: 8, 14: 8, 15: 8, 16: 8, 17: 8, 18: 8, 19: 8, 20: 8,
+    21: 12, 22: 12, 23: 12, 24: 12, 25: 12, 26: 12, 27: 12, 28: 12, 29: 12, 30: 12
+}
+
+# ===== MATCHING INCOME =====
+MATCHING_PER_PAIR = 10.00
 
 def load_db():
     """Load users from JSON file"""
@@ -47,18 +67,25 @@ ADMIN_USER = {
     "last_name": "User",
     "is_admin": True,
     "status": "active",
+    "activation_status": "active",
+    "activation_date": datetime.now().isoformat(),
     "created_at": datetime.now().isoformat(),
     "wallet_balance": 0,
+    "activation_wallet": 0,
+    "matching_wallet": 0,
     "referral_code": "ADMIN123",
     "sponsor_id": None,
     "direct_referrals": [],
     "power_leg_user": None,
     "other_leg_users": [],
+    "matched_pairs": 0,
     "total_income": 0,
+    "commission_received": 0,
     "phone": "",
     "country": "India",
     "state": "",
-    "dob": ""
+    "dob": "",
+    "income_history": []
 }
 
 if "admin-1" not in users_db:
@@ -107,6 +134,88 @@ def calculate_power_leg(user_id, db):
         'power_leg_user': power_leg_user_id
     }
 
+def distribute_activation_income(user_id, db):
+    """When user activates, distribute level income to upline sponsors"""
+    user = db.get(user_id)
+    if not user or not user.get('sponsor_id'):
+        return
+    
+    current_sponsor_id = user.get('sponsor_id')
+    level = 1
+    
+    while current_sponsor_id and level <= 30:
+        sponsor = db.get(current_sponsor_id)
+        if not sponsor:
+            break
+        
+        # Check if sponsor is activated
+        if sponsor.get('activation_status') != 'active':
+            current_sponsor_id = sponsor.get('sponsor_id')
+            level += 1
+            continue
+        
+        # Check direct requirement
+        sponsor_directs = len(sponsor.get('direct_referrals', []))
+        required_directs = DIRECT_REQUIREMENTS.get(level, 12)
+        
+        if sponsor_directs >= required_directs:
+            # Sponsor qualifies for level income
+            income = LEVEL_INCOME.get(level, 0)
+            sponsor['activation_wallet'] = sponsor.get('activation_wallet', 0) + income
+            sponsor['total_income'] = sponsor.get('total_income', 0) + income
+            
+            # Log income
+            if 'income_history' not in sponsor:
+                sponsor['income_history'] = []
+            sponsor['income_history'].append({
+                'type': 'activation_wallet',
+                'from_user': user_id,
+                'level': level,
+                'amount': income,
+                'date': datetime.now().isoformat()
+            })
+            
+            print(f"💰 {sponsor['username']} earned ${income} from Level {level}")
+        
+        # Move to next sponsor
+        current_sponsor_id = sponsor.get('sponsor_id')
+        level += 1
+
+def calculate_matching_income(user_id, db):
+    """Calculate and distribute matching income"""
+    user = db.get(user_id)
+    if not user or user.get('activation_status') != 'active':
+        return
+    
+    leg_data = calculate_power_leg(user_id, db)
+    power_leg = leg_data['power_leg']
+    other_leg = leg_data['other_leg']
+    
+    # Calculate new matching pairs
+    new_matching = min(power_leg, other_leg)
+    old_matching = user.get('matched_pairs', 0)
+    
+    if new_matching > old_matching:
+        # New pairs matched!
+        pairs_increment = new_matching - old_matching
+        income = pairs_increment * MATCHING_PER_PAIR
+        
+        user['matching_wallet'] = user.get('matching_wallet', 0) + income
+        user['total_income'] = user.get('total_income', 0) + income
+        user['matched_pairs'] = new_matching
+        
+        # Log income
+        if 'income_history' not in user:
+            user['income_history'] = []
+        user['income_history'].append({
+            'type': 'matching_wallet',
+            'pairs': pairs_increment,
+            'amount': income,
+            'date': datetime.now().isoformat()
+        })
+        
+        print(f"💰 {user['username']} earned ${income} from {pairs_increment} matching pairs")
+
 def create_user(data):
     user_id = str(uuid.uuid4())
     referral_code = generate_referral_code()
@@ -148,15 +257,22 @@ def create_user(data):
         "country_code": data.get('country_code', ''),
         "is_admin": False,
         "status": "active",
+        "activation_status": "inactive",
+        "activation_date": None,
+        "activation_cost": ACTIVATION_COST,
         "created_at": datetime.now().isoformat(),
         "wallet_balance": 0,
+        "activation_wallet": 0,
+        "matching_wallet": 0,
         "referral_code": referral_code,
         "sponsor_id": sponsor_user_id,
         "direct_referrals": [],
         "power_leg_user": None,
         "other_leg_users": [],
+        "matched_pairs": 0,
         "total_income": 0,
-        "commission_received": 0
+        "commission_received": 0,
+        "income_history": []
     }
 
     # Add user to sponsor's direct referrals
@@ -169,7 +285,7 @@ def create_user(data):
 
     users_db[user_id] = user
     save_db(users_db)
-    print(f"✅ Created user: {user['username']}")
+    print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
 # Routes
@@ -263,9 +379,11 @@ def api_signup():
 
         return jsonify({
             'success': True,
-            'message': 'Registration successful',
+            'message': f'Registration successful! Account INACTIVE. Pay ${ACTIVATION_COST} to activate.',
             'user_id': user['user_id'],
-            'referral_code': user['referral_code']
+            'referral_code': user['referral_code'],
+            'activation_required': True,
+            'activation_cost': ACTIVATION_COST
         }), 201
 
     except Exception as e:
@@ -307,15 +425,56 @@ def get_profile():
             'state': user.get('state', ''),
             'dob': user.get('dob', ''),
             'wallet_balance': user.get('wallet_balance', 0),
+            'activation_wallet': user.get('activation_wallet', 0),
+            'matching_wallet': user.get('matching_wallet', 0),
             'referral_code': user['referral_code'],
             'total_income': user.get('total_income', 0),
             'total_directs': direct_count,
             'directs_remaining': MAX_DIRECTS - direct_count,
             'power_leg_count': leg_data['power_leg'],
             'other_leg_count': leg_data['other_leg'],
+            'matched_pairs': user.get('matched_pairs', 0),
+            'activation_status': user.get('activation_status'),
+            'activation_cost': user.get('activation_cost'),
             'created_at': user.get('created_at')
         }
     }), 200
+
+@app.route('/api/user/activate', methods=['POST'])
+def activate_user():
+    """User activates account with $100"""
+    user_id = session.get('user_id')
+    user = users_db.get(user_id)
+    if not user_id or not user or user.get('is_admin'):
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+    
+    if user.get('activation_status') == 'active':
+        return jsonify({'success': False, 'message': 'Already active'}), 400
+    
+    data = request.get_json() or {}
+    payment_status = data.get('payment_status', 'success')
+    
+    if payment_status == 'success':
+        user['activation_status'] = 'active'
+        user['activation_date'] = datetime.now().isoformat()
+        user['wallet_balance'] -= ACTIVATION_COST
+        
+        # Distribute activation income to upline
+        distribute_activation_income(user_id, users_db)
+        
+        # Calculate matching income for all upline
+        current_sponsor_id = user.get('sponsor_id')
+        while current_sponsor_id:
+            calculate_matching_income(current_sponsor_id, users_db)
+            sponsor = users_db.get(current_sponsor_id)
+            if not sponsor:
+                break
+            current_sponsor_id = sponsor.get('sponsor_id')
+        
+        save_db(users_db)
+        return jsonify({'success': True, 'message': f'Account activated! ${ACTIVATION_COST} deducted.'}), 200
+    else:
+        return jsonify({'success': False, 'message': 'Payment failed'}), 400
 
 @app.route('/api/user/referrals', methods=['GET'])
 def get_referrals():
@@ -334,6 +493,7 @@ def get_referrals():
                 'username': ref_user['username'],
                 'name': f"{ref_user['first_name']} {ref_user['last_name']}",
                 'leg_type': 'Power Leg' if is_power else 'Other Leg',
+                'activation_status': ref_user.get('activation_status'),
                 'status': ref_user.get('status', ''),
                 'joined': ref_user.get('created_at')
             })
@@ -362,6 +522,8 @@ def get_dashboard():
         'success': True,
         'dashboard': {
             'wallet_balance': user.get('wallet_balance', 0),
+            'activation_wallet': user.get('activation_wallet', 0),
+            'matching_wallet': user.get('matching_wallet', 0),
             'total_income': user.get('total_income', 0),
             'commission_received': user.get('commission_received', 0),
             'direct_referrals': direct_count,
@@ -369,6 +531,9 @@ def get_dashboard():
             'max_directs': MAX_DIRECTS,
             'power_leg': leg_data['power_leg'],
             'other_leg': leg_data['other_leg'],
+            'matched_pairs': user.get('matched_pairs', 0),
+            'activation_status': user.get('activation_status'),
+            'activation_cost': user.get('activation_cost'),
             'status': user.get('status', ''),
             'referral_code': user['referral_code'],
             'created_at': user.get('created_at')
@@ -404,6 +569,18 @@ def get_tree_view():
     tree = get_subtree(user_id)
     return jsonify({'success': True, 'tree': tree}), 200
 
+@app.route('/api/user/income-history', methods=['GET'])
+def get_income_history():
+    user_id = session.get('user_id')
+    user = users_db.get(user_id)
+    if not user_id or not user:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
+
+    return jsonify({
+        'success': True,
+        'income_history': user.get('income_history', [])
+    }), 200
+
 # ADMIN API ENDPOINTS
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
@@ -420,6 +597,10 @@ def admin_get_users():
             'name': f"{u['first_name']} {u['last_name']}",
             'phone': u.get('mobile', ''),
             'status': u.get('status', ''),
+            'activation_status': u.get('activation_status'),
+            'activation_wallet': u.get('activation_wallet', 0),
+            'matching_wallet': u.get('matching_wallet', 0),
+            'total_income': u.get('total_income', 0),
             'created_at': u.get('created_at'),
             'wallet_balance': u.get('wallet_balance', 0),
             'directs': len(u.get('direct_referrals', [])),
@@ -447,9 +628,25 @@ def admin_activate_user(user_id):
         return jsonify({'success': False, 'message': 'User not found'}), 404
 
     data = request.get_json() or {}
-    user['status'] = data.get('status', 'active')
+    action = data.get('action', 'activate')
+    
+    if action == 'activate':
+        user['activation_status'] = 'active'
+        user['activation_date'] = datetime.now().isoformat()
+        distribute_activation_income(user_id, users_db)
+        
+        current_sponsor_id = user.get('sponsor_id')
+        while current_sponsor_id:
+            calculate_matching_income(current_sponsor_id, users_db)
+            sponsor = users_db.get(current_sponsor_id)
+            if not sponsor:
+                break
+            current_sponsor_id = sponsor.get('sponsor_id')
+    else:
+        user['activation_status'] = 'inactive'
+    
     save_db(users_db)
-    return jsonify({'success': True, 'message': f'User status changed to {user["status"]}'}), 200
+    return jsonify({'success': True, 'message': f'User activation status changed'}), 200
 
 @app.route('/api/admin/stats', methods=['GET'])
 def admin_stats():
@@ -461,6 +658,10 @@ def admin_stats():
     total_users = len([u for u in users_db.values() if not u.get('is_admin')])
     active_users = len([u for u in users_db.values() if u.get('status') == 'active' and not u.get('is_admin')])
     pending_users = len([u for u in users_db.values() if u.get('status') == 'pending' and not u.get('is_admin')])
+    activated_users = len([u for u in users_db.values() if u.get('activation_status') == 'active' and not u.get('is_admin')])
+    inactive_users = total_users - activated_users
+    total_activation_wallet = sum(u.get('activation_wallet', 0) for u in users_db.values() if not u.get('is_admin'))
+    total_matching_wallet = sum(u.get('matching_wallet', 0) for u in users_db.values() if not u.get('is_admin'))
 
     return jsonify({
         'success': True,
@@ -468,7 +669,13 @@ def admin_stats():
             'total_users': total_users,
             'active_users': active_users,
             'pending_users': pending_users,
-            'total_wallet_balance': sum(u.get('wallet_balance', 0) for u in users_db.values() if not u.get('is_admin'))
+            'activated_users': activated_users,
+            'inactive_users': inactive_users,
+            'total_wallet_balance': sum(u.get('wallet_balance', 0) for u in users_db.values() if not u.get('is_admin')),
+            'total_activation_wallet': total_activation_wallet,
+            'total_matching_wallet': total_matching_wallet,
+            'activation_cost': ACTIVATION_COST,
+            'matching_per_pair': MATCHING_PER_PAIR
         }
     }), 200
 
@@ -487,5 +694,8 @@ if __name__ == "__main__":
     print(f"📝 Admin: admin / admin123")
     print(f"📂 Database: {DB_FILE}")
     print(f"📊 Users loaded: {len(users_db)}")
-    print(f"👥 Max Directs per user: {MAX_DIRECTS}\n")
+    print(f"👥 Max Directs per user: {MAX_DIRECTS}")
+    print(f"💳 Activation Cost: ${ACTIVATION_COST}")
+    print(f"💰 Matching Income: ${MATCHING_PER_PAIR} per pair")
+    print(f"📈 Level Income: Levels 1-30\n")
     app.run(host='0.0.0.0', port=port, debug=True)
