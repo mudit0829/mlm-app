@@ -13,10 +13,12 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+# ===== FILE-BASED DATABASE =====
 DB_FILE = "users_database.json"
 MAX_DIRECTS = 12
 ACTIVATION_COST = 100
 
+# ===== LEVEL INCOME (Activation Wallet) =====
 LEVEL_INCOME = {
     1: 10.00, 2: 5.00, 3: 3.00, 4: 2.00,
     5: 1.00, 6: 1.00, 7: 1.00, 8: 1.00, 9: 1.00, 10: 1.00, 11: 1.00,
@@ -24,6 +26,7 @@ LEVEL_INCOME = {
     21: 0.25, 22: 0.25, 23: 0.25, 24: 0.25, 25: 0.25, 26: 0.25, 27: 0.25, 28: 0.25, 29: 0.25, 30: 0.25
 }
 
+# ===== DIRECT REQUIREMENTS TO UNLOCK LEVEL INCOME =====
 DIRECT_REQUIREMENTS = {
     1: 0, 2: 2, 3: 4,
     4: 6, 5: 6, 6: 6, 7: 6, 8: 6, 9: 6, 10: 6,
@@ -31,6 +34,7 @@ DIRECT_REQUIREMENTS = {
     21: 12, 22: 12, 23: 12, 24: 12, 25: 12, 26: 12, 27: 12, 28: 12, 29: 12, 30: 12
 }
 
+# ===== MATCHING INCOME =====
 MATCHING_PER_PAIR = 10.00
 
 def load_db():
@@ -46,11 +50,13 @@ def save_db(db):
     try:
         with open(DB_FILE, 'w') as f:
             json.dump(db, f, indent=2, default=str)
+        print(f"💾 Database saved to {DB_FILE}")
     except Exception as e:
         print(f"Error saving database: {e}")
 
 users_db = load_db()
 
+# Admin user
 ADMIN_USER = {
     "user_id": "admin-1",
     "username": "admin",
@@ -227,15 +233,16 @@ def create_user(data):
     print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
-# ===== DISABLE CACHING FOR ALL RESPONSES - FIX REFRESH ISSUE =====
+# ===== FIX: DISABLE CACHING FOR ALL RESPONSES =====
 @app.after_request
 def set_response_headers(response):
+    # Disable caching for all responses; do not set dynamic headers causing refresh
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, public, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
 
-# (Keep all other routes exactly as they are in your current file...)
+# Routes and API endpoints remain unchanged from original
 
 @app.route('/')
 def index():
@@ -279,7 +286,7 @@ def admin_dashboard():
         return redirect(url_for('login_page'))
     return render_template('admin_panel.html')
 
-# <Rest of your endpoints unchanged...>
+# AUTH API ENDPOINTS and other APIs remain unchanged from original
 
 @app.errorhandler(404)
 def not_found(e):
