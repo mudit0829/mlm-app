@@ -286,6 +286,25 @@ def set_response_headers(response):
     # response.headers['X-Response-Time'] = str(datetime.now().timestamp())
 
     return response
+
+@app.before_request
+def check_session_validity():
+    """Prevent session cookie from being invalidated on every request"""
+    if request.path.startswith('/admin/'):
+        user_id = session.get('user_id')
+        user = users_db.get(user_id)
+        if not user_id or not user or not user.get('is_admin'):
+            session.clear()
+            return redirect(url_for('login_page'))
+        # Session is valid, proceed
+    elif request.path.startswith('/dashboard'):
+        user_id = session.get('user_id')
+        user = users_db.get(user_id)
+        if not user_id or not user or user.get('is_admin'):
+            session.clear()
+            return redirect(url_for('login_page'))
+        # Session is valid, proceed
+
 # Routes
 @app.route('/')
 def index():
