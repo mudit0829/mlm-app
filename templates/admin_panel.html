@@ -81,16 +81,6 @@
       gap: 1rem;
       align-items: center;
     }
-    .refresh-info {
-      background: #dbeafe;
-      color: #1e40af;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      min-width: 200px;
-      text-align: center;
-    }
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -370,10 +360,6 @@
 <div class="container">
   <div class="header">
     <h1>User Management</h1>
-    <div class="header-right">
-      <div class="refresh-info" id="refreshInfo">⏱️ Manual Refresh Only</div>
-      <button class="btn btn-activate-100" onclick="refreshDataNow()">🔄 Refresh Now</button>
-    </div>
   </div>
 
   <div class="stats-grid">
@@ -496,14 +482,13 @@
     document.getElementById('adminName').textContent = sessionStorage.getItem('username') || 'Admin';
   }
 
-  // Load users
+  // Load users - ONCE ONLY
   async function loadUsers() {
     try {
       document.getElementById('loading').style.display = 'block';
-      const ts = new Date().getTime();
-      const response = await fetch(`${API_URL}/api/admin/users?t=${ts}`, {
+      const response = await fetch(`${API_URL}/api/admin/users`, {
         credentials: 'include',
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
       });
       const data = await response.json();
 
@@ -518,13 +503,12 @@
     }
   }
 
-  // Load stats
+  // Load stats - ONCE ONLY
   async function loadStats() {
     try {
-      const ts = new Date().getTime();
-      const response = await fetch(`${API_URL}/api/admin/stats?t=${ts}`, {
+      const response = await fetch(`${API_URL}/api/admin/stats`, {
         credentials: 'include',
-        headers: { 'Cache-Control': 'no-cache' }
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
       });
       const data = await response.json();
 
@@ -605,8 +589,6 @@
 
       if (data.success) {
         alert(`✅ ${data.message}`);
-        loadUsers();
-        loadStats();
       } else {
         alert(`❌ ${data.message}`);
       }
@@ -695,25 +677,15 @@
     }
   }
 
-  // Refresh data now
-  function refreshDataNow() {
-    console.log("🔄 Manual refresh");
-    loadUsers();
-    loadStats();
-  }
-
-  // Initialize
+  // Initialize - Load data ONCE when page opens
   window.addEventListener('load', function() {
     checkAuth();
     loadUsers();
     loadStats();
     
     document.getElementById('logoutBtn').addEventListener('click', doLogout);
-  });
-
-  // Prevent accidental page reload
-  window.addEventListener('beforeunload', function(e) {
-    // Cleanup if needed
+    
+    console.log("✅ Admin panel initialized. Data loaded ONCE. No auto-refresh.");
   });
 </script>
 
