@@ -3,7 +3,7 @@ from flask_cors import CORS
 import uuid
 import os
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 
 app = Flask(__name__, template_folder='templates')
 CORS(app, supports_credentials=True)
@@ -11,9 +11,6 @@ CORS(app, supports_credentials=True)
 app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
-app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # ===== FILE-BASED DATABASE =====
@@ -276,14 +273,7 @@ def create_user(data):
     print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
-# ===== FIXED: PROPER RESPONSE HEADERS =====
-@app.after_request
-def set_response_headers(response):
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, public, max-age=0'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-    return response
+# NO DECORATORS - Clean and simple
 
 # Routes
 @app.route('/')
@@ -336,7 +326,6 @@ def api_login():
             if user['username'].lower() == username and user['password'] == password:
                 if user['status'] == 'inactive':
                     return jsonify({'success': False, 'message': 'Account inactive'}), 403
-                session.permanent = True
                 session['user_id'] = uid
                 session['username'] = user['username']
                 session['is_admin'] = user['is_admin']
