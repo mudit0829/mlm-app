@@ -273,7 +273,17 @@ def create_user(data):
     print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
-# NO DECORATORS - Clean and simple
+# ADD THIS DECORATOR HERE
+@app.before_request
+def before_request():
+    """Check session validity without clearing it repeatedly"""
+    if request.endpoint and not request.endpoint.startswith('static'):
+        if request.path.startswith('/api/'):
+            return
+        user_id = session.get('user_id')
+        if not user_id:
+            if request.path not in ['/', '/login', '/signup']:
+                return redirect(url_for('login_page'))
 
 # Routes
 @app.route('/')
@@ -689,3 +699,4 @@ if __name__ == "__main__":
     print(f"💰 Matching Income: ${MATCHING_PER_PAIR} per pair")
     print(f"📈 Level Income: Levels 1-30\n")
     app.run(host='0.0.0.0', port=port, debug=False)
+
