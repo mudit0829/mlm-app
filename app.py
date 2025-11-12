@@ -3,14 +3,17 @@ from flask_cors import CORS
 import uuid
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__, template_folder='templates')
-CORS(app)
+CORS(app, supports_credentials=True)
 
 app.config['SECRET_KEY'] = 'mlm-app-secret-key-2025'
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # ===== FILE-BASED DATABASE =====
@@ -273,37 +276,14 @@ def create_user(data):
     print(f"✅ Created INACTIVE user: {user['username']}")
     return user, None
 
-# ===== FIX: DISABLE CACHING FOR ALL RESPONSES =====
+# ===== FIXED: PROPER RESPONSE HEADERS =====
 @app.after_request
 def set_response_headers(response):
-    # Disable caching for all responses
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, public, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
-
-    # Remove these headers that cause auto-refresh and login issues:
-    # response.headers['ETag'] = None
-    # response.headers['X-Response-Time'] = str(datetime.now().timestamp())
-
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
     return response
-
-@app.before_request
-def check_session_validity():
-    """Prevent session cookie from being invalidated on every request"""
-    if request.path.startswith('/admin/'):
-        user_id = session.get('user_id')
-        user = users_db.get(user_id)
-        if not user_id or not user or not user.get('is_admin'):
-            session.clear()
-            return redirect(url_for('login_page'))
-        # Session is valid, proceed
-    elif request.path.startswith('/dashboard'):
-        user_id = session.get('user_id')
-        user = users_db.get(user_id)
-        if not user_id or not user or user.get('is_admin'):
-            session.clear()
-            return redirect(url_for('login_page'))
-        # Session is valid, proceed
 
 # Routes
 @app.route('/')
@@ -318,7 +298,6 @@ def login_page():
         if user['is_admin']:
             return redirect(url_for('admin_dashboard'))
         return redirect(url_for('user_dashboard'))
-    session.clear()
     return render_template('login.html')
 
 @app.route('/signup')
@@ -327,7 +306,6 @@ def signup_page():
     user = users_db.get(user_id)
     if user_id and user and not user.get('is_admin'):
         return redirect(url_for('user_dashboard'))
-    session.clear()
     return render_template('signup.html')
 
 @app.route('/dashboard')
@@ -335,7 +313,6 @@ def user_dashboard():
     user_id = session.get('user_id')
     user = users_db.get(user_id)
     if not user_id or not user or user.get('is_admin'):
-        session.clear()
         return redirect(url_for('login_page'))
     return render_template('user_panel.html')
 
@@ -344,7 +321,6 @@ def admin_dashboard():
     user_id = session.get('user_id')
     user = users_db.get(user_id)
     if not user_id or not user or not user.get('is_admin'):
-        session.clear()
         return redirect(url_for('login_page'))
     return render_template('admin_panel.html')
 
@@ -360,6 +336,7 @@ def api_login():
             if user['username'].lower() == username and user['password'] == password:
                 if user['status'] == 'inactive':
                     return jsonify({'success': False, 'message': 'Account inactive'}), 403
+                session.permanent = True
                 session['user_id'] = uid
                 session['username'] = user['username']
                 session['is_admin'] = user['is_admin']
