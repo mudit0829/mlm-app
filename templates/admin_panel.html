@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Panel - TRADEERA</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* your existing CSS (kept identical) */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Nunito', sans-serif;
@@ -23,64 +22,336 @@
       align-items: center;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
     }
-    .navbar-brand { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; }
-    .navbar-right { display: flex; gap: 2rem; align-items: center; }
-    .user-info { background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; }
-    .logout-btn {
-      background: #dc2626; border: none; color: white; padding: 0.6rem 1.5rem; border-radius: 6px; cursor: pointer;
-      font-weight: 700; font-size: 0.95rem; transition: all 0.3s ease;
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
     }
-    .logout-btn:hover { background: #b91c1c; transform: scale(1.05); }
-    .logout-btn:active { transform: scale(0.95); }
-    .container { max-width: 1600px; margin: 2rem auto; padding: 0 1rem; }
-    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; flex-wrap:wrap; gap:1rem; }
-    .header h1 { font-size: 2rem; color: #0f172a; }
-    .header-right { display:flex; gap:1rem; align-items:center; }
-    .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1.5rem; margin-bottom:2rem; }
-    .stat-card { background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); border-left:4px solid #2563eb; }
-    .stat-card h3 { color:#64748b; font-size:0.9rem; margin-bottom:0.5rem; font-weight:600; }
-    .stat-card .value { font-size:2rem; font-weight:900; color:#2563eb; }
-    .table-container { background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); overflow:hidden; }
-    .table-header { background:#f1f5f9; padding:1.5rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
-    .table-header h2 { font-size:1.3rem; color:#0f172a; }
-    .search-box input { padding:0.75rem 1rem; border:1.5px solid #e2e8f0; border-radius:8px; font-family:'Nunito',sans-serif; font-size:0.95rem; width:250px;}
-    .search-box input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
-    .table-wrapper { overflow-x:auto; }
-    table { width:100%; border-collapse:collapse; }
-    th { background:#f8fafc; padding:1rem; text-align:left; font-weight:700; color:#475569; border-bottom:2px solid #e2e8f0; font-size:0.9rem; white-space:nowrap; }
-    td { padding:1rem; border-bottom:1px solid #e2e8f0; white-space:nowrap; }
-    tr:hover { background:#f9fafb; }
-    .status-badge { display:inline-block; padding:0.4rem 0.8rem; border-radius:6px; font-size:0.85rem; font-weight:600; }
-    .status-active { background:#d1fae5; color:#065f46; }
-    .status-inactive { background:#fee2e2; color:#991b1b; }
-    .user-id { font-size:0.8rem; color:#64748b; font-family:'Courier New',monospace; max-width:150px; overflow:hidden; text-overflow:ellipsis; }
-    .amount { font-weight:700; color:#2563eb; }
-    .actions { display:flex; gap:0.5rem; flex-wrap:wrap; }
-    .btn { padding:0.5rem 0.8rem; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:0.85rem; transition:all 0.3s; white-space:nowrap; }
-    .btn-activate-100 { background:#3b82f6; color:white; } .btn-activate-100:hover{background:#2563eb;}
-    .btn-activate-free { background:#10b981; color:white; } .btn-activate-free:hover{background:#059669;}
-    .btn-view { background:#6b7280; color:white; } .btn-view:hover{background:#4b5563;}
-    .btn-copy { background:#8b5cf6; color:white; padding:0.3rem 0.6rem; font-size:0.75rem; } .btn-copy:hover{background:#7c3aed;}
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:1000; }
-    .modal.active { display:flex; }
-    .modal-content { background:white; padding:2rem; border-radius:12px; max-width:600px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
-    .modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
-    .modal-header h2 { font-size:1.5rem; color:#0f172a; }
-    .close-btn { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#64748b; }
-    .user-detail { margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #e2e8f0; }
-    .user-detail label { color:#64748b; font-weight:600; font-size:0.9rem; }
-    .user-detail p { color:#1f2937; margin-top:0.3rem; font-size:0.95rem; word-break:break-all; }
-    .loading { display:none; text-align:center; padding:2rem; color:#2563eb; }
-    .spinner { border:3px solid #e2e8f0; border-top-color:#2563eb; border-radius:50%; width:30px; height:30px; animation:spin 0.8s linear infinite; margin:0 auto 1rem; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .empty-state { text-align:center; padding:3rem; color:#94a3b8; }
-    .empty-state i { font-size:3rem; margin-bottom:1rem; opacity:0.5; }
-    @media (max-width:768px) {
-      .navbar { flex-direction:column; gap:1rem; }
-      .navbar-right { flex-direction:column; gap:1rem; width:100%; }
-      .header { flex-direction:column; align-items:flex-start; }
-      table { font-size:0.85rem; }
-      .btn { padding:0.4rem 0.6rem; font-size:0.8rem; }
+    .navbar-right {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    .user-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+    .logout-btn {
+      background: #dc2626;
+      border: none;
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+    }
+    .logout-btn:hover {
+      background: #b91c1c;
+      transform: scale(1.05);
+    }
+    .logout-btn:active {
+      transform: scale(0.95);
+    }
+    .container {
+      max-width: 1600px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .header h1 {
+      font-size: 2rem;
+      color: #0f172a;
+    }
+    .header-right {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-left: 4px solid #2563eb;
+    }
+    .stat-card h3 {
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #2563eb;
+    }
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    .table-header {
+      background: #f1f5f9;
+      padding: 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .table-header h2 {
+      font-size: 1.3rem;
+      color: #0f172a;
+    }
+    .search-box input {
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.95rem;
+      width: 250px;
+    }
+    .search-box input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      background: #f8fafc;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 2px solid #e2e8f0;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    tr:hover {
+      background: #f9fafb;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .user-id {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-family: 'Courier New', monospace;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .amount {
+      font-weight: 700;
+      color: #2563eb;
+    }
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 0.5rem 0.8rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .btn-activate-100 {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-activate-100:hover {
+      background: #2563eb;
+    }
+    .btn-activate-free {
+      background: #10b981;
+      color: white;
+    }
+    .btn-activate-free:hover {
+      background: #059669;
+    }
+    .btn-view {
+      background: #6b7280;
+      color: white;
+    }
+    .btn-view:hover {
+      background: #4b5563;
+    }
+    .btn-copy {
+      background: #8b5cf6;
+      color: white;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
+    }
+    .btn-copy:hover {
+      background: #7c3aed;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .modal-header h2 {
+      font-size: 1.5rem;
+      color: #0f172a;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #64748b;
+    }
+    .user-detail {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .user-detail label {
+      color: #64748b;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .user-detail p {
+      color: #1f2937;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+      word-break: break-all;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: #2563eb;
+    }
+    .spinner {
+      border: 3px solid #e2e8f0;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #94a3b8;
+    }
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* small banner shown when not authenticated or for messages */
+    .info-banner {
+      display: none;
+      background: #fff7ed;
+      border: 1px solid #ffd8a8;
+      color: #92400e;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    .info-banner a { font-weight: 700; color: #92400e; margin-left: 0.5rem; text-decoration: underline; cursor: pointer; }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .navbar-right {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      table {
+        font-size: 0.85rem;
+      }
+      .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
@@ -97,17 +368,38 @@
 </div>
 
 <div class="container">
+  <!-- Banner area for auth/info messages (non-blocking) -->
+  <div id="infoBanner" class="info-banner" role="status" aria-live="polite"></div>
+
   <div class="header">
     <h1>User Management</h1>
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card"><h3>Total Users</h3><div class="value" id="totalUsers">0</div></div>
-    <div class="stat-card"><h3>Activated</h3><div class="value" id="activatedUsers">0</div></div>
-    <div class="stat-card"><h3>Inactive</h3><div class="value" id="inactiveUsers">0</div></div>
-    <div class="stat-card"><h3>Activation Wallets</h3><div class="value" id="totalActivationWallet">$0</div></div>
-    <div class="stat-card"><h3>Matching Wallets</h3><div class="value" id="totalMatchingWallet">$0</div></div>
-    <div class="stat-card"><h3>Total Income</h3><div class="value" id="totalIncome">$0</div></div>
+    <div class="stat-card">
+      <h3>Total Users</h3>
+      <div class="value" id="totalUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Activated</h3>
+      <div class="value" id="activatedUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Inactive</h3>
+      <div class="value" id="inactiveUsers">0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Activation Wallets</h3>
+      <div class="value" id="totalActivationWallet">$0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Matching Wallets</h3>
+      <div class="value" id="totalMatchingWallet">$0</div>
+    </div>
+    <div class="stat-card">
+      <h3>Total Income</h3>
+      <div class="value" id="totalIncome">$0</div>
+    </div>
   </div>
 
   <div class="table-container">
@@ -142,14 +434,14 @@
       </table>
     </div>
 
-    <div id="emptyState" class="empty-state">
+    <div id="emptyState" class="empty-state" style="display:none;">
       <i class="fas fa-inbox"></i>
       <p>No users found</p>
     </div>
   </div>
 </div>
 
-<div id="userModal" class="modal">
+<div id="userModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <div class="modal-header">
       <h2>User Details</h2>
@@ -160,11 +452,27 @@
 </div>
 
 <script>
-  // Use a robust API_URL (works on http/https and different hosts)
-  const API_URL = location.protocol + '//' + location.host;
+  // keep using origin — reasonable default (works for typical setups)
+  const API_URL = window.location.origin;
   let allUsers = [];
 
-  // Logout function
+  // utility: show small banner message (non-blocking)
+  function showBanner(msg, includeLogin = false) {
+    const el = document.getElementById('infoBanner');
+    el.innerHTML = msg + (includeLogin ? ` <a id="goLogin">Go to login</a>` : '');
+    el.style.display = 'block';
+    if (includeLogin) {
+      const link = document.getElementById('goLogin');
+      link.addEventListener('click', () => { window.location.href = '/login'; });
+    }
+  }
+  function hideBanner() {
+    const el = document.getElementById('infoBanner');
+    el.style.display = 'none';
+    el.innerHTML = '';
+  }
+
+  // Logout function (same as before)
   function doLogout() {
     console.log("🚪 Logout initiated");
     fetch(`${API_URL}/api/auth/logout`, {
@@ -178,7 +486,7 @@
       sessionStorage.removeItem('username');
       sessionStorage.removeItem('is_admin');
       localStorage.clear();
-      // navigate immediately
+      // immediate navigate to login
       window.location.href = '/login';
     })
     .catch(err => {
@@ -191,25 +499,21 @@
     });
   }
 
-  // Check auth — avoid redirect loop by not redirecting if already on /login
+  // Check auth — DO NOT force redirect. Instead show banner and stop init.
   function checkAuth() {
     try {
       const isAdmin = sessionStorage.getItem('is_admin');
       if (isAdmin !== 'true') {
-        // If current page is already the login page, do not redirect again (prevents loops)
-        if (!window.location.pathname.includes('/login')) {
-          console.warn('Not admin — redirecting to /login');
-          // use replace to avoid creating history entries
-          window.location.replace('/login');
-        } else {
-          console.warn('On /login page already — skipping redirect.');
-        }
+        console.warn('User not authenticated as admin in sessionStorage.');
+        showBanner('You are not authenticated as an admin. Please log in.', true);
         return false;
       }
+      hideBanner();
       document.getElementById('adminName').textContent = sessionStorage.getItem('username') || 'Admin';
       return true;
     } catch (err) {
       console.error('checkAuth error:', err);
+      showBanner('Auth check failed. Open console for details.', true);
       return false;
     }
   }
@@ -222,22 +526,27 @@
         credentials: 'include',
         headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
       });
-      // if unauthorized, server might respond 401 -> handle gracefully
+
+      // If unauthorized, show banner instead of redirecting to avoid loops
       if (response.status === 401 || response.status === 403) {
-        console.warn('Server returned unauthorized for /api/admin/users. Redirecting to login.');
-        window.location.replace('/login');
+        console.warn('Unauthorized (401/403) when fetching users.');
+        showBanner('Session expired or unauthorized. Please log in again.', true);
+        document.getElementById('loading').style.display = 'none';
         return;
       }
-      const data = await response.json();
 
+      const data = await response.json();
       if (data && data.success) {
         allUsers = data.users || [];
         renderTable();
       } else {
-        console.warn('No users or unsuccessful response', data);
+        console.warn('Users API returned unsuccessful response or empty users', data);
+        allUsers = data && data.users ? data.users : [];
+        renderTable();
       }
     } catch (error) {
       console.error('Error loading users:', error);
+      showBanner('Error loading users. Check console for details.');
     } finally {
       document.getElementById('loading').style.display = 'none';
     }
@@ -250,13 +559,14 @@
         credentials: 'include',
         headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
       });
+
       if (response.status === 401 || response.status === 403) {
-        console.warn('Server returned unauthorized for /api/admin/stats. Redirecting to login.');
-        window.location.replace('/login');
+        console.warn('Unauthorized (401/403) when fetching stats.');
+        showBanner('Session expired or unauthorized. Please log in again.', true);
         return;
       }
-      const data = await response.json();
 
+      const data = await response.json();
       if (data && data.success) {
         const stats = data.stats || {};
         document.getElementById('totalUsers').textContent = stats.total_users || 0;
@@ -268,6 +578,7 @@
       }
     } catch (error) {
       console.error('Error loading stats:', error);
+      showBanner('Error loading stats. See console for details.');
     }
   }
 
@@ -288,10 +599,9 @@
     allUsers.forEach(user => {
       const activationStatus = user.activation_status === 'active' ? 'status-active' : 'status-inactive';
       const activationText = user.activation_status === 'active' ? '✅ Active' : '❌ Inactive';
+      const visibleId = (user.user_id || '').substring(0, 12);
 
       const row = document.createElement('tr');
-      // safe substring in case user_id is missing
-      const visibleId = (user.user_id || '').substring(0, 12);
       row.innerHTML = `
         <td><div class="user-id" title="${user.user_id || ''}">${visibleId}${(user.user_id && user.user_id.length > 12) ? '...' : ''}</div></td>
         <td><strong>${user.username || ''}</strong></td>
@@ -319,6 +629,7 @@
       alert('✅ User ID copied!');
     }).catch(err => {
       console.error('Clipboard error', err);
+      alert('Could not copy to clipboard.');
     });
   }
 
@@ -334,12 +645,17 @@
         body: JSON.stringify({ action: 'activate', cost: cost })
       });
 
+      if (response.status === 401 || response.status === 403) {
+        showBanner('Unauthorized. Please log in again.', true);
+        return;
+      }
+
       const data = await response.json();
 
       if (data && data.success) {
         alert(`✅ ${data.message}`);
         // reload users once after success
-        loadUsers();
+        await loadUsers();
       } else {
         alert(`❌ ${data && data.message ? data.message : 'Unknown error'}`);
       }
@@ -371,37 +687,44 @@
       <div class="user-detail"><label>Total Income</label><p class="amount">$${(user.total_income || 0).toFixed(2)}</p></div>
       <div class="user-detail"><label>Direct Members</label><p>${user.directs || 0}</p></div>
       <div class="user-detail"><label>Created At</label><p>${user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</p></div>
-      <div style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
         <button class="btn btn-activate-100" onclick="activateUser('${user.user_id}', 100)">Activate $100</button>
         <button class="btn btn-activate-free" onclick="activateUser('${user.user_id}', 0)">Activate FREE</button>
         <button class="btn btn-view" onclick="closeModal()">Close</button>
       </div>
     `;
     document.getElementById('userModal').classList.add('active');
+    document.getElementById('userModal').setAttribute('aria-hidden', 'false');
   }
 
-  function closeModal() { document.getElementById('userModal').classList.remove('active'); }
+  function closeModal() {
+    document.getElementById('userModal').classList.remove('active');
+    document.getElementById('userModal').setAttribute('aria-hidden', 'true');
+  }
 
   // Filter table
   function filterTable() {
     const searchText = document.getElementById('searchInput').value.toLowerCase();
     const tbody = document.getElementById('tableBody');
     const rows = tbody.getElementsByTagName('tr');
+
     for (let row of rows) {
-      const username = (row.cells[1] && row.cells[1].textContent) ? row.cells[1].textContent.toLowerCase() : '';
+      const username = row.cells[1] && row.cells[1].textContent ? row.cells[1].textContent.toLowerCase() : '';
       row.style.display = username.includes(searchText) ? '' : 'none';
     }
   }
 
   // Initialize - Load data ONCE when page opens
   window.addEventListener('load', function() {
-    console.log('Admin panel load event fired');
+    console.log('✅ Admin panel load event fired');
     const authed = checkAuth();
     if (!authed) {
-      console.log('Not authenticated as admin — stopping initialization.');
+      console.log('Initialization stopped because user is not authenticated as admin.');
       return;
     }
 
+    // if authed === true, hide any banners and run loads
+    hideBanner();
     loadUsers();
     loadStats();
 
